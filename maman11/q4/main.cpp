@@ -11,7 +11,7 @@ int windowHeight = 300;
 
 void init()
 {
-    glClearColor(0.9f, 0.9f, 0.9f, 1.0f); // Light gray background
+    glClearColor(0.9f, 1.0f, 0.9f, 1.0f); // Light green background
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0, windowWidth, 0, windowHeight);
@@ -37,7 +37,6 @@ void reshape(int w, int h)
     glLoadIdentity();
     gluOrtho2D(0, w, 0, h);
     glMatrixMode(GL_MODELVIEW);
-    glutPostRedisplay();
 }
 
 void mouse(int button, int state, int x, int y)
@@ -47,9 +46,14 @@ void mouse(int button, int state, int x, int y)
         // Convert y coordinate to OpenGL coordinate system
         y = windowHeight - y;
 
+        // Get the exit button boundaries
+        const int minX = getExitButtonX(windowWidth, EXIT_BUTTON_WIDTH);
+        const int minY = EXIT_BUTTON_Y;
+        const int maxX = minX + EXIT_BUTTON_WIDTH;
+        const int maxY = minY + EXIT_BUTTON_HEIGHT;
+
         // Check if click is within exit button boundaries
-        if (x >= getExitButtonX(windowWidth, EXIT_BUTTON_WIDTH) && x <= getExitButtonX(windowWidth, EXIT_BUTTON_WIDTH) + EXIT_BUTTON_WIDTH &&
-            y >= EXIT_BUTTON_Y && y <= EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT)
+        if (x >= minX && x <= maxX && y >= minY && y <= maxY)
         {
             exit(0);
         }
