@@ -13,6 +13,9 @@ void handle2DKey(unsigned char key);
 void handle2DSpecial(int key);
 void handle3DKey(unsigned char key);
 void handle3DSpecial(int key);
+void handle3DCameraKey(unsigned char key);
+void handle3DCameraSpecial(int key);
+const char *getCameraModeName();
 
 // State
 enum SceneMode
@@ -68,6 +71,12 @@ void display()
     snprintf(buf, sizeof(buf), "%s", (mode == MODE_2D ? (paused ? "Paused (p to play)" : "Playing (p to pause)") : (paused3D ? "Paused (p to play)" : "Playing (p to pause)")));
     glColor3f(1, 1, 0);
     drawText(10, winHeight - 60, buf);
+    if (mode == MODE_3D)
+    {
+        snprintf(buf, sizeof(buf), "Camera: %s (c to switch)", getCameraModeName());
+        glColor3f(0.5, 1, 1);
+        drawText(10, winHeight - 90, buf);
+    }
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
@@ -100,7 +109,10 @@ void keyboard(unsigned char key, int x, int y)
     if (mode == MODE_2D)
         handle2DKey(key);
     else
+    {
         handle3DKey(key);
+        handle3DCameraKey(key);
+    }
 }
 
 void special(int key, int x, int y)
@@ -108,7 +120,10 @@ void special(int key, int x, int y)
     if (mode == MODE_2D)
         handle2DSpecial(key);
     else
+    {
         handle3DSpecial(key);
+        handle3DCameraSpecial(key);
+    }
 }
 
 int main(int argc, char **argv)
