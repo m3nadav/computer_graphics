@@ -1,0 +1,219 @@
+#define GL_SILENCE_DEPRECATION // Silence deprecation warnings on macOS
+#include "cow/cow.h"
+#include "cow/spots.h"
+#include "shapes/shapes.h"
+#include <GLUT/glut.h>
+#include <cmath>
+
+// Window dimensions
+static int WINDOW_WIDTH = 1200; // Increased window size
+static int WINDOW_HEIGHT = 900;
+
+// Draw a grid for better spatial orientation
+void drawGrid(float size, float step)
+{
+    glDisable(GL_LIGHTING);
+    glBegin(GL_LINES);
+    glColor3f(0.3f, 0.3f, 0.3f);
+    for (float i = -size; i <= size; i += step)
+    {
+        // Draw lines parallel to X axis
+        glVertex3f(-size, 0, i);
+        glVertex3f(size, 0, i);
+        // Draw lines parallel to Z axis
+        glVertex3f(i, 0, -size);
+        glVertex3f(i, 0, size);
+    }
+    glEnd();
+    glEnable(GL_LIGHTING);
+}
+
+// Function to set up the camera for each viewport
+void setupViewport(int index, int total)
+{
+    int cols = 2; // We'll use a 2x2 grid
+    int rows = (total + 1) / 2;
+
+    int width = WINDOW_WIDTH / cols;
+    int height = WINDOW_HEIGHT / rows;
+
+    int row = index / cols;
+    int col = index % cols;
+
+    glViewport(col * width, (rows - 1 - row) * height, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, (float)width / height, 0.1, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
+// Set up material properties
+void setMaterial(float r, float g, float b)
+{
+    GLfloat mat_ambient[] = {r * 0.2f, g * 0.2f, b * 0.2f, 1.0f};
+    GLfloat mat_diffuse[] = {r, g, b, 1.0f};
+    GLfloat mat_specular[] = {0.8f, 0.8f, 0.8f, 1.0f};
+    GLfloat mat_shininess[] = {50.0f};
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+}
+
+// Test scene 1: Basic spot
+void drawTestSpot()
+{
+    glLoadIdentity();
+    gluLookAt(2, 2, 2, // Moved camera back and up for better view
+              0, 0, 0,
+              0, 1, 0);
+
+    drawGrid(2.0f, 0.5f); // Add grid
+
+    // Draw coordinate axes for reference
+    glDisable(GL_LIGHTING);
+    glBegin(GL_LINES);
+    glColor3f(1, 0, 0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(2, 0, 0); // X axis
+    glColor3f(0, 1, 0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, 2, 0); // Y axis
+    glColor3f(0, 0, 1);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, 0, 2); // Z axis
+    glEnd();
+    glEnable(GL_LIGHTING);
+
+    // Draw a single spot
+    setMaterial(0.1f, 0.1f, 0.1f); // Black with material properties
+    drawSpot(0.0f, 0.0f, 0.0f, 0.2f, 0.2f, 0.2f);
+}
+
+// Test scene 2: Projected spot on ellipsoid
+void drawTestProjectedSpot()
+{
+    glLoadIdentity();
+    gluLookAt(2, 2, 2, // Adjusted camera position
+              0, 0, 0,
+              0, 1, 0);
+
+    drawGrid(2.0f, 0.5f); // Add grid
+
+    // Draw a single projected spot on an ellipsoid surface
+    float a = 1.0f, b = 0.8f, c = 0.6f;
+    setMaterial(0.1f, 0.1f, 0.1f); // Black with material properties
+    drawProjectedSpot(a, b, c, 0.2f, M_PI / 4, M_PI / 4, 24,
+                      [](float x, float y, float z, float &wx, float &wy, float &wz)
+                      {
+                          wx = x;
+                          wy = y;
+                          wz = z;
+                      });
+}
+
+// Test scene 3: Complete cow
+void drawTestCow()
+{
+    glLoadIdentity();
+    gluLookAt(4, 3, 4, // Moved camera further back for better view
+              0, 0, 0,
+              0, 1, 0);
+
+    drawGrid(3.0f, 0.5f); // Add grid
+    drawCow();
+}
+
+// Test scene 4: Cow head close-up
+void drawTestCowHead()
+{
+    glLoadIdentity();
+    gluLookAt(2.5, 0.5, 0, // Adjusted for better head view
+              0, 0, 0,
+              0, 1, 0);
+
+    drawGrid(2.0f, 0.5f); // Add grid
+    glPushMatrix();
+    glRotatef(90, 0, 1, 0); // Rotate to see the head better
+    drawCow();
+    glPopMatrix();
+}
+
+void display()
+{
+    glClearColor(0.9f, 0.9f, 0.9f, 1.0f); // Light gray background
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Test Scene 1: Basic Spot
+    setupViewport(0, 4);
+    drawTestSpot();
+
+    // Test Scene 2: Projected Spot
+    setupViewport(1, 4);
+    drawTestProjectedSpot();
+
+    // Test Scene 3: Complete Cow
+    setupViewport(2, 4);
+    drawTestCow();
+
+    // Test Scene 4: Cow Head Close-up
+    setupViewport(3, 4);
+    drawTestCowHead();
+
+    glutSwapBuffers();
+}
+
+void reshape(int w, int h)
+{
+    WINDOW_WIDTH = w;
+    WINDOW_HEIGHT = h;
+}
+
+void keyboard(unsigned char key, int x, int y)
+{
+    switch (key)
+    {
+    case 27: // ESC key
+        exit(0);
+        break;
+    }
+}
+
+void init()
+{
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_NORMALIZE); // Add normalization for better lighting
+
+    // Set up light
+    GLfloat light_position[] = {5.0f, 5.0f, 5.0f, 1.0f}; // Adjusted light position
+    GLfloat light_ambient[] = {0.3f, 0.3f, 0.3f, 1.0f};  // Increased ambient light
+    GLfloat light_diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat light_specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+}
+
+int main(int argc, char **argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    glutCreateWindow("Cow Components Test - Press ESC to exit");
+
+    init();
+
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
+    glutMainLoop();
+
+    return 0;
+}
