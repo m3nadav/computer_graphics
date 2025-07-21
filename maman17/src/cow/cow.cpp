@@ -1,5 +1,6 @@
 #define GL_SILENCE_DEPRECATION // Silence deprecation warnings on macOS
 #include "cow/cow.h"
+#include "cow/body.h"
 #include "cow/spots.h"
 #include "shapes/shapes.h"
 #include <GLUT/glut.h>

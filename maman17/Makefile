@@ -5,19 +5,24 @@ LDFLAGS = -framework OpenGL -framework GLUT
 # Cow test
 COW_SRCS = src/cow/cow_test.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/spots.cpp src/shapes/shapes.cpp
 COW_OBJS = $(COW_SRCS:.cpp=.o)
-COW_TARGET = cow_test.app
+COW_TARGET = cow_test
 
 # Shapes test
 SHAPES_SRCS = src/shapes/shapes_test.cpp src/shapes/shapes.cpp
 SHAPES_OBJS = $(SHAPES_SRCS:.cpp=.o)
-SHAPES_TARGET = shapes_test.app
+SHAPES_TARGET = shapes_test
 
 # Spots test
 SPOTS_SRCS = src/cow/spots_test.cpp src/cow/spots.cpp src/shapes/shapes.cpp
 SPOTS_OBJS = $(SPOTS_SRCS:.cpp=.o)
-SPOTS_TARGET = spots_test.app
+SPOTS_TARGET = spots_test
 
-all: $(COW_TARGET) $(SHAPES_TARGET) $(SPOTS_TARGET)
+# Visual test
+VISUAL_SRCS = src/visual_test.cpp src/cow/spots.cpp src/cow/body.cpp src/cow/cow.cpp src/shapes/shapes.cpp
+VISUAL_OBJS = $(VISUAL_SRCS:.cpp=.o)
+VISUAL_TARGET = visual_test
+
+all: $(COW_TARGET) $(SHAPES_TARGET) $(SPOTS_TARGET) $(VISUAL_TARGET)
 
 $(COW_TARGET): $(COW_OBJS)
 	$(CXX) $(COW_OBJS) -o $(COW_TARGET) $(LDFLAGS)
@@ -27,6 +32,9 @@ $(SHAPES_TARGET): $(SHAPES_OBJS)
 
 $(SPOTS_TARGET): $(SPOTS_OBJS)
 	$(CXX) $(SPOTS_OBJS) -o $(SPOTS_TARGET) $(LDFLAGS)
+
+$(VISUAL_TARGET): $(VISUAL_SRCS)
+	$(CXX) $(CXXFLAGS) $(VISUAL_SRCS) -o $(VISUAL_TARGET) $(LDFLAGS)
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -44,10 +52,15 @@ test-spots: $(SPOTS_TARGET)
 	@echo "Running spots test..."
 	./$(SPOTS_TARGET)
 
+test-visual: $(VISUAL_TARGET)
+	@echo "Running visual test..."
+	./$(VISUAL_TARGET)
+
+
 # Run all tests
 test: test-cow test-shapes test-spots
 
 clean:
-	rm -f $(COW_OBJS) $(SHAPES_OBJS) $(SPOTS_OBJS) $(COW_TARGET) $(SHAPES_TARGET) $(SPOTS_TARGET)
+	rm -f $(COW_OBJS) $(SHAPES_OBJS) $(SPOTS_OBJS) $(COW_TARGET) $(SHAPES_TARGET) $(SPOTS_TARGET) $(VISUAL_OBJS) $(VISUAL_TARGET)
 
-.PHONY: clean all test test-cow test-shapes test-spots 
+.PHONY: clean all test test-cow test-shapes test-spots test-visual test-visual-working 
