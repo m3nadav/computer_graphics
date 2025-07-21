@@ -9,12 +9,27 @@
 #include "cow/body.h"
 #include "cow/cow.h"
 
+// Camera control variables
+static float cameraDistance = 3.0f;
+static float cameraAngleX = 45.0f;
+static float cameraAngleY = 45.0f;
+static bool rightMouseDown = false;
+static int lastMouseX = 0;
+static int lastMouseY = 0;
+
 // Test 1: Simple GLUT test
 void testSimpleGLUT()
 {
     std::cout << "[DEBUG] testSimpleGLUT() called" << std::endl;
     std::cout.flush();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+
+    // Calculate camera position based on angles
+    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
+    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
+
     // Just draw a simple colored quad
     glBegin(GL_QUADS);
     glColor3f(1.0, 0.0, 0.0); // Red
@@ -30,7 +45,13 @@ void testDrawSpot()
 {
     std::cout << "[DEBUG] testDrawSpot() called" << std::endl;
     std::cout.flush();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+
+    // Calculate camera position based on angles
+    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
+    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
     drawSpot(0, 0, 0, 0.3, 0.3, 0.3);
 }
 
@@ -39,7 +60,13 @@ void testDrawBody()
 {
     std::cout << "[DEBUG] testDrawBody() called" << std::endl;
     std::cout.flush();
-    gluLookAt(3, 2, 2, 0, 0, 0, 0, 1, 0);
+
+    // Calculate camera position based on angles
+    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
+    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
     drawBody();
 }
 
@@ -48,7 +75,13 @@ void testDrawCow()
 {
     std::cout << "[DEBUG] testDrawCow() called" << std::endl;
     std::cout.flush();
-    gluLookAt(3, 2, 2, 0, 0, 0, 0, 1, 0);
+
+    // Calculate camera position based on angles
+    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
+    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
     drawCow();
 }
 
@@ -86,6 +119,47 @@ void keyboard(unsigned char key, int, int)
     }
 }
 
+void mouse(int button, int state, int x, int y)
+{
+    if (button == GLUT_RIGHT_BUTTON)
+    {
+        if (state == GLUT_DOWN)
+        {
+            rightMouseDown = true;
+            lastMouseX = x;
+            lastMouseY = y;
+        }
+        else if (state == GLUT_UP)
+        {
+            rightMouseDown = false;
+        }
+    }
+}
+
+void motion(int x, int y)
+{
+    if (rightMouseDown)
+    {
+        int deltaX = x - lastMouseX;
+        int deltaY = y - lastMouseY;
+
+        // Update camera angles based on mouse movement
+        cameraAngleY += deltaX * 0.5f; // Horizontal rotation
+        cameraAngleX += deltaY * 0.5f; // Vertical rotation
+
+        // Clamp vertical angle to prevent flipping
+        if (cameraAngleX > 89.0f)
+            cameraAngleX = 89.0f;
+        if (cameraAngleX < -89.0f)
+            cameraAngleX = -89.0f;
+
+        lastMouseX = x;
+        lastMouseY = y;
+
+        glutPostRedisplay();
+    }
+}
+
 void reshape(int w, int h)
 {
     std::cout << "[DEBUG] reshape() called, w=" << w << ", h=" << h << std::endl;
@@ -111,11 +185,14 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
 
     std::cout << "Visual Test Harness - New Version\n";
     for (size_t i = 0; i < tests.size(); ++i)
         std::cout << (i + 1) << ": " << tests[i].first << std::endl;
     std::cout << "Press number key to switch test, ESC to exit.\n";
+    std::cout << "Right-click and drag to rotate camera.\n";
     std::cout.flush();
 
     glutMainLoop();

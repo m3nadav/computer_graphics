@@ -9,6 +9,14 @@
 static int WINDOW_WIDTH = 1200; // Increased window size
 static int WINDOW_HEIGHT = 900;
 
+// Camera control variables
+static float cameraDistance = 4.0f;
+static float cameraAngleX = 45.0f;
+static float cameraAngleY = 45.0f;
+static bool rightMouseDown = false;
+static int lastMouseX = 0;
+static int lastMouseY = 0;
+
 // Draw a grid for better spatial orientation
 void drawGrid(float size, float step)
 {
@@ -66,9 +74,13 @@ void setMaterial(float r, float g, float b)
 void drawTestSpot()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, // Moved camera back and up for better view
-              0, 0, 0,
-              0, 1, 0);
+
+    // Calculate camera position based on angles
+    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
+    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f); // Add grid
 
@@ -96,9 +108,13 @@ void drawTestSpot()
 void drawTestProjectedSpot()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, // Adjusted camera position
-              0, 0, 0,
-              0, 1, 0);
+
+    // Calculate camera position based on angles
+    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
+    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f); // Add grid
 
@@ -118,9 +134,13 @@ void drawTestProjectedSpot()
 void drawTestCow()
 {
     glLoadIdentity();
-    gluLookAt(4, 3, 4, // Moved camera further back for better view
-              0, 0, 0,
-              0, 1, 0);
+
+    // Calculate camera position based on angles
+    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
+    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(3.0f, 0.5f); // Add grid
     drawCow();
@@ -130,9 +150,13 @@ void drawTestCow()
 void drawTestCowHead()
 {
     glLoadIdentity();
-    gluLookAt(2.5, 0.5, 0, // Adjusted for better head view
-              0, 0, 0,
-              0, 1, 0);
+
+    // Calculate camera position based on angles
+    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
+    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f); // Add grid
     glPushMatrix();
@@ -181,6 +205,47 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
+void mouse(int button, int state, int x, int y)
+{
+    if (button == GLUT_RIGHT_BUTTON)
+    {
+        if (state == GLUT_DOWN)
+        {
+            rightMouseDown = true;
+            lastMouseX = x;
+            lastMouseY = y;
+        }
+        else if (state == GLUT_UP)
+        {
+            rightMouseDown = false;
+        }
+    }
+}
+
+void motion(int x, int y)
+{
+    if (rightMouseDown)
+    {
+        int deltaX = x - lastMouseX;
+        int deltaY = y - lastMouseY;
+
+        // Update camera angles based on mouse movement
+        cameraAngleY += deltaX * 0.5f; // Horizontal rotation
+        cameraAngleX += deltaY * 0.5f; // Vertical rotation
+
+        // Clamp vertical angle to prevent flipping
+        if (cameraAngleX > 89.0f)
+            cameraAngleX = 89.0f;
+        if (cameraAngleX < -89.0f)
+            cameraAngleX = -89.0f;
+
+        lastMouseX = x;
+        lastMouseY = y;
+
+        glutPostRedisplay();
+    }
+}
+
 void init()
 {
     glEnable(GL_DEPTH_TEST);
@@ -206,13 +271,15 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutCreateWindow("Cow Components Test - Press ESC to exit");
+    glutCreateWindow("Cow Components Test - Press ESC to exit, Right-click to rotate camera");
 
     init();
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
     glutMainLoop();
 
     return 0;
