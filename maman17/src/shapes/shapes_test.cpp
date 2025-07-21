@@ -2,17 +2,34 @@
 #include "shapes/shapes.h"
 #include <GLUT/glut.h>
 #include <cmath>
+#include <tuple>
 
 // Window dimensions
 static int WINDOW_WIDTH = 1200;
 static int WINDOW_HEIGHT = 900;
 
+// Camera control variables
+static float cameraDistance = 5.0f;
+static float cameraAngleX = 35.0f;
+static float cameraAngleY = 55.0f;
+static bool rightMouseDown = false;
+static int lastMouseX = 0;
+static int lastMouseY = 0;
+
 // Draw a grid for better spatial orientation
 void drawGrid(float size, float step)
 {
+    // Save current OpenGL state
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+    // Disable lighting and depth testing for grid
     glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+
+    // Use a lighter color for better visibility
+    glColor3f(0.6f, 0.6f, 0.6f);
+
     glBegin(GL_LINES);
-    glColor3f(0.3f, 0.3f, 0.3f);
     for (float i = -size; i <= size; i += step)
     {
         // Draw lines parallel to X axis
@@ -23,7 +40,19 @@ void drawGrid(float size, float step)
         glVertex3f(i, 0, size);
     }
     glEnd();
-    glEnable(GL_LIGHTING);
+
+    // Restore OpenGL state
+    glPopAttrib();
+}
+
+// Calculate camera position based on angles
+std::tuple<float, float, float> calculateCoordinates()
+{
+    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
+    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+
+    return std::make_tuple(x, y, z);
 }
 
 // Function to set up the camera for each viewport
@@ -64,7 +93,8 @@ void setMaterial(float r, float g, float b)
 void drawTestSphere()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+    auto [x, y, z] = calculateCoordinates();
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
 
@@ -91,7 +121,8 @@ void drawTestSphere()
 void drawTestEllipsoidSpherical()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+    auto [x, y, z] = calculateCoordinates();
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
 
@@ -103,7 +134,8 @@ void drawTestEllipsoidSpherical()
 void drawTestEllipsoidElongated()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+    auto [x, y, z] = calculateCoordinates();
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
 
@@ -115,7 +147,8 @@ void drawTestEllipsoidElongated()
 void drawTestEllipsoidFlattened()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+    auto [x, y, z] = calculateCoordinates();
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
 
@@ -127,7 +160,8 @@ void drawTestEllipsoidFlattened()
 void drawTestCylinderStandard()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+    auto [x, y, z] = calculateCoordinates();
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
 
@@ -139,7 +173,8 @@ void drawTestCylinderStandard()
 void drawTestCylinderCone()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+    auto [x, y, z] = calculateCoordinates();
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
 
@@ -151,7 +186,8 @@ void drawTestCylinderCone()
 void drawTestCylinderWide()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+    auto [x, y, z] = calculateCoordinates();
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
 
@@ -163,7 +199,8 @@ void drawTestCylinderWide()
 void drawTestRotatedShapes()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+    auto [x, y, z] = calculateCoordinates();
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
 
@@ -187,7 +224,8 @@ void drawTestRotatedShapes()
 void drawTestScaledShapes()
 {
     glLoadIdentity();
-    gluLookAt(2, 2, 2, 0, 0, 0, 0, 1, 0);
+    auto [x, y, z] = calculateCoordinates();
+    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
 
@@ -265,6 +303,61 @@ void keyboard(unsigned char key, int x, int y)
     case 27: // ESC key
         exit(0);
         break;
+    case '+': // Zoom in
+    case '=':
+        cameraDistance -= 0.5f;
+        if (cameraDistance < 1.0f)
+            cameraDistance = 1.0f;
+        glutPostRedisplay();
+        break;
+    case '-': // Zoom out
+    case '_':
+        cameraDistance += 0.5f;
+        if (cameraDistance > 20.0f)
+            cameraDistance = 20.0f;
+        glutPostRedisplay();
+        break;
+    }
+}
+
+void mouse(int button, int state, int x, int y)
+{
+    if (button == GLUT_RIGHT_BUTTON)
+    {
+        if (state == GLUT_DOWN)
+        {
+            rightMouseDown = true;
+            lastMouseX = x;
+            lastMouseY = y;
+        }
+        else if (state == GLUT_UP)
+        {
+            rightMouseDown = false;
+        }
+    }
+}
+
+void motion(int x, int y)
+{
+    if (rightMouseDown)
+    {
+        int deltaX = x - lastMouseX;
+        int deltaY = y - lastMouseY;
+
+        // Update camera angles based on mouse movement
+        cameraAngleY += deltaX * 0.5f; // Horizontal rotation
+        cameraAngleX += deltaY * 0.5f; // Vertical rotation
+
+        // Clamp vertical angle to prevent flipping
+        if (cameraAngleX > 89.0f)
+            cameraAngleX = 89.0f;
+        if (cameraAngleX < -89.0f)
+            cameraAngleX = -89.0f;
+
+        lastMouseX = x;
+        lastMouseY = y;
+
+        glutPostRedisplay();
     }
 }
 
@@ -293,13 +386,15 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutCreateWindow("Shapes Test - Basic Geometric Primitives - Press ESC to exit");
+    glutCreateWindow("Shapes Test - Right-click to rotate camera, +/- to zoom - Press ESC to exit");
 
     init();
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
     glutMainLoop();
 
     return 0;
