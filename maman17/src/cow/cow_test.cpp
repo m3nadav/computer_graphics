@@ -4,25 +4,39 @@
 #include "shapes/shapes.h"
 #include <GLUT/glut.h>
 #include <cmath>
+#include <iostream> // Added for debugging output
 
 // Window dimensions
 static int WINDOW_WIDTH = 1200; // Increased window size
 static int WINDOW_HEIGHT = 900;
 
 // Camera control variables
-static float cameraDistance = 6.0f;
+static float cameraDistance = 4.0f;
 static float cameraAngleX = 45.0f;
-static float cameraAngleY = 45.0f;
+static float cameraAngleY = 105.0f;
 static bool rightMouseDown = false;
 static int lastMouseX = 0;
 static int lastMouseY = 0;
 
+// Calculate camera position based on angles
+float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
+float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+
 // Draw a grid for better spatial orientation
 void drawGrid(float size, float step)
 {
+    // Save current OpenGL state
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+    // Disable lighting and depth testing for grid
     glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+
+    // Use a lighter color for better visibility
+    glColor3f(0.6f, 0.6f, 0.6f);
+
     glBegin(GL_LINES);
-    glColor3f(0.3f, 0.3f, 0.3f);
     for (float i = -size; i <= size; i += step)
     {
         // Draw lines parallel to X axis
@@ -33,7 +47,9 @@ void drawGrid(float size, float step)
         glVertex3f(i, 0, size);
     }
     glEnd();
-    glEnable(GL_LIGHTING);
+
+    // Restore OpenGL state
+    glPopAttrib();
 }
 
 // Function to set up the camera for each viewport
@@ -75,11 +91,6 @@ void drawTestCow()
 {
     glLoadIdentity();
 
-    // Calculate camera position based on angles
-    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
-    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
-    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
-
     gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(3.0f, 0.5f); // Add grid
@@ -90,11 +101,6 @@ void drawTestCow()
 void drawTestCowHead()
 {
     glLoadIdentity();
-
-    // Calculate camera position based on angles
-    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
-    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
-    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
 
     gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
@@ -134,6 +140,20 @@ void keyboard(unsigned char key, int x, int y)
     case 27: // ESC key
         exit(0);
         break;
+    case '+': // Zoom in
+    case '=':
+        cameraDistance -= 0.5f;
+        if (cameraDistance < 1.0f)
+            cameraDistance = 1.0f;
+        glutPostRedisplay();
+        break;
+    case '-': // Zoom out
+    case '_':
+        cameraDistance += 0.5f;
+        if (cameraDistance > 20.0f)
+            cameraDistance = 20.0f;
+        glutPostRedisplay();
+        break;
     }
 }
 
@@ -164,6 +184,7 @@ void motion(int x, int y)
         // Update camera angles based on mouse movement
         cameraAngleY += deltaX * 0.5f; // Horizontal rotation
         cameraAngleX += deltaY * 0.5f; // Vertical rotation
+        std::cout << "cameraAngleX: " << cameraAngleX << ", cameraAngleY: " << cameraAngleY << std::endl;
 
         // Clamp vertical angle to prevent flipping
         if (cameraAngleX > 89.0f)
@@ -203,7 +224,7 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutCreateWindow("Cow Components Test - Press ESC to exit, Right-click to rotate camera");
+    glutCreateWindow("Cow Components Test - Press ESC to exit, Right-click to rotate camera, Mouse wheel or +/- to zoom");
 
     init();
 

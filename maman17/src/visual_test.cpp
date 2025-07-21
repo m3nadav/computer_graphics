@@ -10,84 +10,77 @@
 #include "cow/cow.h"
 
 // Camera control variables
-static float cameraDistance = 3.0f;
-static float cameraAngleX = 45.0f;
-static float cameraAngleY = 45.0f;
+static float cameraDistance = 5.0f;
+static float cameraAngleX = 35.0f;
+static float cameraAngleY = 55.0f;
 static bool rightMouseDown = false;
 static int lastMouseX = 0;
 static int lastMouseY = 0;
 
-// Test 1: Simple GLUT test
-void testSimpleGLUT()
+void drawGrid(float size, float step)
 {
-    std::cout << "[DEBUG] testSimpleGLUT() called" << std::endl;
-    std::cout.flush();
+    // Save current OpenGL state
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-    // Calculate camera position based on angles
-    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
-    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
-    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    // Disable lighting and depth testing for grid
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
 
-    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
+    // Use a lighter color for better visibility
+    glColor3f(0.6f, 0.6f, 0.6f);
 
-    // Just draw a simple colored quad
-    glBegin(GL_QUADS);
-    glColor3f(1.0, 0.0, 0.0); // Red
-    glVertex3f(-0.5, -0.5, 0);
-    glVertex3f(0.5, -0.5, 0);
-    glVertex3f(0.5, 0.5, 0);
-    glVertex3f(-0.5, 0.5, 0);
+    glBegin(GL_LINES);
+    for (float i = -size; i <= size; i += step)
+    {
+        // Draw lines parallel to X axis
+        glVertex3f(-size, 0, i);
+        glVertex3f(size, 0, i);
+        // Draw lines parallel to Z axis
+        glVertex3f(i, 0, -size);
+        glVertex3f(i, 0, size);
+    }
     glEnd();
+
+    // Restore OpenGL state
+    glPopAttrib();
 }
 
-// Test 2: drawSpot test
-void testDrawSpot()
+std::tuple<float, float, float> calculateCoordinates()
 {
-    std::cout << "[DEBUG] testDrawSpot() called" << std::endl;
-    std::cout.flush();
-
-    // Calculate camera position based on angles
     float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
     float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
     float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
 
-    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
-    drawSpot(0, 0, 0, 0.3, 0.3, 0.3);
+    return std::make_tuple(x, y, z);
 }
 
-// Test 3: drawBody test
+// Test 2: drawBody test
 void testDrawBody()
 {
     std::cout << "[DEBUG] testDrawBody() called" << std::endl;
     std::cout.flush();
 
-    // Calculate camera position based on angles
-    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
-    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
-    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    auto [x, y, z] = calculateCoordinates();
 
     gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
+    drawGrid(3.0f, 0.5f); // Add grid
     drawBody();
 }
 
-// Test 4: drawCow test
+// Test 3: drawCow test
 void testDrawCow()
 {
     std::cout << "[DEBUG] testDrawCow() called" << std::endl;
     std::cout.flush();
 
-    // Calculate camera position based on angles
-    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
-    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
-    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
+    auto [x, y, z] = calculateCoordinates();
 
     gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
+    drawGrid(3.0f, 0.5f); // Add grid
     drawCow();
 }
 
 std::vector<std::pair<std::string, std::function<void()>>> tests = {
-    {"Simple GLUT Test", testSimpleGLUT},
-    {"Draw Spot Test", testDrawSpot},
     {"Draw Body Test", testDrawBody},
     {"Draw Cow Test", testDrawCow},
 };
@@ -117,6 +110,36 @@ void keyboard(unsigned char key, int, int)
         std::cout.flush();
         glutPostRedisplay();
     }
+    else if (key == '+' || key == '=') // Zoom in
+    {
+        cameraDistance -= 0.5f;
+        if (cameraDistance < 1.0f)
+            cameraDistance = 1.0f;
+        glutPostRedisplay();
+    }
+    else if (key == '-' || key == '_') // Zoom out
+    {
+        cameraDistance += 0.5f;
+        if (cameraDistance > 20.0f)
+            cameraDistance = 20.0f;
+        glutPostRedisplay();
+    }
+}
+
+void zoomIn()
+{
+    cameraDistance -= 0.5f;
+    if (cameraDistance < 1.0f)
+        cameraDistance = 1.0f;
+    glutPostRedisplay();
+}
+
+void zoomOut()
+{
+    cameraDistance += 0.5f;
+    if (cameraDistance > 20.0f)
+        cameraDistance = 20.0f;
+    glutPostRedisplay();
 }
 
 void mouse(int button, int state, int x, int y)
@@ -146,6 +169,7 @@ void motion(int x, int y)
         // Update camera angles based on mouse movement
         cameraAngleY += deltaX * 0.5f; // Horizontal rotation
         cameraAngleX += deltaY * 0.5f; // Vertical rotation
+        std::cout << "cameraAngleX: " << cameraAngleX << ", cameraAngleY: " << cameraAngleY << std::endl;
 
         // Clamp vertical angle to prevent flipping
         if (cameraAngleX > 89.0f)
@@ -178,7 +202,7 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(900, 700);
-    glutCreateWindow("Visual Test Harness - New");
+    glutCreateWindow("Visual Test Harness - Right-click to rotate, Mouse wheel or +/- to zoom");
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.8, 0.8, 0.8, 1.0);
 
@@ -193,6 +217,7 @@ int main(int argc, char **argv)
         std::cout << (i + 1) << ": " << tests[i].first << std::endl;
     std::cout << "Press number key to switch test, ESC to exit.\n";
     std::cout << "Right-click and drag to rotate camera.\n";
+    std::cout << "Mouse wheel or press +/- to zoom in/out.\n";
     std::cout.flush();
 
     glutMainLoop();
