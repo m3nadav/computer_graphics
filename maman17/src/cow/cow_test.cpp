@@ -10,7 +10,7 @@ static int WINDOW_WIDTH = 1200; // Increased window size
 static int WINDOW_HEIGHT = 900;
 
 // Camera control variables
-static float cameraDistance = 4.0f;
+static float cameraDistance = 6.0f;
 static float cameraAngleX = 45.0f;
 static float cameraAngleY = 45.0f;
 static bool rightMouseDown = false;
@@ -70,66 +70,6 @@ void setMaterial(float r, float g, float b)
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 }
 
-// Test scene 1: Basic spot
-void drawTestSpot()
-{
-    glLoadIdentity();
-
-    // Calculate camera position based on angles
-    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
-    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
-    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
-
-    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
-
-    drawGrid(2.0f, 0.5f); // Add grid
-
-    // Draw coordinate axes for reference
-    glDisable(GL_LIGHTING);
-    glBegin(GL_LINES);
-    glColor3f(1, 0, 0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(2, 0, 0); // X axis
-    glColor3f(0, 1, 0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(0, 2, 0); // Y axis
-    glColor3f(0, 0, 1);
-    glVertex3f(0, 0, 0);
-    glVertex3f(0, 0, 2); // Z axis
-    glEnd();
-    glEnable(GL_LIGHTING);
-
-    // Draw a single spot
-    setMaterial(0.1f, 0.1f, 0.1f); // Black with material properties
-    drawSpot(0.0f, 0.0f, 0.0f, 0.2f, 0.2f, 0.2f);
-}
-
-// Test scene 2: Projected spot on ellipsoid
-void drawTestProjectedSpot()
-{
-    glLoadIdentity();
-
-    // Calculate camera position based on angles
-    float x = cameraDistance * cos(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
-    float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
-    float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
-
-    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
-
-    drawGrid(2.0f, 0.5f); // Add grid
-
-    // Draw a single projected spot on an ellipsoid surface
-    float a = 1.0f, b = 0.8f, c = 0.6f;
-    setMaterial(0.1f, 0.1f, 0.1f); // Black with material properties
-    drawProjectedSpot(a, b, c, 0.2f, M_PI / 4, M_PI / 4, 24,
-                      [](float x, float y, float z, float &wx, float &wy, float &wz)
-                      {
-                          wx = x;
-                          wy = y;
-                          wz = z;
-                      });
-}
-
 // Test scene 3: Complete cow
 void drawTestCow()
 {
@@ -170,20 +110,12 @@ void display()
     glClearColor(0.9f, 0.9f, 0.9f, 1.0f); // Light gray background
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Test Scene 1: Basic Spot
-    setupViewport(0, 4);
-    drawTestSpot();
-
-    // Test Scene 2: Projected Spot
-    setupViewport(1, 4);
-    drawTestProjectedSpot();
-
-    // Test Scene 3: Complete Cow
-    setupViewport(2, 4);
+    // Test Scene 1: Complete Cow
+    setupViewport(0, 2);
     drawTestCow();
 
-    // Test Scene 4: Cow Head Close-up
-    setupViewport(3, 4);
+    // Test Scene 2: Cow Head Close-up
+    setupViewport(1, 2);
     drawTestCowHead();
 
     glutSwapBuffers();
