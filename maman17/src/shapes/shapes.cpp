@@ -61,10 +61,10 @@ unsigned int loadTexture(const char *filename)
             float y = (float)j / texSize;
 
             // Create spots at various positions
-            if ((x - 0.2f) * (x - 0.2f) + (y - 0.3f) * (y - 0.3f) < 0.05f ||
-                (x - 0.7f) * (x - 0.7f) + (y - 0.6f) * (y - 0.6f) < 0.08f ||
-                (x - 0.4f) * (x - 0.4f) + (y - 0.8f) * (y - 0.8f) < 0.06f ||
-                (x - 0.8f) * (x - 0.8f) + (y - 0.2f) * (y - 0.2f) < 0.04f)
+            if ((x - 0.3f) * (x - 0.3f) + (y - 0.5f) * (y - 0.3f) < 0.005f ||
+                (x - 0.7f) * (x - 0.7f) + (y - 0.8f) * (y - 0.8f) < 0.005f ||
+                (x - 0.4f) * (x - 0.4f) + (y - 0.8f) * (y - 0.8f) < 0.005f ||
+                (x - 0.8f) * (x - 0.8f) + (y - 0.2f) * (y - 0.2f) < 0.005f)
             {
                 texture[i][j][0] = 0;
                 texture[i][j][1] = 0;
