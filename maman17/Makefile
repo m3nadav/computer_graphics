@@ -7,7 +7,7 @@ SHAPES_SRCS = src/shapes/shapes_test.cpp src/shapes/shapes.cpp
 SHAPES_TARGET = shapes_test
 
 # Visual test
-VISUAL_SRCS = src/visual_test.cpp src/cow/spots.cpp src/cow/body.cpp src/cow/cow.cpp src/shapes/shapes.cpp
+VISUAL_SRCS = src/visual_test.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/head.cpp src/shapes/shapes.cpp
 VISUAL_TARGET = visual_test
 
 all: $(SHAPES_TARGET) $(VISUAL_TARGET)
