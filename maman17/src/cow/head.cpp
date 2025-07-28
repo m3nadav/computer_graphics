@@ -75,12 +75,36 @@ void drawHeadHorns()
     for (int s = -1; s <= 1; s += 2)
     {
         glPushMatrix();
-        // Position horns on top of head, slightly back
-        glTranslatef(-0.05f, 0.28f, 0.15f * s);
-        glRotatef(30 * s, 0, 0, 1);
-        // glRotatef(-30, 0, 1, 0);
+        // Position horns on top of head where ears used to be
+        glTranslatef(-0.05f, 0.30f, 0.15f * s);
         glColor3f(0.9f, 0.9f, 0.7f);
-        drawCylinder(0.015, 0.01, 0.11);
+        
+        // Create curved horn using multiple segments
+        int segments = 6;
+        float segmentHeight = 0.018f;
+        float baseRadius = 0.02f;
+        
+        for (int i = 0; i < segments; i++)
+        {
+            glPushMatrix();
+            
+            // Calculate position and rotation for curved effect
+            float t = (float)i / (segments - 1);
+            float curveAngle = t * 25.0f * s; // Curve outward, mirrored
+            float yOffset = i * segmentHeight;
+            float radius = baseRadius * (1.0f - t * 0.6f); // Taper to point
+            
+            // Apply curve transformation
+            glTranslatef(0.0f, yOffset, 0.0f);
+            glRotatef(curveAngle, 1, 0, 0); // Curve forward and outward
+            glRotatef(15 * s, 0, 0, 1); // Slight outward angle
+            
+            // Draw horn segment as tapered cylinder
+            drawCylinder(radius, radius * 0.8f, segmentHeight);
+            
+            glPopMatrix();
+        }
+        
         glPopMatrix();
     }
 }
@@ -90,12 +114,26 @@ void drawHeadEars()
     for (int s = -1; s <= 1; s += 2)
     {
         glPushMatrix();
-        // Position ears on sides of head, behind eyes
-        glTranslatef(-0.05f, 0.30f, 0.245f * s);
-        glRotatef(60, 0, 0, 1);
-        glScalef(0.08f, 0.04f, 0.03f);
-        glColor3f(0.7f, 0.5f, 0.3f);
+        // Position ears prominently on the sides of the head
+        glTranslatef(-0.05f, 0.15f, 0.25f * s); // More visible position
+        glRotatef(20 * s, 0, 1, 0); // Slight outward angle
+        glRotatef(-10, 1, 0, 0); // Slight backward tilt
+        glColor3f(1.0f, 0.8f, 0.6f); // Much brighter, more visible color
+        
+        // Create ear shape: large oval base with pointed tip
+        // Main oval part of the ear - reduced to 75% size
+        glPushMatrix();
+        glScalef(0.1125f, 0.135f, 0.0375f); // 75% of previous size
         drawEllipsoid(1.0, 1.0, 1.0);
+        glPopMatrix();
+        
+        // Pointed tip at the top - also reduced to 75%
+        glPushMatrix();
+        glTranslatef(0.0f, 0.09f, 0.0f); // Move to top of oval (adjusted for smaller ear)
+        glScalef(0.06f, 0.06f, 0.0225f); // 75% of previous size
+        drawEllipsoid(1.0, 1.0, 1.0);
+        glPopMatrix();
+        
         glPopMatrix();
     }
 }
