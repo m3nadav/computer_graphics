@@ -1,5 +1,5 @@
 #include "cow/head.h"
-#include "cow/body.h"
+#include "cow/spots.h"
 #include "shapes/shapes.h"
 #include <GLUT/glut.h>
 

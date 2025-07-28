@@ -1,14 +1,19 @@
 #define GL_SILENCE_DEPRECATION // Silence deprecation warnings on macOS
 #include "cow/spots.h"
+#include "shapes/shapes.h"
 #include <GLUT/glut.h>
 
-// Helper function to draw a spot
-void drawSpot(float x, float y, float z, float rx, float ry, float rz)
+// Global texture ID for cow spots
+static unsigned int cowSpotsTexture = 0;
+static bool textureLoaded = false;
+
+unsigned int getCowSpotsTexture()
 {
-    glPushMatrix();
-    glTranslatef(x, y, z);
-    glScalef(rx, ry, rz);
-    glColor3f(0.1f, 0.1f, 0.1f); // Black
-    glutSolidSphere(1.0, 16, 16);
-    glPopMatrix();
+    // Load texture once if not already loaded
+    if (!textureLoaded)
+    {
+        cowSpotsTexture = loadTexture("SPOTS.png");
+        textureLoaded = true;
+    }
+    return cowSpotsTexture;
 }

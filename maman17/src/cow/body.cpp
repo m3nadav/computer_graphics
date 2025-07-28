@@ -6,33 +6,16 @@
 #include <cmath>
 #include <iostream>
 
-// Global texture ID for cow spots
-static unsigned int cowSpotsTexture = 0;
-static bool textureLoaded = false;
-
-unsigned int getCowSpotsTexture()
-{
-    // Load texture once if not already loaded
-    if (!textureLoaded)
-    {
-        cowSpotsTexture = loadTexture("SPOTS.png");
-        textureLoaded = true;
-    }
-    return cowSpotsTexture;
-}
-
 void drawBody()
 {
-    // Ensure texture is loaded
-    getCowSpotsTexture();
-
     glPushMatrix();
     glColor3f(0.95f, 0.95f, 0.95f); // White
     glPushMatrix();
     glScalef(1.0f, 0.6f, 0.6f);
 
-    // Draw textured ellipsoid instead of individual spots
-    drawTexturedEllipsoid(1.0, 1.0, 1.0, cowSpotsTexture, false);
+    // Draw textured ellipsoid with spots texture
+    unsigned int spotsTexture = getCowSpotsTexture();
+    drawTexturedEllipsoid(1.0, 1.0, 1.0, spotsTexture, false);
 
     glPopMatrix();
     glPopMatrix();
