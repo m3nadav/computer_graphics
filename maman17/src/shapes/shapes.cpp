@@ -80,7 +80,7 @@ unsigned int loadTexture(const char *filename)
 }
 
 // Draw ellipsoid with texture mapping
-void drawTexturedEllipsoid(double rx, double ry, double rz, unsigned int textureID)
+void drawTexturedEllipsoid(double rx, double ry, double rz, unsigned int textureID, bool mirrored)
 {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -113,6 +113,12 @@ void drawTexturedEllipsoid(double rx, double ry, double rz, unsigned int texture
             float s = (float)j / slices;
             float t1 = (float)i / stacks;
             float t2 = (float)(i + 1) / stacks;
+
+            // Mirror vertically (flip t coordinates) if requested
+            if (mirrored) {
+                t1 = 1.0f - t1;
+                t2 = 1.0f - t2;
+            }
 
             glTexCoord2f(s, t1);
             glVertex3f(x1, y1, z1);

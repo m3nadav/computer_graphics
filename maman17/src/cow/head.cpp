@@ -1,4 +1,5 @@
 #include "cow/head.h"
+#include "cow/body.h"
 #include "shapes/shapes.h"
 #include <GLUT/glut.h>
 
@@ -21,8 +22,13 @@ void drawFullHead()
 void drawHead()
 {
     glPushMatrix();
+    glColor3f(0.95f, 0.95f, 0.95f); // White base color like body
     glScalef(0.35f, 0.35f, 0.35f);
-    drawEllipsoid(1.0, 1.0, 1.0);
+    
+    // Use the same spots texture as the body, but mirrored for variety
+    unsigned int spotsTexture = getCowSpotsTexture();
+    drawTexturedEllipsoid(1.0, 1.0, 1.0, spotsTexture, true);
+    
     glPopMatrix();
 }
 

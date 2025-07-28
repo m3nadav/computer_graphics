@@ -10,14 +10,21 @@
 static unsigned int cowSpotsTexture = 0;
 static bool textureLoaded = false;
 
-void drawBody()
+unsigned int getCowSpotsTexture()
 {
-    // Load texture once
+    // Load texture once if not already loaded
     if (!textureLoaded)
     {
         cowSpotsTexture = loadTexture("SPOTS.png");
         textureLoaded = true;
     }
+    return cowSpotsTexture;
+}
+
+void drawBody()
+{
+    // Ensure texture is loaded
+    getCowSpotsTexture();
 
     glPushMatrix();
     glColor3f(0.95f, 0.95f, 0.95f); // White
@@ -25,7 +32,7 @@ void drawBody()
     glScalef(1.0f, 0.6f, 0.6f);
 
     // Draw textured ellipsoid instead of individual spots
-    drawTexturedEllipsoid(1.0, 1.0, 1.0, cowSpotsTexture);
+    drawTexturedEllipsoid(1.0, 1.0, 1.0, cowSpotsTexture, false);
 
     glPopMatrix();
     glPopMatrix();
