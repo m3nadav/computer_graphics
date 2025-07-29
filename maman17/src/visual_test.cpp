@@ -7,6 +7,7 @@
 
 #include "cow/spots.h"
 #include "cow/cow.h"
+#include "scene/scene.h"
 
 // Camera control variables
 static float cameraDistance = 5.0f;
@@ -180,6 +181,13 @@ void reshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 }
 
+void timer(int value)
+{
+    incrementAnimationFrame();    // Increment animation frame
+    glutPostRedisplay();          // Request redraw
+    glutTimerFunc(500, timer, 0); // Schedule next timer call in 500ms (0.5 seconds)
+}
+
 int main(int argc, char **argv)
 {
     std::cout << "[DEBUG] main() starting" << std::endl;
@@ -196,6 +204,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
+    glutTimerFunc(500, timer, 0); // Start timer for 0.5 second intervals
 
     std::cout << "Visual Test Harness - New Version\n";
     for (size_t i = 0; i < tests.size(); ++i)

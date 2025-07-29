@@ -17,6 +17,13 @@ void reshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 }
 
+void timer(int value)
+{
+    incrementAnimationFrame();    // Increment animation frame
+    glutPostRedisplay();          // Request redraw
+    glutTimerFunc(500, timer, 0); // Schedule next timer call in 500ms (0.5 seconds)
+}
+
 int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
@@ -28,6 +35,7 @@ int main(int argc, char **argv)
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
+    glutTimerFunc(500, timer, 0); // Start timer for 0.5 second intervals
 
     glutMainLoop();
     return 0;

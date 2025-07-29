@@ -2,6 +2,9 @@
 #include "cow/cow.h"
 #include <GLUT/glut.h>
 
+// Global animation counter
+static int animationFrame = 0;
+
 void drawMeadow()
 {
     glColor3f(0.2f, 0.8f, 0.2f); // Green
@@ -10,6 +13,14 @@ void drawMeadow()
     glScalef(50.0f, 0.1f, 50.0f); // Large flat ground
     glutSolidCube(1.0);
     glPopMatrix();
+}
+
+int getAnimationFrame() {
+    return animationFrame;
+}
+
+void incrementAnimationFrame() {
+    animationFrame++;
 }
 
 void drawScene()

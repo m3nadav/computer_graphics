@@ -2,6 +2,7 @@
 #include "cow/body.h"
 #include "cow/spots.h"
 #include "shapes/shapes.h"
+#include "scene/scene.h"
 #include <GLUT/glut.h>
 #include <cmath>
 #include <iostream>
@@ -23,19 +24,57 @@ void drawBody()
 
 void drawTail()
 {
-    // TAIL (single cone following spline curve)
+    // ANIMATED TAIL (multiple cone variations following different spline curves)
     glPushMatrix();
     glTranslatef(-0.866f, 0.15f, 0.0f); // Start position at back of body
     glColor3f(0.5f, 0.5f, 0.5f);        // Match body color
 
-    // Define spline control points for realistic tail curve
-    float controlPoints[5][3] = {
-        {0.0f, 0.0f, 0.0f},      // Start point
-        {-0.2f, 0.0f, 0.0f},     // Straight back with no curve or height change
-        {-0.25f, -0.05f, 0.00f}, // Curve right while going down and back
-        {-0.35f, -0.15f, -0.2f}, // Curve left while going down and back more
-        {-0.45f, -0.25f, 0.0f}   // Curve right and end pointing right
+    // Use frame-based animation that changes every timer tick (0.5 seconds)
+    int currentVariation = getAnimationFrame() % 4;
+    
+    // Create 4 different tail positions for wavy motion
+    float tailVariations[4][5][3] = {
+        // Variation 1: Original curve
+        {
+            {0.0f, 0.0f, 0.0f},      // Start point
+            {-0.2f, 0.0f, 0.0f},     // Straight back
+            {-0.25f, -0.05f, 0.00f}, // Curve right while going down
+            {-0.35f, -0.15f, -0.2f}, // Curve left while going down more
+            {-0.45f, -0.25f, 0.0f}   // Curve right and end pointing right
+        },
+        // Variation 2: More upward curve
+        {
+            {0.0f, 0.0f, 0.0f},      // Start point
+            {-0.2f, 0.05f, 0.0f},    // Slight up curve
+            {-0.25f, 0.1f, 0.1f},    // Higher and curve left
+            {-0.35f, 0.0f, 0.2f},    // Level off and curve more left
+            {-0.45f, -0.1f, 0.15f}   // Drop slightly and curve back
+        },
+        // Variation 3: Lower curve
+        {
+            {0.0f, 0.0f, 0.0f},      // Start point
+            {-0.2f, -0.05f, 0.0f},   // Drop immediately
+            {-0.25f, -0.15f, -0.1f}, // Drop more and curve right
+            {-0.35f, -0.25f, 0.1f},  // Bottom out and curve left
+            {-0.45f, -0.2f, -0.05f}  // End slightly right
+        },
+        // Variation 4: Side sweep
+        {
+            {0.0f, 0.0f, 0.0f},      // Start point
+            {-0.2f, 0.0f, 0.15f},    // Sweep left immediately
+            {-0.25f, -0.05f, 0.25f}, // Continue left and down
+            {-0.35f, -0.1f, 0.1f},   // Curve back toward center
+            {-0.45f, -0.15f, -0.1f}  // End slightly right
+        }
     };
+    float controlPoints[5][3];
+    
+    // Copy the current variation's control points
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 3; j++) {
+            controlPoints[i][j] = tailVariations[currentVariation][i][j];
+        }
+    }
 
     // Create single curved cone using triangle strips
     int segments = 20; // More segments for smoother curve
