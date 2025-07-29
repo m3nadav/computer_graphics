@@ -7,11 +7,11 @@ SHAPES_SRCS = src/shapes/shapes_test.cpp src/shapes/shapes.cpp
 SHAPES_TARGET = shapes_test
 
 # Visual test
-VISUAL_SRCS = src/visual_test.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp
+VISUAL_SRCS = src/visual_test.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp
 VISUAL_TARGET = visual_test
 
 # Main application (with environment models)
-MAIN_SRCS = main.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp
+MAIN_SRCS = main.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp
 MAIN_TARGET = main
 
 all: $(SHAPES_TARGET) $(VISUAL_TARGET) $(MAIN_TARGET)
