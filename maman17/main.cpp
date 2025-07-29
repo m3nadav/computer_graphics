@@ -4,7 +4,7 @@
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    drawScene();
+    drawEnhancedScene(); // Use the enhanced scene with trees, grass, and rocks
     glutSwapBuffers();
 }
 
