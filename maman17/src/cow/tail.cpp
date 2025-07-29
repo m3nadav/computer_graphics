@@ -1,5 +1,6 @@
 #define GL_SILENCE_DEPRECATION // Silence deprecation warnings on macOS
 #include "cow/tail.h"
+#include "cow/cow_coordinates.h"
 #include "shapes/shapes.h"
 #include "scene/scene.h"
 #include <GLUT/glut.h>
@@ -17,11 +18,6 @@ const float TAPER_FACTOR = 0.8f;
 const float HAIR_TUFT_SCALE_X = 0.04f;
 const float HAIR_TUFT_SCALE_Y = 0.06f;
 const float HAIR_TUFT_SCALE_Z = 0.04f;
-
-// Tail position constants
-const float TAIL_START_X = -0.866f;
-const float TAIL_START_Y = 0.15f;
-const float TAIL_START_Z = 0.0f;
 
 // Tail variations data - 30 different positions for realistic wavy motion
 const float TAIL_VARIATIONS[NUM_TAIL_VARIATIONS][NUM_CONTROL_POINTS][NUM_COORDS] = {
@@ -508,7 +504,7 @@ void drawTail()
 {
     // Setup tail position and color
     glPushMatrix();
-    glTranslatef(TAIL_START_X, TAIL_START_Y, TAIL_START_Z);
+    glTranslatef(COW_TAIL_X, COW_TAIL_Y, COW_TAIL_Z);
     glColor3f(0.5f, 0.5f, 0.5f); // Match body color
 
     // Get current tail variation control points

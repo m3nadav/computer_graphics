@@ -60,7 +60,10 @@ void testDrawCow()
     std::cout << "[DEBUG] testDrawCow() called" << std::endl;
     std::cout.flush();
 
-    auto [x, y, z] = calculateCoordinates();
+    auto coords = calculateCoordinates();
+    float x = std::get<0>(coords);
+    float y = std::get<1>(coords);
+    float z = std::get<2>(coords);
 
     gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
     drawGrid(3.0f, 0.5f); // Add grid
@@ -83,7 +86,7 @@ void display()
     glutSwapBuffers();
 }
 
-void keyboard(unsigned char key, int, int)
+void keyboard(unsigned char key, int x, int y)
 {
     std::cout << "[DEBUG] keyboard() called, key=" << (int)key << std::endl;
     std::cout.flush();
@@ -109,6 +112,11 @@ void keyboard(unsigned char key, int, int)
         if (cameraDistance > 20.0f)
             cameraDistance = 20.0f;
         glutPostRedisplay();
+    }
+    else
+    {
+        // Handle cow movement keys
+        handleCowMovement(key, x, y);
     }
 }
 
@@ -170,6 +178,12 @@ void motion(int x, int y)
     }
 }
 
+void specialKeys(int key, int x, int y)
+{
+    // Handle cow movement special keys (arrow keys)
+    handleCowSpecialKeys(key, x, y);
+}
+
 void reshape(int w, int h)
 {
     std::cout << "[DEBUG] reshape() called, w=" << w << ", h=" << h << std::endl;
@@ -199,9 +213,13 @@ int main(int argc, char **argv)
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.8, 0.8, 0.8, 1.0);
 
+    // Initialize cow movement
+    initCowMovement();
+
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
+    glutSpecialFunc(specialKeys);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
     glutTimerFunc(500, timer, 0); // Start timer for 0.5 second intervals
@@ -212,6 +230,7 @@ int main(int argc, char **argv)
     std::cout << "Press number key to switch test, ESC to exit.\n";
     std::cout << "Right-click and drag to rotate camera.\n";
     std::cout << "Mouse wheel or press +/- to zoom in/out.\n";
+    std::cout << "Use WASD or Arrow keys to move the cow.\n";
     std::cout.flush();
 
     glutMainLoop();

@@ -2,6 +2,7 @@
 #include "cow/body.h"
 #include "cow/spots.h"
 #include "cow/tail.h"
+#include "cow/cow_coordinates.h"
 #include "shapes/shapes.h"
 #include "scene/scene.h"
 #include <GLUT/glut.h>
@@ -27,10 +28,10 @@ void drawLegs()
 {
     // Define leg positions: front left, front right, back left, back right
     float legPositions[4][3] = {
-        {0.4f, -0.3f, 0.25f},  // Front left
-        {0.4f, -0.3f, -0.25f}, // Front right
-        {-0.4f, -0.3f, 0.25f}, // Back left
-        {-0.4f, -0.3f, -0.25f} // Back right
+        {COW_LEG_FRONT_LEFT_X, COW_LEG_FRONT_LEFT_Y, COW_LEG_FRONT_LEFT_Z},    // Front left
+        {COW_LEG_FRONT_RIGHT_X, COW_LEG_FRONT_RIGHT_Y, COW_LEG_FRONT_RIGHT_Z}, // Front right
+        {COW_LEG_BACK_LEFT_X, COW_LEG_BACK_LEFT_Y, COW_LEG_BACK_LEFT_Z},       // Back left
+        {COW_LEG_BACK_RIGHT_X, COW_LEG_BACK_RIGHT_Y, COW_LEG_BACK_RIGHT_Z}     // Back right
     };
 
     for (int i = 0; i < 4; i++)

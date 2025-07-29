@@ -1,5 +1,6 @@
 #include <GLUT/glut.h>
 #include "scene/scene.h"
+#include "cow/cow.h"
 
 void display()
 {
@@ -33,9 +34,16 @@ int main(int argc, char **argv)
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.5f, 0.8f, 1.0f, 1.0f); // Sky blue
 
+    // Initialize cow movement
+    initCowMovement();
+
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutTimerFunc(500, timer, 0); // Start timer for 0.5 second intervals
+
+    // Register keyboard handlers for cow movement
+    glutKeyboardFunc(handleCowMovement);
+    glutSpecialFunc(handleCowSpecialKeys);
 
     glutMainLoop();
     return 0;
