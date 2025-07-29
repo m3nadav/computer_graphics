@@ -3,6 +3,8 @@
 #include <GLUT/glut.h>
 #include <cmath>
 #include <tuple>
+#include <string>
+#include <utility>
 
 // Window dimensions
 static int WINDOW_WIDTH = 1200;
@@ -52,7 +54,7 @@ std::tuple<float, float, float> calculateCoordinates()
     float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
     float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
 
-    return std::make_tuple(x, y, z);
+    return {x, y, z};
 }
 
 // Function to set up the camera for each viewport
@@ -89,6 +91,21 @@ void setMaterial(float r, float g, float b)
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 }
 
+// Render text in 3D space
+void renderText(const std::string &text, float x, float y, float z)
+{
+    glDisable(GL_LIGHTING);
+    glColor3f(0.0f, 0.0f, 0.0f); // Black text
+
+    glRasterPos3f(x, y, z);
+    for (char c : text)
+    {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, c);
+    }
+
+    glEnable(GL_LIGHTING);
+}
+
 // Test scene 1: Basic sphere
 void drawTestSphere()
 {
@@ -113,6 +130,9 @@ void drawTestSphere()
     glEnd();
     glEnable(GL_LIGHTING);
 
+    // Render title
+    renderText("Basic Sphere", -0.8f, 1.5f, 0.0f);
+
     setMaterial(0.8f, 0.2f, 0.2f); // Red
     drawSphere(0.5);
 }
@@ -125,6 +145,9 @@ void drawTestEllipsoidSpherical()
     gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
+
+    // Render title
+    renderText("Spherical Ellipsoid", -1.0f, 1.5f, 0.0f);
 
     setMaterial(0.2f, 0.8f, 0.2f); // Green
     drawEllipsoid(0.5, 0.5, 0.5);  // Sphere-like
@@ -139,6 +162,9 @@ void drawTestEllipsoidElongated()
 
     drawGrid(2.0f, 0.5f);
 
+    // Render title
+    renderText("Elongated Ellipsoid", -1.0f, 1.5f, 0.0f);
+
     setMaterial(0.2f, 0.2f, 0.8f); // Blue
     drawEllipsoid(1.0, 0.3, 0.3);  // Elongated in X direction
 }
@@ -151,6 +177,9 @@ void drawTestEllipsoidFlattened()
     gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
+
+    // Render title
+    renderText("Flattened Ellipsoid", -1.0f, 1.5f, 0.0f);
 
     setMaterial(0.8f, 0.8f, 0.2f); // Yellow
     drawEllipsoid(0.5, 0.5, 0.2);  // Flattened in Z direction
@@ -165,6 +194,9 @@ void drawTestCylinderStandard()
 
     drawGrid(2.0f, 0.5f);
 
+    // Render title
+    renderText("Standard Cylinder", -1.0f, 1.5f, 0.0f);
+
     setMaterial(0.8f, 0.2f, 0.8f); // Magenta
     drawCylinder(0.3, 0.3, 1.0);   // Standard cylinder
 }
@@ -177,6 +209,9 @@ void drawTestCylinderCone()
     gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
+
+    // Render title
+    renderText("Cone-like Cylinder", -1.0f, 1.5f, 0.0f);
 
     setMaterial(0.2f, 0.8f, 0.8f); // Cyan
     drawCylinder(0.5, 0.1, 1.0);   // Cone-like
@@ -191,6 +226,9 @@ void drawTestCylinderWide()
 
     drawGrid(2.0f, 0.5f);
 
+    // Render title
+    renderText("Wide Cylinder", -0.8f, 1.5f, 0.0f);
+
     setMaterial(0.8f, 0.4f, 0.2f); // Orange
     drawCylinder(0.8, 0.8, 0.5);   // Wide and short
 }
@@ -203,6 +241,9 @@ void drawTestRotatedShapes()
     gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
+
+    // Render title
+    renderText("Rotated Shapes", -0.8f, 1.5f, 0.0f);
 
     // Rotated ellipsoid
     glPushMatrix();
@@ -228,6 +269,9 @@ void drawTestScaledShapes()
     gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
 
     drawGrid(2.0f, 0.5f);
+
+    // Render title
+    renderText("Scaled Shapes", -0.8f, 1.5f, 0.0f);
 
     // Scaled sphere
     glPushMatrix();
