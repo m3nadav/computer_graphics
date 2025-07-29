@@ -6,7 +6,6 @@
 #include <cmath>
 
 #include "cow/spots.h"
-#include "cow/body.h"
 #include "cow/cow.h"
 
 // Camera control variables
@@ -51,23 +50,10 @@ std::tuple<float, float, float> calculateCoordinates()
     float y = cameraDistance * sin(cameraAngleX * M_PI / 180.0f);
     float z = cameraDistance * sin(cameraAngleY * M_PI / 180.0f) * cos(cameraAngleX * M_PI / 180.0f);
 
-    return std::make_tuple(x, y, z);
+    return {x, y, z};
 }
 
-// Test 2: drawBody test
-void testDrawBody()
-{
-    std::cout << "[DEBUG] testDrawBody() called" << std::endl;
-    std::cout.flush();
-
-    auto [x, y, z] = calculateCoordinates();
-
-    gluLookAt(x, y, z, 0, 0, 0, 0, 1, 0);
-    drawGrid(3.0f, 0.5f); // Add grid
-    drawBody();
-}
-
-// Test 3: drawCow test
+// Test: drawCow test
 void testDrawCow()
 {
     std::cout << "[DEBUG] testDrawCow() called" << std::endl;
@@ -81,7 +67,6 @@ void testDrawCow()
 }
 
 std::vector<std::pair<std::string, std::function<void()>>> tests = {
-    {"Draw Body Test", testDrawBody},
     {"Draw Cow Test", testDrawCow},
 };
 

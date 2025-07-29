@@ -3,5 +3,6 @@
 
 void drawBody();
 void drawTail();
+void drawLegs();
 
 #endif
