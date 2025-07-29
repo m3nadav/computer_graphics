@@ -57,9 +57,6 @@ std::tuple<float, float, float> calculateCoordinates()
 // Test: drawCow test
 void testDrawCow()
 {
-    std::cout << "[DEBUG] testDrawCow() called" << std::endl;
-    std::cout.flush();
-
     auto coords = calculateCoordinates();
     float x = std::get<0>(coords);
     float y = std::get<1>(coords);
@@ -78,8 +75,6 @@ int currentTest = 0;
 
 void display()
 {
-    std::cout << "[DEBUG] display() called, currentTest=" << currentTest << std::endl;
-    std::cout.flush();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     tests[currentTest].second();
@@ -88,8 +83,6 @@ void display()
 
 void keyboard(unsigned char key, int x, int y)
 {
-    std::cout << "[DEBUG] keyboard() called, key=" << (int)key << std::endl;
-    std::cout.flush();
     if (key == 27)
         exit(0); // ESC
     if (key >= '1' && key < '1' + tests.size())

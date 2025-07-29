@@ -487,7 +487,8 @@ void drawHairTuft(float controlPoints[5][3])
 void getCurrentTailVariation(float controlPoints[5][3])
 {
     // Use frame-based animation that changes every timer tick (0.5 seconds)
-    int currentVariation = getAnimationFrame() % NUM_TAIL_VARIATIONS;
+    // Slow down the animation by dividing by 4 to make it easier to see movement
+    int currentVariation = (getAnimationFrame() / 4) % NUM_TAIL_VARIATIONS;
 
     // Copy the current variation's control points
     for (int i = 0; i < NUM_CONTROL_POINTS; i++)
@@ -505,7 +506,7 @@ void drawTail()
     // Setup tail position and color
     glPushMatrix();
     glTranslatef(COW_TAIL_X, COW_TAIL_Y, COW_TAIL_Z);
-    glColor3f(0.5f, 0.5f, 0.5f); // Match body color
+    glColor3f(1.0f, 0.0f, 0.0f); // BRIGHT RED COLOR FOR TESTING - should be very visible
 
     // Get current tail variation control points
     float controlPoints[NUM_CONTROL_POINTS][NUM_COORDS];

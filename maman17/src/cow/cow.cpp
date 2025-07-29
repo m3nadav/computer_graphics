@@ -2,12 +2,14 @@
 #include "cow/cow.h"
 #include "cow/head.h"
 #include "cow/body.h"
+#include "cow/tail.h"
 #include "cow/cow_coordinates.h"
 #include "shapes/shapes.h"
 #include <GLUT/glut.h>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
 
 // Global cow movement variables
 static float cowX = 0.0f;
@@ -32,31 +34,16 @@ struct Vector2D
     Vector2D(float x = 0.0f, float z = 0.0f) : x(x), z(z) {}
 };
 
-// Function to calculate the head-tail tangent vector based on actual head and tail positions
-Vector2D calculateHeadTailTangent()
+Vector2D getCowForwardDirection()
 {
-    // Calculate the head-tail direction vector (from tail to head)
-    float deltaX = COW_HEAD_X - COW_TAIL_X;
-    float deltaZ = COW_HEAD_Z - COW_TAIL_Z;
-
-    // Normalize the vector to get the unit tangent
-    float length = sqrt(deltaX * deltaX + deltaZ * deltaZ);
-    if (length > 0.001f)
-    {
-        deltaX /= length;
-        deltaZ /= length;
-    }
-
-    // Apply the cow's current rotation to get the actual facing direction
+    // The cow's head faces along the positive X-axis relative to the cow's body
+    // So the forward direction is simply the cow's rotation applied to (1, 0)
+    // Note: In OpenGL with our camera setup, negative Z is "forward" from camera perspective
     float angleRadians = cowRotation * M_PI / 180.0f;
-    float cosAngle = cos(angleRadians);
-    float sinAngle = sin(angleRadians);
+    float forwardX = cos(angleRadians);
+    float forwardZ = -sin(angleRadians); // Negative because -Z is "forward" in OpenGL
 
-    // Rotate the head-tail vector by the cow's rotation
-    float rotatedX = deltaX * cosAngle - deltaZ * sinAngle;
-    float rotatedZ = deltaX * sinAngle + deltaZ * cosAngle;
-
-    return Vector2D(rotatedX, rotatedZ);
+    return Vector2D(forwardX, forwardZ);
 }
 
 // Movement actions enum
@@ -116,18 +103,18 @@ void executeCowAction(MovementAction action)
     {
     case MOVE_FORWARD:
     {
-        // Move forward along the cow's actual head-tail axis
-        Vector2D tangent = calculateHeadTailTangent();
-        cowX += COW_MOVEMENT_SPEED * tangent.x;
-        cowZ += COW_MOVEMENT_SPEED * tangent.z;
+        // Use the head-tail direction as the forward direction
+        Vector2D direction = getCowForwardDirection();
+        cowX += COW_MOVEMENT_SPEED * direction.x;
+        cowZ += COW_MOVEMENT_SPEED * direction.z;
         break;
     }
     case MOVE_BACKWARD:
     {
-        // Move backward opposite to the cow's actual head-tail axis
-        Vector2D tangentBack = calculateHeadTailTangent();
-        cowX -= COW_MOVEMENT_SPEED * tangentBack.x;
-        cowZ -= COW_MOVEMENT_SPEED * tangentBack.z;
+        // Move backward relative to head-tail direction
+        Vector2D direction = getCowForwardDirection();
+        cowX -= COW_MOVEMENT_SPEED * direction.x;
+        cowZ -= COW_MOVEMENT_SPEED * direction.z;
         break;
     }
     case TURN_LEFT:
@@ -172,6 +159,19 @@ void drawCow()
     // Apply cow's position and rotation
     glTranslatef(cowX, 0.0f, cowZ);
     glRotatef(cowRotation, 0.0f, 1.0f, 0.0f);
+
+    // Debug: Print cow position and rotation
+    std::cout << "[DEBUG] Cow Position: (" << cowX << ", 0, " << cowZ << "), Rotation: " << cowRotation << "°" << std::endl;
+
+    // Debug: Calculate and print body center coordinates (should be at cow position)
+    std::cout << "[DEBUG] Body Center: (" << cowX << ", 0, " << cowZ << ")" << std::endl;
+
+    // Debug: Calculate and print tail coordinates after rotation
+    float angleRadians = cowRotation * M_PI / 180.0f;
+    float tailX = cowX + COW_TAIL_X * cos(angleRadians) - COW_TAIL_Z * sin(angleRadians);
+    float tailZ = cowZ + COW_TAIL_X * sin(angleRadians) + COW_TAIL_Z * cos(angleRadians);
+    std::cout << "[DEBUG] Tail Position: (" << tailX << ", " << COW_TAIL_Y << ", " << tailZ << ")" << std::endl;
+    std::cout << "[DEBUG] ---" << std::endl;
 
     drawBody();
     drawFullHead();

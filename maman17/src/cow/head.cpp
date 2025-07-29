@@ -17,8 +17,7 @@ void drawFullHead()
     drawHeadEars();
     drawHeadNostrils();
 
-    glPopMatrix(); // End head/neck group
-    glPopMatrix(); // End neck
+    glPopMatrix();
 }
 void drawHead()
 {
