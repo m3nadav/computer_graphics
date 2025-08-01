@@ -4,15 +4,24 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
+#include <cstring>
 
 // Initialize random seed
 static bool randomInitialized = false;
 
 void initializeRandom() {
     if (!randomInitialized) {
-        srand(time(nullptr));
+        srand(12345); // Fixed seed for consistent environment generation
         randomInitialized = true;
     }
+}
+
+// Set a specific seed for deterministic generation based on position/id
+void setSeedForObject(float x, float y, float z, int objectType) {
+    // Create a unique seed based on position and object type
+    int seed = (int)(x * 1000) + (int)(y * 1000) * 1000 + (int)(z * 1000) * 1000000 + objectType * 10000000;
+    srand(abs(seed));
 }
 
 // Random number generation utilities
@@ -206,7 +215,8 @@ void drawLeaves(float x, float y, float z, float size) {
 }
 
 void drawTree(float x, float y, float z, float scale) {
-    initializeRandom();
+    // Set deterministic seed based on tree position
+    setSeedForObject(x, y, z, 1); // objectType = 1 for trees
     
     glPushMatrix();
     glTranslatef(x, y, z);
@@ -266,18 +276,10 @@ void drawGrassBlade(float height, float width, float bend, float colorVariation)
 }
 
 void drawProceduralMeadow(float width, float depth, int grassDensity) {
-    initializeRandom();
+    // Set deterministic seed for consistent grass generation
+    setSeedForObject(width, depth, grassDensity, 3); // objectType = 3 for grass
     
-    // Draw base ground
-    setGrassMaterial(0.0f);
-    glColor3f(0.15f, 0.4f, 0.15f); // Dark green base
-    glPushMatrix();
-    glTranslatef(0.0f, -0.05f, 0.0f);
-    glScalef(width, 0.1f, depth);
-    glutSolidCube(1.0f);
-    glPopMatrix();
-    
-    // Draw individual grass blades
+    // Draw individual grass blades (no ground base)
     for (int i = 0; i < grassDensity; i++) {
         float grassX = randomFloat(-width/2, width/2);
         float grassZ = randomFloat(-depth/2, depth/2);
@@ -374,7 +376,8 @@ void drawIrregularRock(float scale, int complexity) {
 }
 
 void drawRock(float x, float y, float z, float scale) {
-    initializeRandom();
+    // Set deterministic seed based on rock position
+    setSeedForObject(x, y, z, 2); // objectType = 2 for rocks
     
     glPushMatrix();
     glTranslatef(x, y, z);
@@ -390,4 +393,124 @@ void drawRock(float x, float y, float z, float scale) {
     drawIrregularRock(1.0f, 24);
     
     glPopMatrix();
+}
+
+// Ground texture management functions
+unsigned int loadGroundTexture(const char* filename) {
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    
+    // Set texture parameters for ground textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    // For now, create a simple procedural ground texture as fallback
+    // TODO: Implement PNG loading similar to shapes.cpp
+    const int texSize = 256;
+    unsigned char texture[texSize][texSize][3];
+    
+    // Create a dirt/grass pattern
+    for (int i = 0; i < texSize; i++) {
+        for (int j = 0; j < texSize; j++) {
+            // Base dirt color
+            float noise = sin(i * 0.1f) * cos(j * 0.1f) + sin(i * 0.05f) * cos(j * 0.05f);
+            noise = (noise + 2.0f) / 4.0f; // Normalize to 0-1
+            
+            if (strstr(filename, "grass") != nullptr) {
+                // Grass texture - green with variations
+                texture[i][j][0] = (unsigned char)(40 + noise * 60);   // Red
+                texture[i][j][1] = (unsigned char)(80 + noise * 100);  // Green
+                texture[i][j][2] = (unsigned char)(20 + noise * 40);   // Blue
+            } else {
+                // Dirt texture - brown with variations
+                texture[i][j][0] = (unsigned char)(80 + noise * 60);   // Red
+                texture[i][j][1] = (unsigned char)(60 + noise * 50);   // Green
+                texture[i][j][2] = (unsigned char)(30 + noise * 30);   // Blue
+            }
+        }
+    }
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texSize, texSize, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+    std::cout << "Generated procedural ground texture for: " << filename << std::endl;
+    
+    return textureID;
+}
+
+void drawTexturedGroundPatch(float centerX, float centerZ, float size, unsigned int textureID) {
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    
+    glPushMatrix();
+    glTranslatef(centerX, 0.01f, centerZ); // Slightly above ground to avoid z-fighting
+    
+    // Draw a textured quad
+    glBegin(GL_QUADS);
+    glNormal3f(0.0f, 1.0f, 0.0f); // Point up
+    
+    // Bottom-left
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-size/2, 0.0f, -size/2);
+    
+    // Bottom-right
+    glTexCoord2f(2.0f, 0.0f); // Repeat texture 2x for tiling
+    glVertex3f(size/2, 0.0f, -size/2);
+    
+    // Top-right
+    glTexCoord2f(2.0f, 2.0f);
+    glVertex3f(size/2, 0.0f, size/2);
+    
+    // Top-left
+    glTexCoord2f(0.0f, 2.0f);
+    glVertex3f(-size/2, 0.0f, size/2);
+    
+    glEnd();
+    glPopMatrix();
+    
+    glDisable(GL_TEXTURE_2D);
+}
+
+// World-wide ground texture
+void drawWorldGround(float worldSize) {
+    static unsigned int worldGroundTextureID = 0;
+    if (worldGroundTextureID == 0) {
+        worldGroundTextureID = loadGroundTexture("textures/dirt_texture.png");
+    }
+    
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, worldGroundTextureID);
+    
+    glPushMatrix();
+    glTranslatef(0.0f, -0.01f, 0.0f); // Slightly below ground level
+    
+    // Calculate texture repeat count for 1:1 mapping
+    // Assuming texture represents 1 world unit, repeat it across the world
+    float textureRepeats = worldSize;
+    
+    // Draw a large textured quad covering the entire world
+    glBegin(GL_QUADS);
+    glNormal3f(0.0f, 1.0f, 0.0f); // Point up
+    
+    // Bottom-left
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-worldSize/2, 0.0f, -worldSize/2);
+    
+    // Bottom-right
+    glTexCoord2f(textureRepeats, 0.0f);
+    glVertex3f(worldSize/2, 0.0f, -worldSize/2);
+    
+    // Top-right
+    glTexCoord2f(textureRepeats, textureRepeats);
+    glVertex3f(worldSize/2, 0.0f, worldSize/2);
+    
+    // Top-left
+    glTexCoord2f(0.0f, textureRepeats);
+    glVertex3f(-worldSize/2, 0.0f, worldSize/2);
+    
+    glEnd();
+    glPopMatrix();
+    
+    glDisable(GL_TEXTURE_2D);
 }

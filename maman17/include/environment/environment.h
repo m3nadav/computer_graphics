@@ -21,4 +21,12 @@ void setTreeMaterial();
 void setGrassMaterial(float colorVariation = 0.0f);
 void setRockMaterial();
 
+// Random seed management for consistent generation
+void setSeedForObject(float x, float y, float z, int objectType);
+
+// Ground texture management
+unsigned int loadGroundTexture(const char* filename);
+void drawTexturedGroundPatch(float centerX, float centerZ, float size, unsigned int textureID);
+void drawWorldGround(float worldSize);
+
 #endif // ENVIRONMENT_H

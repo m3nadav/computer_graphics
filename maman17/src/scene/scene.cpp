@@ -34,7 +34,10 @@ void drawEnhancedScene()
     // Setup lighting for realistic rendering
     setupEnvironmentLighting();
     
-    // Draw enhanced procedural meadow
+    // Draw world-wide ground texture
+    drawWorldGround(100.0f);
+    
+    // Draw enhanced procedural meadow (grass only, no ground base)
     drawProceduralMeadow(50.0f, 50.0f, 2000);
     
     // Draw multiple trees at different positions
@@ -61,6 +64,9 @@ void drawScene()
     gluLookAt(0.0, 5.0, 15.0, // Eye position
               0.0, 0.0, 0.0,  // Look at
               0.0, 1.0, 0.0); // Up
-    drawMeadow();
+    
+    // Draw world-wide ground texture instead of colored meadow
+    drawWorldGround(100.0f);
+    
     drawCow();
 }
