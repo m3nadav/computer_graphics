@@ -2,6 +2,15 @@
 #include "scene/scene.h"
 #include "cow/cow.h"
 
+// Combined keyboard handler for both cow movement and head movement
+void keyboardHandler(unsigned char key, int x, int y)
+{
+    // Try cow movement first
+    handleCowMovement(key, x, y);
+    // Then try head movement (this will only redraw if head moved)
+    handleHeadMovement(key, x, y);
+}
+
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -22,7 +31,7 @@ void timer(int value)
 {
     incrementAnimationFrame();    // Increment animation frame
     glutPostRedisplay();          // Request redraw
-    glutTimerFunc(500, timer, 0); // Schedule next timer call in 500ms (0.5 seconds)
+    glutTimerFunc(50, timer, 0); // Schedule next timer call in 50ms (0.5 seconds)
 }
 
 int main(int argc, char **argv)
@@ -39,10 +48,10 @@ int main(int argc, char **argv)
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    glutTimerFunc(500, timer, 0); // Start timer for 0.5 second intervals
+    glutTimerFunc(50, timer, 0); // Start timer for 0.5 second intervals
 
-    // Register keyboard handlers for cow movement
-    glutKeyboardFunc(handleCowMovement);
+    // Register keyboard handlers for cow and head movement
+    glutKeyboardFunc(keyboardHandler);
     glutSpecialFunc(handleCowSpecialKeys);
 
     glutMainLoop();
