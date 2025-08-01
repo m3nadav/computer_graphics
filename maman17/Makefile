@@ -2,20 +2,25 @@ CXX = g++
 CXXFLAGS = -std=c++11 -I./include
 LDFLAGS = -framework OpenGL -framework GLUT
 
+# Common source files used by all targets
+COMMON_SRCS = src/common/camera.cpp src/common/input.cpp src/common/drawing.cpp
+
 # Shapes test
-SHAPES_SRCS = src/shapes/shapes_test.cpp src/shapes/shapes.cpp
+SHAPES_SRCS = src/shapes/shapes_test.cpp src/shapes/shapes.cpp $(COMMON_SRCS)
 SHAPES_TARGET = shapes_test
 
 # Visual test
-VISUAL_SRCS = src/visual_test.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp 
+VISUAL_SRCS = src/visual_test.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp $(COMMON_SRCS)
 VISUAL_TARGET = visual_test
+VISUAL_FLAGS = -DCOW_CONTROLS_AVAILABLE
 
 # Main application (with environment models)
-MAIN_SRCS = main.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp
+MAIN_SRCS = main.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp $(COMMON_SRCS)
 MAIN_TARGET = main
+MAIN_FLAGS = -DCOW_CONTROLS_AVAILABLE
 
 # Environment test
-ENV_SRCS = src/env_test.cpp src/shapes/shapes.cpp src/environment/environment.cpp
+ENV_SRCS = src/env_test.cpp src/shapes/shapes.cpp src/environment/environment.cpp $(COMMON_SRCS)
 ENV_TARGET = env_test
 
 all: $(SHAPES_TARGET) $(VISUAL_TARGET) $(MAIN_TARGET) $(ENV_TARGET)
@@ -24,10 +29,10 @@ $(SHAPES_TARGET): $(SHAPES_SRCS)
 	$(CXX) $(CXXFLAGS) $(SHAPES_SRCS) -o $(SHAPES_TARGET) $(LDFLAGS)
 
 $(VISUAL_TARGET): $(VISUAL_SRCS)
-	$(CXX) $(CXXFLAGS) $(VISUAL_SRCS) -o $(VISUAL_TARGET) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(VISUAL_FLAGS) $(VISUAL_SRCS) -o $(VISUAL_TARGET) $(LDFLAGS)
 
 $(MAIN_TARGET): $(MAIN_SRCS)
-	$(CXX) $(CXXFLAGS) $(MAIN_SRCS) -o $(MAIN_TARGET) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(MAIN_FLAGS) $(MAIN_SRCS) -o $(MAIN_TARGET) $(LDFLAGS)
 
 $(ENV_TARGET): $(ENV_SRCS)
 	$(CXX) $(CXXFLAGS) $(ENV_SRCS) -o $(ENV_TARGET) $(LDFLAGS)
