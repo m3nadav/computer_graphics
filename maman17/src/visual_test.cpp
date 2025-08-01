@@ -102,8 +102,8 @@ void keyboard(unsigned char key, int x, int y)
     else if (key == '-' || key == '_') // Zoom out
     {
         cameraDistance += 0.5f;
-        if (cameraDistance > 20.0f)
-            cameraDistance = 20.0f;
+        if (cameraDistance > 100.0f)
+            cameraDistance = 100.0f;
         glutPostRedisplay();
     }
     else
@@ -126,8 +126,8 @@ void zoomIn()
 void zoomOut()
 {
     cameraDistance += 0.5f;
-    if (cameraDistance > 20.0f)
-        cameraDistance = 20.0f;
+    if (cameraDistance > 100.0f)
+        cameraDistance = 100.0f;
     glutPostRedisplay();
 }
 
@@ -207,6 +207,16 @@ int main(int argc, char **argv)
     glutCreateWindow("Visual Test Harness - Right-click to rotate, Mouse wheel or +/- to zoom");
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.8, 0.8, 0.8, 1.0);
+
+    // Handle command line argument for starting test
+    if (argc > 1)
+    {
+        int testArg = atoi(argv[1]);
+        if (testArg >= 1 && testArg <= (int)tests.size())
+        {
+            currentTest = testArg - 1; // Convert to 0-based index
+        }
+    }
 
     // Initialize cow movement
     initCowMovement();
