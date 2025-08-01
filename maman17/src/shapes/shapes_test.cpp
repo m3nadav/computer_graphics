@@ -17,6 +17,7 @@ static float cameraAngleY = 55.0f;
 static bool rightMouseDown = false;
 static int lastMouseX = 0;
 static int lastMouseY = 0;
+static int currentScene = 0; // 0, 1, or 2 for the three scene groups
 
 // Draw a grid for better spatial orientation
 void drawGrid(float size, float step)
@@ -295,43 +296,46 @@ void display()
     glClearColor(0.9f, 0.9f, 0.9f, 1.0f); // Light gray background
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Test Scene 1: Basic Sphere
-    setupViewport(0, 9);
-    drawTestSphere();
+    // Show 3 shapes per scene based on currentScene
+    // Scene 0: Shapes 0-2 (Basic Sphere, Ellipsoid Spherical, Ellipsoid Elongated)
+    // Scene 1: Shapes 3-5 (Ellipsoid Flattened, Cylinder Standard, Cylinder Cone)
+    // Scene 2: Shapes 6-8 (Cylinder Wide, Rotated Shapes, Scaled Shapes)
 
-    // Test Scene 2: Ellipsoid (spherical)
-    setupViewport(1, 9);
-    drawTestEllipsoidSpherical();
-
-    // Test Scene 3: Ellipsoid (elongated)
-    setupViewport(2, 9);
-    drawTestEllipsoidElongated();
-
-    // Test Scene 4: Ellipsoid (flattened)
-    setupViewport(3, 9);
-    drawTestEllipsoidFlattened();
-
-    // Test Scene 5: Cylinder (standard)
-    setupViewport(4, 9);
-    drawTestCylinderStandard();
-
-    // Test Scene 6: Cylinder (cone-like)
-    setupViewport(5, 9);
-    drawTestCylinderCone();
-
-    // Test Scene 7: Cylinder (wide)
-    setupViewport(6, 9);
-    drawTestCylinderWide();
-
-    // Test Scene 8: Rotated shapes
-    setupViewport(7, 9);
-    drawTestRotatedShapes();
-
-    // Test Scene 9: Scaled shapes
-    setupViewport(8, 9);
-    drawTestScaledShapes();
+    if (currentScene == 0)
+    {
+        setupViewport(0, 3);
+        drawTestSphere();
+        setupViewport(1, 3);
+        drawTestEllipsoidSpherical();
+        setupViewport(2, 3);
+        drawTestEllipsoidElongated();
+    }
+    else if (currentScene == 1)
+    {
+        setupViewport(0, 3);
+        drawTestEllipsoidFlattened();
+        setupViewport(1, 3);
+        drawTestCylinderStandard();
+        setupViewport(2, 3);
+        drawTestCylinderCone();
+    }
+    else if (currentScene == 2)
+    {
+        setupViewport(0, 3);
+        drawTestCylinderWide();
+        setupViewport(1, 3);
+        drawTestRotatedShapes();
+        setupViewport(2, 3);
+        drawTestScaledShapes();
+    }
 
     glutSwapBuffers();
+}
+
+void timer(int value)
+{
+    glutPostRedisplay();         // Request redraw
+    glutTimerFunc(50, timer, 0); // Schedule next timer call in 50ms
 }
 
 void reshape(int w, int h)
@@ -347,6 +351,18 @@ void keyboard(unsigned char key, int x, int y)
     case 27: // ESC key
         exit(0);
         break;
+    case '1': // Scene 1
+        currentScene = 0;
+        glutPostRedisplay();
+        break;
+    case '2': // Scene 2
+        currentScene = 1;
+        glutPostRedisplay();
+        break;
+    case '3': // Scene 3
+        currentScene = 2;
+        glutPostRedisplay();
+        break;
     case '+': // Zoom in
     case '=':
         cameraDistance -= 0.5f;
@@ -357,8 +373,8 @@ void keyboard(unsigned char key, int x, int y)
     case '-': // Zoom out
     case '_':
         cameraDistance += 0.5f;
-        if (cameraDistance > 20.0f)
-            cameraDistance = 20.0f;
+        if (cameraDistance > 100.0f)
+            cameraDistance = 100.0f;
         glutPostRedisplay();
         break;
     }
@@ -432,6 +448,16 @@ int main(int argc, char **argv)
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     glutCreateWindow("Shapes Test - Right-click to rotate camera, +/- to zoom - Press ESC to exit");
 
+    // Handle command line argument for starting scene
+    if (argc > 1)
+    {
+        int sceneArg = atoi(argv[1]);
+        if (sceneArg >= 1 && sceneArg <= 3)
+        {
+            currentScene = sceneArg - 1; // Convert to 0-based index
+        }
+    }
+
     init();
 
     glutDisplayFunc(display);
@@ -439,6 +465,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
+    glutTimerFunc(50, timer, 0); // Start timer for animations
     glutMainLoop();
 
     return 0;
