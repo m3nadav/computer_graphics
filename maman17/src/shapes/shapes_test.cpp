@@ -411,8 +411,8 @@ void motion(int x, int y)
         // Clamp vertical angle to prevent flipping
         if (cameraAngleX > 89.0f)
             cameraAngleX = 89.0f;
-        if (cameraAngleX < -89.0f)
-            cameraAngleX = -89.0f;
+        if (cameraAngleX < 10.0f)
+            cameraAngleX = 10.0f;
 
         lastMouseX = x;
         lastMouseY = y;
