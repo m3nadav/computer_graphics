@@ -506,7 +506,7 @@ void drawTail()
     // Setup tail position and color
     glPushMatrix();
     glTranslatef(COW_TAIL_X, COW_TAIL_Y, COW_TAIL_Z);
-    glColor3f(1.0f, 0.0f, 0.0f); // BRIGHT RED COLOR FOR TESTING - should be very visible
+    glColor3f(0.95f, 0.95f, 0.95f); // White to match body base color
 
     // Get current tail variation control points
     float controlPoints[NUM_CONTROL_POINTS][NUM_COORDS];
