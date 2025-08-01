@@ -12,7 +12,7 @@ unsigned int getCowSpotsTexture()
     // Load texture once if not already loaded
     if (!textureLoaded)
     {
-        cowSpotsTexture = loadTexture("SPOTS.png");
+        cowSpotsTexture = loadTexture("textures/spots.png");
         textureLoaded = true;
     }
     return cowSpotsTexture;

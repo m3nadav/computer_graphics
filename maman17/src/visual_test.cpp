@@ -192,9 +192,9 @@ void reshape(int w, int h)
 
 void timer(int value)
 {
-    incrementAnimationFrame();   // Increment animation frame
+    incrementAnimationFrame();   // Keep animation frame for cow animations (tail, etc.)
     glutPostRedisplay();         // Request redraw
-    glutTimerFunc(50, timer, 0); // Schedule next timer call in 50ms (0.5 seconds)
+    glutTimerFunc(50, timer, 0); // Schedule next timer call in 50ms
 }
 
 int main(int argc, char **argv)
@@ -217,7 +217,7 @@ int main(int argc, char **argv)
     glutSpecialFunc(specialKeys);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
-    glutTimerFunc(50, timer, 0); // Start timer for 0.5 second intervals
+    glutTimerFunc(50, timer, 0); // Keep timer for cow animations
 
     std::cout << "Visual Test Harness - New Version\n";
     for (size_t i = 0; i < tests.size(); ++i)

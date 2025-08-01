@@ -14,7 +14,11 @@ VISUAL_TARGET = visual_test
 MAIN_SRCS = main.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp
 MAIN_TARGET = main
 
-all: $(SHAPES_TARGET) $(VISUAL_TARGET) $(MAIN_TARGET)
+# Environment test
+ENV_SRCS = src/env_test.cpp src/shapes/shapes.cpp src/environment/environment.cpp
+ENV_TARGET = env_test
+
+all: $(SHAPES_TARGET) $(VISUAL_TARGET) $(MAIN_TARGET) $(ENV_TARGET)
 
 $(SHAPES_TARGET): $(SHAPES_SRCS)
 	$(CXX) $(CXXFLAGS) $(SHAPES_SRCS) -o $(SHAPES_TARGET) $(LDFLAGS)
@@ -24,6 +28,9 @@ $(VISUAL_TARGET): $(VISUAL_SRCS)
 
 $(MAIN_TARGET): $(MAIN_SRCS)
 	$(CXX) $(CXXFLAGS) $(MAIN_SRCS) -o $(MAIN_TARGET) $(LDFLAGS)
+
+$(ENV_TARGET): $(ENV_SRCS)
+	$(CXX) $(CXXFLAGS) $(ENV_SRCS) -o $(ENV_TARGET) $(LDFLAGS)
 
 test-shapes: $(SHAPES_TARGET)
 	@echo "Running shapes test..."
@@ -37,9 +44,13 @@ test-main: $(MAIN_TARGET)
 	@echo "Running main application..."
 	./$(MAIN_TARGET)
 
+test-env: $(ENV_TARGET)
+	@echo "Running environment test..."
+	./$(ENV_TARGET)
+
 test: test-shapes test-visual
 
 clean:
-	rm -f $(SHAPES_TARGET) $(VISUAL_TARGET) $(MAIN_TARGET) 
+	rm -f $(SHAPES_TARGET) $(VISUAL_TARGET) $(MAIN_TARGET) $(ENV_TARGET)
 
-.PHONY: clean all test test-shapes test-visual test-main
+.PHONY: clean all test test-shapes test-visual test-main test-env
