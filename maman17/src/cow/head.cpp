@@ -9,7 +9,7 @@ void drawFullHead()
 {
     glPushMatrix();
     glTranslatef(COW_HEAD_X, COW_HEAD_Y, COW_HEAD_Z);
-    
+
     // Apply head rotations for user control
     glRotatef(getHeadRotationY(), 0, 1, 0); // Left/right rotation
     glRotatef(getHeadRotationX(), 0, 0, 1); // Up/down rotation (around Z-axis)
