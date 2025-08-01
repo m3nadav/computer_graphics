@@ -110,6 +110,8 @@ void keyboard(unsigned char key, int x, int y)
     {
         // Handle cow movement keys
         handleCowMovement(key, x, y);
+        // Handle head movement keys
+        handleHeadMovement(key, x, y);
     }
 }
 
@@ -190,9 +192,9 @@ void reshape(int w, int h)
 
 void timer(int value)
 {
-    incrementAnimationFrame();    // Increment animation frame
-    glutPostRedisplay();          // Request redraw
-    glutTimerFunc(500, timer, 0); // Schedule next timer call in 500ms (0.5 seconds)
+    incrementAnimationFrame();   // Increment animation frame
+    glutPostRedisplay();         // Request redraw
+    glutTimerFunc(50, timer, 0); // Schedule next timer call in 50ms (0.5 seconds)
 }
 
 int main(int argc, char **argv)
@@ -215,7 +217,7 @@ int main(int argc, char **argv)
     glutSpecialFunc(specialKeys);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
-    glutTimerFunc(500, timer, 0); // Start timer for 0.5 second intervals
+    glutTimerFunc(50, timer, 0); // Start timer for 0.5 second intervals
 
     std::cout << "Visual Test Harness - New Version\n";
     for (size_t i = 0; i < tests.size(); ++i)
@@ -224,6 +226,7 @@ int main(int argc, char **argv)
     std::cout << "Right-click and drag to rotate camera.\n";
     std::cout << "Mouse wheel or press +/- to zoom in/out.\n";
     std::cout << "Use WASD or Arrow keys to move the cow.\n";
+    std::cout << "Use IJKL keys to move the cow's head.\n";
     std::cout.flush();
 
     glutMainLoop();

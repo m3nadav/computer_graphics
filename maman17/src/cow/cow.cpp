@@ -16,16 +16,27 @@ static float cowX = 0.0f;
 static float cowZ = 0.0f;
 static float cowRotation = 0.0f; // Rotation in degrees around Y-axis
 
+// Global head movement variables
+static float headRotationX = 0.0f; // Up/down rotation around Z-axis (-30 to +30 degrees)
+static float headRotationY = 0.0f; // Left/right rotation around Y-axis (-45 to +45 degrees)
+
 void initCowMovement()
 {
     cowX = 0.0f;
     cowZ = 0.0f;
     cowRotation = 0.0f;
+    headRotationX = 0.0f;
+    headRotationY = 0.0f;
 }
 
 // Movement constants - easily tweakable
 const float COW_MOVEMENT_SPEED = 0.5f;  // Units per key press
 const float COW_STEERING_ANGLE = 10.0f; // Degrees per key press
+
+// Head movement constants
+const float HEAD_ROTATION_SPEED = 5.0f;  // Degrees per key press
+const float HEAD_MAX_X_ROTATION = 30.0f; // Max up/down rotation
+const float HEAD_MAX_Y_ROTATION = 45.0f; // Max left/right rotation
 
 // Structure to represent a 2D vector
 struct Vector2D
@@ -152,6 +163,38 @@ float getCowX() { return cowX; }
 float getCowZ() { return cowZ; }
 float getCowRotation() { return cowRotation; }
 
+// Head movement handler for separate head controls
+void handleHeadMovement(unsigned char key, int x, int y)
+{
+    switch (key)
+    {
+    case 'i': // Head up (rotate to look up)
+    case 'I':
+        headRotationX = std::min(headRotationX + HEAD_ROTATION_SPEED, HEAD_MAX_X_ROTATION);
+        break;
+    case 'k': // Head down (rotate to look down)
+    case 'K':
+        headRotationX = std::max(headRotationX - HEAD_ROTATION_SPEED, -HEAD_MAX_X_ROTATION);
+        break;
+    case 'j': // Head left
+    case 'J':
+        headRotationY = std::max(headRotationY - HEAD_ROTATION_SPEED, -HEAD_MAX_Y_ROTATION);
+        break;
+    case 'l': // Head right
+    case 'L':
+        headRotationY = std::min(headRotationY + HEAD_ROTATION_SPEED, HEAD_MAX_Y_ROTATION);
+        break;
+    default:
+        return; // Don't redraw if no head movement
+    }
+
+    glutPostRedisplay(); // Request redraw only if head moved
+}
+
+// Head rotation getters
+float getHeadRotationX() { return headRotationX; }
+float getHeadRotationY() { return headRotationY; }
+
 void drawCow()
 {
     glPushMatrix();
@@ -159,19 +202,6 @@ void drawCow()
     // Apply cow's position and rotation
     glTranslatef(cowX, 0.0f, cowZ);
     glRotatef(cowRotation, 0.0f, 1.0f, 0.0f);
-
-    // Debug: Print cow position and rotation
-    std::cout << "[DEBUG] Cow Position: (" << cowX << ", 0, " << cowZ << "), Rotation: " << cowRotation << "°" << std::endl;
-
-    // Debug: Calculate and print body center coordinates (should be at cow position)
-    std::cout << "[DEBUG] Body Center: (" << cowX << ", 0, " << cowZ << ")" << std::endl;
-
-    // Debug: Calculate and print tail coordinates after rotation
-    float angleRadians = cowRotation * M_PI / 180.0f;
-    float tailX = cowX + COW_TAIL_X * cos(angleRadians) - COW_TAIL_Z * sin(angleRadians);
-    float tailZ = cowZ + COW_TAIL_X * sin(angleRadians) + COW_TAIL_Z * cos(angleRadians);
-    std::cout << "[DEBUG] Tail Position: (" << tailX << ", " << COW_TAIL_Y << ", " << tailZ << ")" << std::endl;
-    std::cout << "[DEBUG] ---" << std::endl;
 
     drawBody();
     drawFullHead();

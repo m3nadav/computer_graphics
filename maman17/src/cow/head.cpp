@@ -1,6 +1,7 @@
 #include "cow/head.h"
 #include "cow/spots.h"
 #include "cow/cow_coordinates.h"
+#include "cow/cow.h"
 #include "shapes/shapes.h"
 #include <GLUT/glut.h>
 
@@ -8,7 +9,10 @@ void drawFullHead()
 {
     glPushMatrix();
     glTranslatef(COW_HEAD_X, COW_HEAD_Y, COW_HEAD_Z);
-    glRotatef(0, 10, 0, 1);
+    
+    // Apply head rotations for user control
+    glRotatef(getHeadRotationY(), 0, 1, 0); // Left/right rotation
+    glRotatef(getHeadRotationX(), 0, 0, 1); // Up/down rotation (around Z-axis)
 
     drawHead();
     drawHeadMuzzle();
