@@ -200,7 +200,7 @@ void drawCow()
     glPushMatrix();
 
     // Apply cow's position and rotation
-    glTranslatef(cowX, 0.0f, cowZ);
+    glTranslatef(cowX, 0.68, cowZ);
     glRotatef(cowRotation, 0.0f, 1.0f, 0.0f);
 
     drawBody();
