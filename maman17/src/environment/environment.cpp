@@ -103,6 +103,41 @@ float getCowClearanceRadius()
 }
 #endif
 
+// Sun position management
+static int currentSunPosition = 0; // 0: (-x,y,-z), 1: (-x,y,z), 2: (x,y,-z), 3: (x,y,z)
+
+void setSunPosition(int positionIndex)
+{
+    if (positionIndex >= 0 && positionIndex < 4)
+    {
+        currentSunPosition = positionIndex;
+    }
+}
+
+int getCurrentSunPosition()
+{
+    return currentSunPosition;
+}
+
+void handleSunControls(unsigned char key, int x, int y)
+{
+    switch (key)
+    {
+    case '1':
+        setSunPosition(0); // (-x,y,-z)
+        break;
+    case '2':
+        setSunPosition(1); // (-x,y,z)
+        break;
+    case '3':
+        setSunPosition(2); // (x,y,-z)
+        break;
+    case '4':
+        setSunPosition(3); // (x,y,z)
+        break;
+    }
+}
+
 // Check if position is safe for rock placement (not too close to cow spawn or current position)
 bool isPositionSafeForRock(float rockX, float rockZ)
 {

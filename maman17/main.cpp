@@ -14,6 +14,9 @@ static InputHandler *inputHandler = nullptr;
 // Custom keyboard handler (cow controls now handled by InputHandler)
 void customKeyboardHandler(unsigned char key, int x, int y)
 {
+    // Handle sun position controls
+    handleSunControls(key, x, y);
+    
     // Any additional custom key handling can go here
     // Cow controls are automatically handled by InputHandler when enabled
 }
@@ -27,8 +30,11 @@ void drawMainScene()
     // Use camera controller for positioning
     camera.setupGLCamera();
 
-    // Setup lighting for realistic rendering
-    setupEnvironmentLighting();
+    // Setup sun lighting
+    setupSunLighting();
+
+    // Draw the sun in the sky
+    drawSun();
 
     // Draw world-wide ground texture
     drawWorldGround(worldSize);
