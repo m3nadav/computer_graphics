@@ -9,12 +9,14 @@
 
 // Initialize random seed
 static bool randomInitialized = false;
+static int programStartTime = 0;
 
 void initializeRandom()
 {
     if (!randomInitialized)
     {
-        srand(12345); // Fixed seed for consistent environment generation
+        programStartTime = (int)time(nullptr); // Use current time as base seed
+        srand(programStartTime); // Use program start time for general random seed
         randomInitialized = true;
     }
 }
@@ -22,8 +24,13 @@ void initializeRandom()
 // Set a specific seed for deterministic generation based on position/id
 void setSeedForObject(float x, float y, float z, int objectType)
 {
-    // Create a unique seed based on position and object type
-    int seed = (int)(x * 1000) + (int)(y * 1000) * 1000 + (int)(z * 1000) * 1000000 + objectType * 10000000;
+    // Ensure random is initialized
+    if (!randomInitialized) {
+        initializeRandom();
+    }
+    
+    // Create a unique seed based on position, object type, and program execution time
+    int seed = (int)(x * 1000) + (int)(y * 1000) * 1000 + (int)(z * 1000) * 1000000 + objectType * 10000000 + programStartTime;
     srand(abs(seed));
 }
 
@@ -90,10 +97,16 @@ void setGrassMaterial(float colorVariation)
     glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
 }
 
-void setRockMaterial()
+void setRockMaterial(float colorVariation)
 {
-    GLfloat matAmbient[] = {0.3f, 0.3f, 0.3f, 1.0f};  // Gray ambient
-    GLfloat matDiffuse[] = {0.5f, 0.5f, 0.45f, 1.0f}; // Slightly warm gray
+    // Base gray with slight variation
+    float baseGray = 0.5f + colorVariation * 0.2f;
+
+    // Set color for GL_COLOR_MATERIAL mode (when enabled)
+    glColor3f(baseGray, baseGray, baseGray);
+
+    GLfloat matAmbient[] = {baseGray * 0.3f, baseGray * 0.3f, baseGray * 0.3f, 1.0f};
+    GLfloat matDiffuse[] = {baseGray, baseGray, baseGray, 1.0f};
     GLfloat matSpecular[] = {0.1f, 0.1f, 0.1f, 1.0f}; // Low specular
     GLfloat matShininess[] = {5.0f};
 
@@ -416,9 +429,9 @@ void drawProceduralMeadow(float width, float depth, int grassDensity)
 }
 
 // Rock implementation
-void drawIrregularRock(float scale, int complexity)
+void drawIrregularRock(float scale, int complexity, float colorVariation)
 {
-    setRockMaterial();
+    setRockMaterial(colorVariation);
 
     // Create irregular rock using distorted sphere vertices
     glBegin(GL_TRIANGLES);
@@ -499,7 +512,7 @@ void drawIrregularRock(float scale, int complexity)
     glEnd();
 }
 
-void drawRock(float x, float y, float z, float scale)
+void drawRock(float x, float y, float z, float scale, float colorVariation)
 {
     // Set deterministic seed based on rock position
     setSeedForObject(x, y, z, 2); // objectType = 2 for rocks
@@ -515,18 +528,47 @@ void drawRock(float x, float y, float z, float scale)
     float scaleVar = scale * randomFloat(0.8f, 1.2f);
     glScalef(scaleVar, scaleVar * 0.7f, scaleVar); // Slightly flattened
 
-    drawIrregularRock(1.0f, 24);
+    drawIrregularRock(1.0f, 24, colorVariation);
 
     glPopMatrix();
+}
+
+void drawScatteredRocks(float x, float y, float z, int numRocks)
+{
+    // Set deterministic seed for consistent grass generation
+    setSeedForObject(x, y, z, 2); // objectType = 3 for grass
+
+    // Draw individual rocks
+    for (int i = 0; i < numRocks; i++)
+    {
+        // Generate rock positions so that both rockX and rockZ can be positive or negative independently,
+        // and so that rocks are distributed across the full area centered at (0,0).
+        // Use the absolute values of x and z to define the extents, so sign of x/z doesn't affect the range.
+        float halfX = std::abs(x) / 2.5f;
+        float halfZ = std::abs(z) / 2.5f;
+        float rockX = randomFloat(-halfX, halfX);
+        float rockZ = randomFloat(-halfZ, halfZ);
+        std::cout << "rockX: " << rockX << ", rockZ: " << rockZ << std::endl;
+        float rockScale = randomFloat(0.5f, 1.5f);
+        float colorVar = randomFloat(-0.2f, 0.2f);
+
+        glPushMatrix();
+        glTranslatef(rockX, 0.0f, rockZ);
+        glRotatef(randomFloat(0.0f, 360.0f), 0.0f, 1.0f, 0.0f); // Random rotation
+
+        drawIrregularRock(rockScale, 24, colorVar);
+
+        glPopMatrix();
+    }
 }
 
 // Metal material for bench
 void setMetalMaterial()
 {
-    GLfloat matAmbient[] = {0.25f, 0.25f, 0.25f, 1.0f};  // Dark metallic ambient
-    GLfloat matDiffuse[] = {0.4f, 0.4f, 0.4f, 1.0f};    // Gray metallic diffuse
+    GLfloat matAmbient[] = {0.25f, 0.25f, 0.25f, 1.0f};              // Dark metallic ambient
+    GLfloat matDiffuse[] = {0.4f, 0.4f, 0.4f, 1.0f};                 // Gray metallic diffuse
     GLfloat matSpecular[] = {0.774597f, 0.774597f, 0.774597f, 1.0f}; // High metallic specular
-    GLfloat matShininess[] = {76.8f};                     // High shininess for metal
+    GLfloat matShininess[] = {76.8f};                                // High shininess for metal
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);

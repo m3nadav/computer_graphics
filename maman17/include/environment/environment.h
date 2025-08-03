@@ -12,8 +12,9 @@ void drawProceduralMeadow(float width, float depth, int grassDensity = 1000);
 void drawGrassBlade(float height, float width, float bend, float colorVariation);
 
 // Rock model functions
-void drawRock(float x, float y, float z, float scale = 1.0f);
-void drawIrregularRock(float scale, int complexity = 20);
+void drawRock(float x, float y, float z, float scale = 1.0f, float colorVariation = 0.0f);
+void drawIrregularRock(float scale, int complexity = 20, float colorVariation = 0.0f);
+void drawScatteredRocks(float x, float y, float z, int numRocks);
 
 // Metal bench functions
 void drawMetalBench(float x, float y, float z, float scale = 1.0f);
@@ -23,7 +24,7 @@ void setMetalMaterial();
 void setupEnvironmentLighting();
 void setTreeMaterial();
 void setGrassMaterial(float colorVariation = 0.0f);
-void setRockMaterial();
+void setRockMaterial(float colorVariation = 0.0f);
 void setMaterialFromColor(float r, float g, float b, float shininess = 20.0f, float specularLevel = 0.2f);
 
 // Cow-specific materials
