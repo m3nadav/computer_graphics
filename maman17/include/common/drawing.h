@@ -16,6 +16,9 @@ namespace DrawingUtils
     // Text rendering in 3D space
     void renderText(const std::string &text, float x, float y, float z);
 
+    // Material setup helper
+    void setMaterial(float r, float g, float b);
+
     // Common OpenGL initialization
     void initOpenGL();
     void setupLighting();

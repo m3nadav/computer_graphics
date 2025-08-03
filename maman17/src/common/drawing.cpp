@@ -76,6 +76,11 @@ namespace DrawingUtils
         glEnable(GL_LIGHTING);
     }
 
+    void setMaterial(float r, float g, float b)
+    {
+        setMaterialFromColor(r, g, b, 50.0f, 0.8f);
+    }
+
     void initOpenGL()
     {
         glEnable(GL_DEPTH_TEST);
