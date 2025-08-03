@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -I./include
+CXXFLAGS = -std=c++11 -I./include -DGL_SILENCE_DEPRECATION
 LDFLAGS = -framework OpenGL -framework GLUT
 
 # Common source files used by all targets

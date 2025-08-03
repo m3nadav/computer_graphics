@@ -1,4 +1,3 @@
-#define GL_SILENCE_DEPRECATION // Silence deprecation warnings on macOS
 #include <GLUT/glut.h>
 #include <iostream>
 #include <vector>
@@ -23,10 +22,10 @@ static InputHandler *inputHandler = nullptr;
 void testDrawCow()
 {
     camera.setupGLCamera();
-    
+
     // Setup lighting for realistic rendering (same as main.cpp)
     setupEnvironmentLighting();
-    
+
     DrawingUtils::drawGrid(3.0f, 0.5f); // Add grid
     drawCow();
 }

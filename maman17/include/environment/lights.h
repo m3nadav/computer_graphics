@@ -3,6 +3,8 @@
 
 // Lighting setup
 void setupEnvironmentLighting();
+void setupSunLighting();
+void drawSun();
 
 // Material functions
 void setMaterialFromColor(float r, float g, float b, float shininess = 20.0f, float specularLevel = 0.2f);

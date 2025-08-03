@@ -1,4 +1,3 @@
-#define GL_SILENCE_DEPRECATION // Silence deprecation warnings on macOS
 #include "cow/tail.h"
 #include "cow/cow_coordinates.h"
 #include "shapes/shapes.h"

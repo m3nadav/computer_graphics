@@ -1,4 +1,3 @@
-#define GL_SILENCE_DEPRECATION // Silence deprecation warnings on macOS
 #include <GLUT/glut.h>
 #include <iostream>
 #include <vector>
