@@ -2,6 +2,7 @@
 #define INPUT_H
 
 #include "common/camera.h"
+#include "common/menu.h"
 #include <functional>
 
 // Input handler system with configurable callbacks
@@ -34,6 +35,11 @@ public:
     void handleCommandLineArgs(int argc, char **argv, int maxScenes = 0);
     int getStartingScene() const { return startingScene; }
 
+    // Menu system
+    void drawUI();
+    void toggleMenu() { menuSystem.toggleMenu(); }
+    bool isMenuVisible() const { return menuSystem.isMenuVisible(); }
+
 private:
     CameraController &cameraController;
     KeyboardCallback keyboardCallback;
@@ -55,6 +61,9 @@ private:
     // Command line
     int startingScene;
 
+    // Menu system
+    MenuSystem menuSystem;
+    
     // Static callback wrappers for GLUT
     static void keyboardWrapper(unsigned char key, int x, int y);
     static void mouseWrapper(int button, int state, int x, int y);

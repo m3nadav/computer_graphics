@@ -97,6 +97,16 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
         cameraController.zoomOut();
         glutPostRedisplay();
     }
+    else if (key == 'm' || key == 'M') // Menu toggle
+    {
+        toggleMenu();
+        glutPostRedisplay();
+    }
+    else if (key == 'h' || key == 'H') // Help
+    {
+        // For now, just print to console - button display only as per requirements
+        std::cout << "Help: Use H for help, Esc to quit, M to toggle menu" << std::endl;
+    }
     else
     {
         // Try cow controls if enabled
@@ -128,7 +138,17 @@ void InputHandler::handleCowControls(unsigned char key, int x, int y)
 
 void InputHandler::handleMouse(int button, int state, int x, int y)
 {
-    if (button == GLUT_RIGHT_BUTTON)
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    {
+        // Let menu system handle the click first
+        if (menuSystem.handleMenuClick(x, y))
+        {
+            return; // Menu system handled the click
+        }
+        
+        // Handle other left mouse button interactions here if needed
+    }
+    else if (button == GLUT_RIGHT_BUTTON)
     {
         if (state == GLUT_DOWN)
         {
@@ -185,4 +205,13 @@ void InputHandler::handleReshape(int w, int h)
     glLoadIdentity();
     gluPerspective(60.0, (float)w / h, 1.0, 1000.0);
     glMatrixMode(GL_MODELVIEW);
+}
+
+// ========================================
+// UI DRAWING METHODS
+// ========================================
+
+void InputHandler::drawUI()
+{
+    menuSystem.drawUI();
 }
