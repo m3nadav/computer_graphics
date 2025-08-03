@@ -508,7 +508,7 @@ void drawTail()
     // Setup tail position and color
     glPushMatrix();
     glTranslatef(COW_TAIL_X, COW_TAIL_Y, COW_TAIL_Z);
-    setCowWhiteMaterial();
+    setCowLightGrayMaterial();
 
     // Get current tail variation control points
     float controlPoints[NUM_CONTROL_POINTS][NUM_COORDS];

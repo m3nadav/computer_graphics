@@ -103,11 +103,11 @@ void setMetalMaterial()
     // Set color for GL_COLOR_MATERIAL mode (when enabled)
     glColor3f(0.6f, 0.6f, 0.6f);
 
-    // Set shiny metal material properties (like polished chrome/steel)
-    GLfloat matAmbient[] = {0.1f, 0.1f, 0.1f, 1.0f};     // Very low ambient for metallic look
-    GLfloat matDiffuse[] = {0.2f, 0.2f, 0.2f, 1.0f};     // Low diffuse - metals don't scatter much light
-    GLfloat matSpecular[] = {0.95f, 0.95f, 0.95f, 1.0f}; // Very high white specular for mirror-like reflections
-    GLfloat matShininess[] = {128.0f};                   // Maximum shininess for tight, bright highlights
+    // Set shiny metal material properties (broader reflections for multi-angle visibility)
+    GLfloat matAmbient[] = {0.15f, 0.15f, 0.15f, 1.0f}; // Slightly higher ambient for visibility
+    GLfloat matDiffuse[] = {0.1f, 0.1f, 0.1f, 1.0f};    // Slightly higher diffuse for broader lighting
+    GLfloat matSpecular[] = {0.9f, 0.9f, 0.9f, 1.0f};   // High white specular for metallic reflections
+    GLfloat matShininess[] = {64.0f};                   // Reduced shininess for broader highlights
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse);
