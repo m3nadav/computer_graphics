@@ -14,14 +14,17 @@ void setupEnvironmentLighting()
     GLfloat lightDiffuse[] = {0.8f, 0.8f, 0.7f, 1.0f}; // Warm sunlight
     GLfloat lightSpecular[] = {0.5f, 0.5f, 0.4f, 1.0f};
 
-    // glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-    // glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-    // glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
 
-    // Enable color material
+    // Setup for rotating objects like the cow
     glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    glEnable(GL_NORMALIZE);                          // Auto-normalize normals after transformations
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // Light both sides of polygons
+    glDisable(GL_CULL_FACE);                         // Render all polygons for proper lighting
 }
 
 // Helper function to set material properties from RGB color
@@ -35,10 +38,10 @@ void setMaterialFromColor(float r, float g, float b, float shininess, float spec
     GLfloat matSpecular[] = {specularLevel, specularLevel, specularLevel, 1.0f};
     GLfloat matShininess[] = {shininess};
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess);
 }
 
 // Environment-specific materials
@@ -49,10 +52,10 @@ void setTreeMaterial()
     GLfloat matSpecular[] = {0.1f, 0.1f, 0.1f, 1.0f}; // Low specular for bark
     GLfloat matShininess[] = {10.0f};
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess);
 }
 
 void setGrassMaterial(float colorVariation)
@@ -70,10 +73,10 @@ void setGrassMaterial(float colorVariation)
     GLfloat matSpecular[] = {0.2f, 0.3f, 0.2f, 1.0f};
     GLfloat matShininess[] = {20.0f};
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess);
 }
 
 void setRockMaterial(float colorVariation)
@@ -89,10 +92,10 @@ void setRockMaterial(float colorVariation)
     GLfloat matSpecular[] = {0.1f, 0.1f, 0.1f, 1.0f}; // Low specular
     GLfloat matShininess[] = {5.0f};
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess);
 }
 
 void setMetalMaterial()
@@ -106,56 +109,65 @@ void setMetalMaterial()
     GLfloat matSpecular[] = {0.774597f, 0.774597f, 0.774597f, 1.0f}; // High metallic specular
     GLfloat matShininess[] = {76.8f};                                // High shininess for metal
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpecular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess);
 }
 
 // Cow-specific material functions
 void setCowWhiteMaterial()
 {
-    setMaterialFromColor(0.95f, 0.95f, 0.95f, 25.0f, 0.3f);
+    glDisable(GL_LIGHTING);
+    glColor3f(0.95f, 0.95f, 0.95f);
 }
 
 void setCowLightGrayMaterial()
 {
-    setMaterialFromColor(0.9f, 0.9f, 0.9f, 25.0f, 0.3f);
+    glDisable(GL_LIGHTING);
+    glColor3f(0.9f, 0.9f, 0.9f);
 }
 
 void setCowHoofMaterial()
 {
-    setMaterialFromColor(0.2f, 0.1f, 0.1f, 5.0f, 0.1f);
+    glDisable(GL_LIGHTING);
+    glColor3f(0.2f, 0.1f, 0.1f);
 }
 
 void setCowHoofDetailMaterial()
 {
-    setMaterialFromColor(0.1f, 0.05f, 0.05f, 5.0f, 0.1f);
+    glDisable(GL_LIGHTING);
+    glColor3f(0.1f, 0.05f, 0.05f);
 }
 
 void setCowPinkMaterial()
 {
-    setMaterialFromColor(1.0f, 0.8f, 0.6f, 15.0f, 0.2f);
+    glDisable(GL_LIGHTING);
+    glColor3f(1.0f, 0.8f, 0.6f);
 }
 
 void setCowBlackMaterial()
 {
-    setMaterialFromColor(0.1f, 0.1f, 0.1f, 10.0f, 0.1f);
+    glDisable(GL_LIGHTING);
+    glColor3f(0.1f, 0.1f, 0.1f);
 }
 
 void setCowBeigeMaterial()
 {
-    setMaterialFromColor(0.85f, 0.7f, 0.6f, 15.0f, 0.2f);
+    glDisable(GL_LIGHTING);
+    glColor3f(0.85f, 0.7f, 0.6f);
 }
 
 void setCowDarkBrownMaterial()
 {
-    setMaterialFromColor(0.2f, 0.1f, 0.1f, 8.0f, 0.1f);
+    glDisable(GL_LIGHTING);
+    glColor3f(0.2f, 0.1f, 0.1f);
 }
 
 void setCowHornMaterial()
 {
-    setMaterialFromColor(0.9f, 0.9f, 0.7f, 12.0f, 0.2f);
+    glDisable(GL_LIGHTING);
+    glColor3f(0.9f, 0.9f, 0.7f);
 }
 
 // Drawing utility materials

@@ -76,19 +76,6 @@ namespace DrawingUtils
         glEnable(GL_LIGHTING);
     }
 
-    void setMaterial(float r, float g, float b)
-    {
-        GLfloat mat_ambient[] = {r * 0.2f, g * 0.2f, b * 0.2f, 1.0f};
-        GLfloat mat_diffuse[] = {r, g, b, 1.0f};
-        GLfloat mat_specular[] = {0.8f, 0.8f, 0.8f, 1.0f};
-        GLfloat mat_shininess[] = {50.0f};
-
-        glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-        glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-    }
-
     void initOpenGL()
     {
         glEnable(GL_DEPTH_TEST);
