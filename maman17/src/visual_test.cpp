@@ -8,6 +8,7 @@
 #include "cow/spots.h"
 #include "cow/cow.h"
 #include "scene/scene.h"
+#include "environment/lights.h"
 #include "common/camera.h"
 #include "common/input.h"
 #include "common/drawing.h"
@@ -22,6 +23,10 @@ static InputHandler *inputHandler = nullptr;
 void testDrawCow()
 {
     camera.setupGLCamera();
+    
+    // Setup lighting for realistic rendering (same as main.cpp)
+    setupEnvironmentLighting();
+    
     DrawingUtils::drawGrid(3.0f, 0.5f); // Add grid
     drawCow();
 }

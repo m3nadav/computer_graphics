@@ -1,4 +1,6 @@
 #include "common/drawing.h"
+#include "environment/environment.h"
+#include "environment/lights.h"
 #include <GLUT/glut.h>
 
 namespace DrawingUtils
@@ -13,7 +15,7 @@ namespace DrawingUtils
         glDisable(GL_DEPTH_TEST);
 
         // Use a consistent grid color
-        glColor3f(0.6f, 0.6f, 0.6f);
+        setGridMaterial();
         glLineWidth(1.0f);
 
         glBegin(GL_LINES);
@@ -40,17 +42,17 @@ namespace DrawingUtils
         glBegin(GL_LINES);
 
         // X-axis (Red)
-        glColor3f(1.0f, 0.0f, 0.0f);
+        setRedAxisMaterial();
         glVertex3f(0.0f, 0.0f, 0.0f);
         glVertex3f(length, 0.0f, 0.0f);
 
         // Y-axis (Green)
-        glColor3f(0.0f, 1.0f, 0.0f);
+        setGreenAxisMaterial();
         glVertex3f(0.0f, 0.0f, 0.0f);
         glVertex3f(0.0f, length, 0.0f);
 
         // Z-axis (Blue)
-        glColor3f(0.0f, 0.0f, 1.0f);
+        setBlueAxisMaterial();
         glVertex3f(0.0f, 0.0f, 0.0f);
         glVertex3f(0.0f, 0.0f, length);
 
@@ -63,7 +65,7 @@ namespace DrawingUtils
     void renderText(const std::string &text, float x, float y, float z)
     {
         glDisable(GL_LIGHTING);
-        glColor3f(0.0f, 0.0f, 0.0f); // Black text
+        setBlackTextMaterial();
 
         glRasterPos3f(x, y, z);
         for (char c : text)
@@ -76,15 +78,7 @@ namespace DrawingUtils
 
     void setMaterial(float r, float g, float b)
     {
-        GLfloat mat_ambient[] = {r * 0.2f, g * 0.2f, b * 0.2f, 1.0f};
-        GLfloat mat_diffuse[] = {r, g, b, 1.0f};
-        GLfloat mat_specular[] = {0.8f, 0.8f, 0.8f, 1.0f};
-        GLfloat mat_shininess[] = {50.0f};
-
-        glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-        glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+        setMaterialFromColor(r, g, b, 50.0f, 0.8f);
     }
 
     void initOpenGL()

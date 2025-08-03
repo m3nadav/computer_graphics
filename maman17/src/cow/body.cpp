@@ -4,6 +4,8 @@
 #include "cow/tail.h"
 #include "shapes/shapes.h"
 #include "scene/scene.h"
+#include "environment/environment.h"
+#include "environment/lights.h"
 #include <GLUT/glut.h>
 #include <cmath>
 #include <iostream>
@@ -11,7 +13,7 @@
 void drawBody()
 {
     glPushMatrix();
-    glColor3f(0.95f, 0.95f, 0.95f); // White
+    setCowWhiteMaterial();
     glPushMatrix();
     glScalef(1.0f, 0.6f, 0.6f);
 
@@ -40,7 +42,7 @@ void drawLegs()
 
         // Upper leg (thigh)
         glPushMatrix();
-        glColor3f(0.95f, 0.95f, 0.95f); // Match body color
+        setCowWhiteMaterial();
         glScalef(0.08f, 0.15f, 0.08f);
         drawEllipsoid(1.0, 1.0, 1.0);
         glPopMatrix();
@@ -48,7 +50,7 @@ void drawLegs()
         // Knee joint
         glPushMatrix();
         glTranslatef(0.0f, -0.12f, 0.0f);
-        glColor3f(0.9f, 0.9f, 0.9f); // Slightly darker
+        setCowLightGrayMaterial();
         glScalef(0.06f, 0.04f, 0.06f);
         drawEllipsoid(1.0, 1.0, 1.0);
         glPopMatrix();
@@ -56,7 +58,7 @@ void drawLegs()
         // Lower leg (shin)
         glPushMatrix();
         glTranslatef(0.0f, -0.22f, 0.0f);
-        glColor3f(0.95f, 0.95f, 0.95f);
+        setCowWhiteMaterial();
         glScalef(0.06f, 0.12f, 0.06f);
         drawEllipsoid(1.0, 1.0, 1.0);
         glPopMatrix();
@@ -64,7 +66,7 @@ void drawLegs()
         // Ankle joint
         glPushMatrix();
         glTranslatef(0.0f, -0.32f, 0.0f);
-        glColor3f(0.9f, 0.9f, 0.9f);
+        setCowLightGrayMaterial();
         glScalef(0.05f, 0.03f, 0.05f);
         drawEllipsoid(1.0, 1.0, 1.0);
         glPopMatrix();
@@ -72,7 +74,7 @@ void drawLegs()
         // Hoof
         glPushMatrix();
         glTranslatef(0.0f, -0.38f, 0.0f);
-        glColor3f(0.2f, 0.1f, 0.1f);   // Dark brown/black
+        setCowHoofMaterial();
         glScalef(0.06f, 0.06f, 0.08f); // Slightly elongated forward
         drawEllipsoid(1.0, 1.0, 1.0);
         glPopMatrix();
@@ -80,7 +82,7 @@ void drawLegs()
         // Hoof split (cloven hoof detail)
         glPushMatrix();
         glTranslatef(0.0f, -0.36f, 0.0f);
-        glColor3f(0.1f, 0.05f, 0.05f); // Even darker line
+        setCowHoofDetailMaterial();
         glScalef(0.01f, 0.04f, 0.08f);
         drawEllipsoid(1.0, 1.0, 1.0);
         glPopMatrix();

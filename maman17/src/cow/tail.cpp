@@ -3,6 +3,8 @@
 #include "cow/cow_coordinates.h"
 #include "shapes/shapes.h"
 #include "scene/scene.h"
+#include "environment/environment.h"
+#include "environment/lights.h"
 #include <GLUT/glut.h>
 #include <cmath>
 #include <iostream>
@@ -465,7 +467,7 @@ void drawHairTuft(float controlPoints[5][3])
 {
     glPushMatrix();
     glTranslatef(controlPoints[4][0], controlPoints[4][1], controlPoints[4][2]);
-    glColor3f(0.1f, 0.1f, 0.1f); // Black hair
+    setCowBlackMaterial();
 
     // Calculate tangent vector at the end of the tail curve
     float tangent[3];
@@ -506,7 +508,7 @@ void drawTail()
     // Setup tail position and color
     glPushMatrix();
     glTranslatef(COW_TAIL_X, COW_TAIL_Y, COW_TAIL_Z);
-    glColor3f(0.95f, 0.95f, 0.95f); // White to match body base color
+    setCowLightGrayMaterial();
 
     // Get current tail variation control points
     float controlPoints[NUM_CONTROL_POINTS][NUM_COORDS];

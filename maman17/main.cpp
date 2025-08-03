@@ -2,6 +2,7 @@
 #include "scene/scene.h"
 #include "cow/cow.h"
 #include "environment/environment.h"
+#include "environment/lights.h"
 #include "common/camera.h"
 #include "common/input.h"
 #include <cmath>
@@ -17,6 +18,7 @@ void customKeyboardHandler(unsigned char key, int x, int y)
     // Cow controls are automatically handled by InputHandler when enabled
 }
 
+float worldSize = 50.0f;
 // Custom main scene drawing
 void drawMainScene()
 {
@@ -29,10 +31,10 @@ void drawMainScene()
     setupEnvironmentLighting();
 
     // Draw world-wide ground texture
-    drawWorldGround(100.0f);
+    drawWorldGround(worldSize);
 
     // Draw enhanced procedural meadow (grass only, no ground base)
-    drawProceduralMeadow(50.0f, 50.0f, 2000);
+    drawProceduralMeadow(worldSize, worldSize, 2000);
 
     // Draw multiple trees at different positions
     drawTree(-8.0f, 0.0f, -5.0f, 1.2f);
@@ -42,11 +44,10 @@ void drawMainScene()
     drawTree(-3.0f, 0.0f, -15.0f, 0.8f);
 
     // Draw rocks scattered around
-    drawRock(-5.0f, 0.0f, 8.0f, 1.0f);
-    drawRock(10.0f, 0.0f, 3.0f, 0.7f);
-    drawRock(-12.0f, 0.0f, -2.0f, 1.3f);
-    drawRock(15.0f, 0.0f, -12.0f, 0.9f);
-    drawRock(2.0f, 0.0f, 18.0f, 1.1f);
+    drawScatteredRocks(worldSize, 0.0f, worldSize, 10);
+
+    // Draw metal benches
+    drawMetalBench(-4, 0.0f, -6, 1.0f);
 
     // Draw the cow in the center
     drawCow();
@@ -69,7 +70,7 @@ int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(800, 600);
+    glutInitWindowSize(1024, 768);
     glutCreateWindow("OpenGL Cow in a Meadow");
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.5f, 0.8f, 1.0f, 1.0f); // Sky blue

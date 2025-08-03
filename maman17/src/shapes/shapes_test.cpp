@@ -191,7 +191,7 @@ void drawTestScaledShapes()
     glPushMatrix();
     glTranslatef(-0.5f, 0, 0);
     glScalef(0.5f, 1.0f, 1.0f);
-    DrawingUtils::setMaterial(0.9f, 0.6f, 0.3f); // Light orange
+    // DrawingUtils::setMaterial(0.9f, 0.6f, 0.3f); // Light orange
     drawSphere(0.4);
     glPopMatrix();
 
@@ -199,7 +199,7 @@ void drawTestScaledShapes()
     glPushMatrix();
     glTranslatef(0.5f, 0, 0);
     glScalef(1.0f, 0.5f, 1.0f);
-    DrawingUtils::setMaterial(0.3f, 0.6f, 0.9f); // Light blue
+    // DrawingUtils::setMaterial(0.3f, 0.6f, 0.9f); // Light blue
     drawCylinder(0.3, 0.3, 0.8);
     glPopMatrix();
 }

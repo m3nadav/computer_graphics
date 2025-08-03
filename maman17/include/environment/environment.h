@@ -11,21 +11,29 @@ void drawLeaves(float x, float y, float z, float size);
 void drawProceduralMeadow(float width, float depth, int grassDensity = 1000);
 void drawGrassBlade(float height, float width, float bend, float colorVariation);
 
-// Rock model functions  
-void drawRock(float x, float y, float z, float scale = 1.0f);
-void drawIrregularRock(float scale, int complexity = 20);
+// Rock model functions
+void drawRock(float x, float y, float z, float scale = 1.0f, float colorVariation = 0.0f);
+void drawIrregularRock(float scale, int complexity = 20, float colorVariation = 0.0f);
+void drawScatteredRocks(float x, float y, float z, int numRocks);
 
-// Lighting and material setup
-void setupEnvironmentLighting();
-void setTreeMaterial();
-void setGrassMaterial(float colorVariation = 0.0f);
-void setRockMaterial();
+// Metal bench functions
+void drawMetalBench(float x, float y, float z, float scale = 1.0f);
+
 
 // Random seed management for consistent generation
 void setSeedForObject(float x, float y, float z, int objectType);
 
+// Simple collision detection utilities
+bool isPositionTooCloseToPoint(float x, float z, float targetX, float targetZ, float minDistance);
+bool isPositionSafeForRock(float rockX, float rockZ);
+
+// Dynamic cow dimension calculations
+float getCowCollisionRadius();
+float getCowSpawnRadius();
+float getCowClearanceRadius();
+
 // Ground texture management
-unsigned int loadGroundTexture(const char* filename);
+unsigned int loadGroundTexture(const char *filename);
 void drawTexturedGroundPatch(float centerX, float centerZ, float size, unsigned int textureID);
 void drawWorldGround(float worldSize);
 

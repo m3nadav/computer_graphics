@@ -1,5 +1,10 @@
 #include "environment/environment.h"
+#include "environment/lights.h"
 #include "shapes/shapes.h"
+#ifdef COW_CONTROLS_AVAILABLE
+#include "cow/cow.h"
+#include "cow/cow_coordinates.h"
+#endif
 #include <GLUT/glut.h>
 #include <cmath>
 #include <cstdlib>
@@ -9,12 +14,14 @@
 
 // Initialize random seed
 static bool randomInitialized = false;
+static int programStartTime = 0;
 
 void initializeRandom()
 {
     if (!randomInitialized)
     {
-        srand(12345); // Fixed seed for consistent environment generation
+        programStartTime = (int)time(nullptr); // Use current time as base seed
+        srand(programStartTime);               // Use program start time for general random seed
         randomInitialized = true;
     }
 }
@@ -22,8 +29,14 @@ void initializeRandom()
 // Set a specific seed for deterministic generation based on position/id
 void setSeedForObject(float x, float y, float z, int objectType)
 {
-    // Create a unique seed based on position and object type
-    int seed = (int)(x * 1000) + (int)(y * 1000) * 1000 + (int)(z * 1000) * 1000000 + objectType * 10000000;
+    // Ensure random is initialized
+    if (!randomInitialized)
+    {
+        initializeRandom();
+    }
+
+    // Create a unique seed based on position, object type, and program execution time
+    int seed = (int)(x * 1000) + (int)(y * 1000) * 1000 + (int)(z * 1000) * 1000000 + objectType * 10000000 + programStartTime;
     srand(abs(seed));
 }
 
@@ -33,76 +46,83 @@ float randomFloat(float min, float max)
     return min + (float)rand() / RAND_MAX * (max - min);
 }
 
-// Lighting and material setup
-void setupEnvironmentLighting()
+// Simple collision detection function to check if a point is too close to another point
+bool isPositionTooCloseToPoint(float x, float z, float targetX, float targetZ, float minDistance)
 {
-    // Enable lighting
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-
-    // Set up directional light (sun)
-    GLfloat lightPos[] = {10.0f, 20.0f, 10.0f, 0.0f}; // Directional light
-    GLfloat lightAmbient[] = {0.3f, 0.3f, 0.3f, 1.0f};
-    GLfloat lightDiffuse[] = {0.8f, 0.8f, 0.7f, 1.0f}; // Warm sunlight
-    GLfloat lightSpecular[] = {0.5f, 0.5f, 0.4f, 1.0f};
-
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
-
-    // Enable color material
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    float dx = x - targetX;
+    float dz = z - targetZ;
+    float distanceSquared = dx * dx + dz * dz;
+    return distanceSquared < (minDistance * minDistance);
 }
 
-void setTreeMaterial()
+#ifdef COW_CONTROLS_AVAILABLE
+// Calculate cow's collision radius based on actual cow dimensions
+float getCowCollisionRadius()
 {
-    GLfloat matAmbient[] = {0.2f, 0.1f, 0.05f, 1.0f}; // Dark brown ambient
-    GLfloat matDiffuse[] = {0.4f, 0.2f, 0.1f, 1.0f};  // Brown diffuse
-    GLfloat matSpecular[] = {0.1f, 0.1f, 0.1f, 1.0f}; // Low specular for bark
-    GLfloat matShininess[] = {10.0f};
+    // Calculate cow's extent in X direction (length)
+    // From tail position to head position, plus some margin for actual geometry
+    float lengthX = (COW_HEAD_X - COW_TAIL_X) + 0.5f; // Add 0.5 units margin for head/tail geometry
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+    // Calculate cow's extent in Z direction (width)
+    // Body is scaled to 0.6f on a unit ellipsoid (radius 1.0), so body width is 1.2
+    // Legs extend to ±0.25, but body is wider
+    float widthZ = std::max(1.2f, 2.0f * std::abs(COW_LEG_FRONT_LEFT_Z)) + 0.2f; // Add 0.2 units margin
+
+    // Use the larger dimension as collision radius for conservative collision detection
+    float radius = std::max(lengthX, widthZ) / 2.0f;
+
+    return radius;
 }
 
-void setGrassMaterial(float colorVariation)
+// Calculate spawn protection radius (larger than collision radius for initial placement)
+float getCowSpawnRadius()
 {
-    // Base green with slight variation
-    float baseGreen = 0.6f + colorVariation * 0.2f;
-    float baseRed = 0.1f + colorVariation * 0.1f;
-    float baseBlue = 0.2f + colorVariation * 0.1f;
-
-    GLfloat matAmbient[] = {baseRed * 0.3f, baseGreen * 0.3f, baseBlue * 0.3f, 1.0f};
-    GLfloat matDiffuse[] = {baseRed, baseGreen, baseBlue, 1.0f};
-    GLfloat matSpecular[] = {0.2f, 0.3f, 0.2f, 1.0f};
-    GLfloat matShininess[] = {20.0f};
-
-    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+    return getCowCollisionRadius() + 1.5f; // Extra clearance for spawn area
 }
 
-void setRockMaterial()
+// Calculate clearance radius for dynamic rock placement (smaller than spawn radius)
+float getCowClearanceRadius()
 {
-    GLfloat matAmbient[] = {0.3f, 0.3f, 0.3f, 1.0f};  // Gray ambient
-    GLfloat matDiffuse[] = {0.5f, 0.5f, 0.45f, 1.0f}; // Slightly warm gray
-    GLfloat matSpecular[] = {0.1f, 0.1f, 0.1f, 1.0f}; // Low specular
-    GLfloat matShininess[] = {5.0f};
+    return getCowCollisionRadius() + 0.5f; // Some clearance but not as much as spawn
+}
+#else
+// Fallback functions when cow module is not available - use default values
+float getCowCollisionRadius()
+{
+    return 1.5f; // Default conservative cow collision radius
+}
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+float getCowSpawnRadius()
+{
+    return 3.0f; // Default spawn protection radius
+}
+
+float getCowClearanceRadius()
+{
+    return 2.5f; // Default clearance radius
+}
+#endif
+
+// Check if position is safe for rock placement (not too close to cow spawn or current position)
+bool isPositionSafeForRock(float rockX, float rockZ)
+{
+    // Cow spawn protection - avoid placing rocks near origin (0, 0)
+    // Use calculated spawn radius based on cow's actual dimensions
+    float spawnRadius = getCowSpawnRadius();
+    if (isPositionTooCloseToPoint(rockX, rockZ, 0.0f, 0.0f, spawnRadius))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 // Tree implementation
 void drawTrunk(float height, float baseRadius, float topRadius)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     setTreeMaterial();
 
     // Create trunk with texture-like appearance using multiple cylinders
@@ -153,12 +173,18 @@ void drawTrunk(float height, float baseRadius, float topRadius)
 
         glPopMatrix();
     }
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawBranch(float length, float radius, int depth, float angleX, float angleY)
 {
     if (depth <= 0 || length < 0.1f)
         return;
+
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
 
     setTreeMaterial();
 
@@ -194,10 +220,16 @@ void drawBranch(float length, float radius, int depth, float angleX, float angle
     }
 
     glPopMatrix();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawLeaves(float x, float y, float z, float size)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     // Set leaf material (green)
     GLfloat matAmbient[] = {0.1f, 0.3f, 0.1f, 1.0f};
     GLfloat matDiffuse[] = {0.2f, 0.8f, 0.2f, 1.0f};
@@ -222,19 +254,25 @@ void drawLeaves(float x, float y, float z, float size)
 
         glTranslatef(leafX, leafY, leafZ);
 
-        // Vary leaf color slightly
+        // Vary leaf color slightly with proper material properties
         float colorVar = randomFloat(-0.1f, 0.1f);
-        glColor3f(0.2f + colorVar, 0.8f + colorVar, 0.2f + colorVar);
+        setMaterialFromColor(0.2f + colorVar, 0.8f + colorVar, 0.2f + colorVar, 30.0f, 0.3f);
 
         // Small leaf sphere
         glutSolidSphere(size * 0.15f, 6, 6);
 
         glPopMatrix();
     }
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawTree(float x, float y, float z, float scale)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     // Set deterministic seed based on tree position
     setSeedForObject(x, y, z, 1); // objectType = 1 for trees
 
@@ -266,11 +304,17 @@ void drawTree(float x, float y, float z, float scale)
 
     glPopMatrix();
     glPopMatrix();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 // Enhanced meadow implementation
 void drawGrassBlade(float height, float width, float bend, float colorVariation)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     setGrassMaterial(colorVariation);
 
     // Create a single grass blade using triangular strips
@@ -296,10 +340,16 @@ void drawGrassBlade(float height, float width, float bend, float colorVariation)
     }
 
     glEnd();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawProceduralMeadow(float width, float depth, int grassDensity)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     // Set deterministic seed for consistent grass generation
     setSeedForObject(width, depth, grassDensity, 3); // objectType = 3 for grass
 
@@ -321,12 +371,18 @@ void drawProceduralMeadow(float width, float depth, int grassDensity)
 
         glPopMatrix();
     }
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 // Rock implementation
-void drawIrregularRock(float scale, int complexity)
+void drawIrregularRock(float scale, int complexity, float colorVariation)
 {
-    setRockMaterial();
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
+    setRockMaterial(colorVariation);
 
     // Create irregular rock using distorted sphere vertices
     glBegin(GL_TRIANGLES);
@@ -405,10 +461,16 @@ void drawIrregularRock(float scale, int complexity)
     }
 
     glEnd();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
-void drawRock(float x, float y, float z, float scale)
+void drawRock(float x, float y, float z, float scale, float colorVariation)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     // Set deterministic seed based on rock position
     setSeedForObject(x, y, z, 2); // objectType = 2 for rocks
 
@@ -423,13 +485,146 @@ void drawRock(float x, float y, float z, float scale)
     float scaleVar = scale * randomFloat(0.8f, 1.2f);
     glScalef(scaleVar, scaleVar * 0.7f, scaleVar); // Slightly flattened
 
-    drawIrregularRock(1.0f, 24);
+    drawIrregularRock(1.0f, 24, colorVariation);
 
     glPopMatrix();
+
+    // Restore previous material state
+    glPopAttrib();
+}
+
+void drawScatteredRocks(float x, float y, float z, int numRocks)
+{
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
+    // Set deterministic seed for consistent rock generation
+    setSeedForObject(x, y, z, 2); // objectType = 2 for rocks
+
+    // Draw individual rocks
+    for (int i = 0; i < numRocks; i++)
+    {
+        float rockX, rockZ;
+        int attempts = 0;
+        const int MAX_ATTEMPTS = 50; // Prevent infinite loops
+
+        // Generate rock position, avoiding the cow's spawn area and current position
+        do
+        {
+            // Generate rock positions so that both rockX and rockZ can be positive or negative independently,
+            // and so that rocks are distributed across the full area centered at (0,0).
+            // Use the absolute values of x and z to define the extents, so sign of x/z doesn't affect the range.
+            float halfX = std::abs(x) / 2.5f;
+            float halfZ = std::abs(z) / 2.5f;
+            rockX = randomFloat(-halfX, halfX);
+            rockZ = randomFloat(-halfZ, halfZ);
+            attempts++;
+        } while (!isPositionSafeForRock(rockX, rockZ) && attempts < MAX_ATTEMPTS);
+
+        // If we couldn't find a safe position after many attempts, skip this rock
+        if (attempts >= MAX_ATTEMPTS)
+        {
+            std::cout << "Warning: Could not find safe position for rock " << i << ", skipping." << std::endl;
+            continue;
+        }
+
+        float rockScale = randomFloat(0.5f, 1.5f);
+        float colorVar = randomFloat(-0.2f, 0.2f);
+
+        glPushMatrix();
+        glTranslatef(rockX, 0.0f, rockZ);
+        glRotatef(randomFloat(0.0f, 360.0f), 0.0f, 1.0f, 0.0f); // Random rotation
+
+        drawIrregularRock(rockScale, 24, colorVar);
+
+        glPopMatrix();
+    }
+
+    // Restore previous material state
+    glPopAttrib();
+}
+
+// Metal bench implementation
+void drawMetalBench(float x, float y, float z, float scale)
+{
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glScalef(scale, scale, scale);
+
+    setMetalMaterial();
+
+    // Bench dimensions
+    float seatWidth = 2.0f;
+    float seatDepth = 0.5f;
+    float seatHeight = 0.1f;
+    float seatYPos = 0.4f;
+
+    float backrestWidth = 2.0f;
+    float backrestHeight = 0.8f;
+    float backrestThickness = 0.1f;
+    float backrestYPos = seatYPos + seatHeight + backrestHeight / 2;
+
+    float legWidth = 0.1f;
+    float legDepth = 0.1f;
+    float legHeight = 0.4f;
+
+    // Draw seat (horizontal rectangle)
+    glPushMatrix();
+    glTranslatef(0.0f, seatYPos, 0.0f);
+    glScalef(seatWidth, seatHeight, seatDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Draw backrest (vertical rectangle)
+    glPushMatrix();
+    glTranslatef(0.0f, backrestYPos, -seatDepth / 2 + backrestThickness / 2);
+    glScalef(backrestWidth, backrestHeight, backrestThickness);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Draw legs (4 vertical rectangles at corners)
+    // Front left leg
+    glPushMatrix();
+    glTranslatef(-seatWidth / 2 + legWidth / 2, legHeight / 2, seatDepth / 2 - legDepth / 2);
+    glScalef(legWidth, legHeight, legDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Front right leg
+    glPushMatrix();
+    glTranslatef(seatWidth / 2 - legWidth / 2, legHeight / 2, seatDepth / 2 - legDepth / 2);
+    glScalef(legWidth, legHeight, legDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Back left leg
+    glPushMatrix();
+    glTranslatef(-seatWidth / 2 + legWidth / 2, legHeight / 2, -seatDepth / 2 + legDepth / 2);
+    glScalef(legWidth, legHeight, legDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Back right leg
+    glPushMatrix();
+    glTranslatef(seatWidth / 2 - legWidth / 2, legHeight / 2, -seatDepth / 2 + legDepth / 2);
+    glScalef(legWidth, legHeight, legDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    glPopMatrix();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawTexturedGroundPatch(float centerX, float centerZ, float size, unsigned int textureID)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -460,11 +655,23 @@ void drawTexturedGroundPatch(float centerX, float centerZ, float size, unsigned 
     glPopMatrix();
 
     glDisable(GL_TEXTURE_2D);
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 // World-wide ground texture
 void drawWorldGround(float worldSize)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
+    // Set bright material for ground to show texture clearly
+    GLfloat matFullAmbientOrDiffuse[] = {0.0f, 0.0f, 0.0f, 1.0f}; // Full ambient
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matFullAmbientOrDiffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matFullAmbientOrDiffuse);
+    glColor3f(1.0f, 1.0f, 1.0f); // Ensure white color
+
     static unsigned int worldGroundTextureID = 0;
     if (worldGroundTextureID == 0)
     {
@@ -475,7 +682,7 @@ void drawWorldGround(float worldSize)
     glBindTexture(GL_TEXTURE_2D, worldGroundTextureID);
 
     glPushMatrix();
-    glTranslatef(0.0f, -0.01f, 0.0f); // Slightly below ground level
+    glTranslatef(0.0f, 0.0f, 0.0f); // Slightly below ground level
 
     // Calculate texture repeat count for 1:1 mapping
     // The texture is 1024x1024 pixels and represents 1 world unit
@@ -506,4 +713,7 @@ void drawWorldGround(float worldSize)
     glPopMatrix();
 
     glDisable(GL_TEXTURE_2D);
+
+    // Restore previous material state
+    glPopAttrib();
 }
