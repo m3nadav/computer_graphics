@@ -4,6 +4,7 @@
 #include "cow/cow.h"
 #include "shapes/shapes.h"
 #include "environment/environment.h"
+#include "environment/lights.h"
 #include <GLUT/glut.h>
 
 void drawFullHead()

@@ -6,6 +6,7 @@
 #include <cmath>
 
 #include "environment/environment.h"
+#include "environment/lights.h"
 #include "shapes/shapes.h"
 #include "common/camera.h"
 #include "common/input.h"

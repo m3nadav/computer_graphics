@@ -2,6 +2,7 @@
 #include "scene/scene.h"
 #include "cow/cow.h"
 #include "environment/environment.h"
+#include "environment/lights.h"
 #include "common/camera.h"
 #include "common/input.h"
 #include <cmath>

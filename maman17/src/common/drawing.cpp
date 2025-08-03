@@ -1,5 +1,6 @@
 #include "common/drawing.h"
 #include "environment/environment.h"
+#include "environment/lights.h"
 #include <GLUT/glut.h>
 
 namespace DrawingUtils

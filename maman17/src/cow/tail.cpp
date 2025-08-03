@@ -4,6 +4,7 @@
 #include "shapes/shapes.h"
 #include "scene/scene.h"
 #include "environment/environment.h"
+#include "environment/lights.h"
 #include <GLUT/glut.h>
 #include <cmath>
 #include <iostream>
