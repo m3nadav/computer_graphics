@@ -1,5 +1,9 @@
 #include "environment/environment.h"
 #include "shapes/shapes.h"
+#ifdef COW_CONTROLS_AVAILABLE
+#include "cow/cow.h"
+#include "cow/cow_coordinates.h"
+#endif
 #include <GLUT/glut.h>
 #include <cmath>
 #include <cstdlib>
@@ -16,7 +20,7 @@ void initializeRandom()
     if (!randomInitialized)
     {
         programStartTime = (int)time(nullptr); // Use current time as base seed
-        srand(programStartTime); // Use program start time for general random seed
+        srand(programStartTime);               // Use program start time for general random seed
         randomInitialized = true;
     }
 }
@@ -25,10 +29,11 @@ void initializeRandom()
 void setSeedForObject(float x, float y, float z, int objectType)
 {
     // Ensure random is initialized
-    if (!randomInitialized) {
+    if (!randomInitialized)
+    {
         initializeRandom();
     }
-    
+
     // Create a unique seed based on position, object type, and program execution time
     int seed = (int)(x * 1000) + (int)(y * 1000) * 1000 + (int)(z * 1000) * 1000000 + objectType * 10000000 + programStartTime;
     srand(abs(seed));
@@ -38,6 +43,77 @@ void setSeedForObject(float x, float y, float z, int objectType)
 float randomFloat(float min, float max)
 {
     return min + (float)rand() / RAND_MAX * (max - min);
+}
+
+// Simple collision detection function to check if a point is too close to another point
+bool isPositionTooCloseToPoint(float x, float z, float targetX, float targetZ, float minDistance)
+{
+    float dx = x - targetX;
+    float dz = z - targetZ;
+    float distanceSquared = dx * dx + dz * dz;
+    return distanceSquared < (minDistance * minDistance);
+}
+
+#ifdef COW_CONTROLS_AVAILABLE
+// Calculate cow's collision radius based on actual cow dimensions
+float getCowCollisionRadius()
+{
+    // Calculate cow's extent in X direction (length)
+    // From tail position to head position, plus some margin for actual geometry
+    float lengthX = (COW_HEAD_X - COW_TAIL_X) + 0.5f; // Add 0.5 units margin for head/tail geometry
+
+    // Calculate cow's extent in Z direction (width)
+    // Body is scaled to 0.6f on a unit ellipsoid (radius 1.0), so body width is 1.2
+    // Legs extend to ±0.25, but body is wider
+    float widthZ = std::max(1.2f, 2.0f * std::abs(COW_LEG_FRONT_LEFT_Z)) + 0.2f; // Add 0.2 units margin
+
+    // Use the larger dimension as collision radius for conservative collision detection
+    float radius = std::max(lengthX, widthZ) / 2.0f;
+
+    return radius;
+}
+
+// Calculate spawn protection radius (larger than collision radius for initial placement)
+float getCowSpawnRadius()
+{
+    return getCowCollisionRadius() + 1.5f; // Extra clearance for spawn area
+}
+
+// Calculate clearance radius for dynamic rock placement (smaller than spawn radius)
+float getCowClearanceRadius()
+{
+    return getCowCollisionRadius() + 0.5f; // Some clearance but not as much as spawn
+}
+#else
+// Fallback functions when cow module is not available - use default values
+float getCowCollisionRadius()
+{
+    return 1.5f; // Default conservative cow collision radius
+}
+
+float getCowSpawnRadius()
+{
+    return 3.0f; // Default spawn protection radius
+}
+
+float getCowClearanceRadius()
+{
+    return 2.5f; // Default clearance radius
+}
+#endif
+
+// Check if position is safe for rock placement (not too close to cow spawn or current position)
+bool isPositionSafeForRock(float rockX, float rockZ)
+{
+    // Cow spawn protection - avoid placing rocks near origin (0, 0)
+    // Use calculated spawn radius based on cow's actual dimensions
+    float spawnRadius = getCowSpawnRadius();
+    if (isPositionTooCloseToPoint(rockX, rockZ, 0.0f, 0.0f, spawnRadius))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 // Lighting and material setup
@@ -535,20 +611,36 @@ void drawRock(float x, float y, float z, float scale, float colorVariation)
 
 void drawScatteredRocks(float x, float y, float z, int numRocks)
 {
-    // Set deterministic seed for consistent grass generation
-    setSeedForObject(x, y, z, 2); // objectType = 3 for grass
+    // Set deterministic seed for consistent rock generation
+    setSeedForObject(x, y, z, 2); // objectType = 2 for rocks
 
     // Draw individual rocks
     for (int i = 0; i < numRocks; i++)
     {
-        // Generate rock positions so that both rockX and rockZ can be positive or negative independently,
-        // and so that rocks are distributed across the full area centered at (0,0).
-        // Use the absolute values of x and z to define the extents, so sign of x/z doesn't affect the range.
-        float halfX = std::abs(x) / 2.5f;
-        float halfZ = std::abs(z) / 2.5f;
-        float rockX = randomFloat(-halfX, halfX);
-        float rockZ = randomFloat(-halfZ, halfZ);
-        std::cout << "rockX: " << rockX << ", rockZ: " << rockZ << std::endl;
+        float rockX, rockZ;
+        int attempts = 0;
+        const int MAX_ATTEMPTS = 50; // Prevent infinite loops
+
+        // Generate rock position, avoiding the cow's spawn area and current position
+        do
+        {
+            // Generate rock positions so that both rockX and rockZ can be positive or negative independently,
+            // and so that rocks are distributed across the full area centered at (0,0).
+            // Use the absolute values of x and z to define the extents, so sign of x/z doesn't affect the range.
+            float halfX = std::abs(x) / 2.5f;
+            float halfZ = std::abs(z) / 2.5f;
+            rockX = randomFloat(-halfX, halfX);
+            rockZ = randomFloat(-halfZ, halfZ);
+            attempts++;
+        } while (!isPositionSafeForRock(rockX, rockZ) && attempts < MAX_ATTEMPTS);
+
+        // If we couldn't find a safe position after many attempts, skip this rock
+        if (attempts >= MAX_ATTEMPTS)
+        {
+            std::cout << "Warning: Could not find safe position for rock " << i << ", skipping." << std::endl;
+            continue;
+        }
+
         float rockScale = randomFloat(0.5f, 1.5f);
         float colorVar = randomFloat(-0.2f, 0.2f);
 

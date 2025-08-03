@@ -48,6 +48,15 @@ void setBlackTextMaterial();
 // Random seed management for consistent generation
 void setSeedForObject(float x, float y, float z, int objectType);
 
+// Simple collision detection utilities
+bool isPositionTooCloseToPoint(float x, float z, float targetX, float targetZ, float minDistance);
+bool isPositionSafeForRock(float rockX, float rockZ);
+
+// Dynamic cow dimension calculations
+float getCowCollisionRadius();
+float getCowSpawnRadius();
+float getCowClearanceRadius();
+
 // Ground texture management
 unsigned int loadGroundTexture(const char *filename);
 void drawTexturedGroundPatch(float centerX, float centerZ, float size, unsigned int textureID);
