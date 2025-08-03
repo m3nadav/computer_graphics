@@ -76,6 +76,9 @@ void setGrassMaterial(float colorVariation)
     float baseRed = 0.1f + colorVariation * 0.1f;
     float baseBlue = 0.2f + colorVariation * 0.1f;
 
+    // Set color for GL_COLOR_MATERIAL mode (when enabled)
+    glColor3f(baseRed, baseGreen, baseBlue);
+
     GLfloat matAmbient[] = {baseRed * 0.3f, baseGreen * 0.3f, baseBlue * 0.3f, 1.0f};
     GLfloat matDiffuse[] = {baseRed, baseGreen, baseBlue, 1.0f};
     GLfloat matSpecular[] = {0.2f, 0.3f, 0.2f, 1.0f};
@@ -98,6 +101,95 @@ void setRockMaterial()
     glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
     glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+}
+
+// Helper function to set material properties from RGB color
+void setMaterialFromColor(float r, float g, float b, float shininess, float specularLevel)
+{
+    // Set color for GL_COLOR_MATERIAL mode (when enabled)
+    glColor3f(r, g, b);
+
+    GLfloat matAmbient[] = {r * 0.3f, g * 0.3f, b * 0.3f, 1.0f};
+    GLfloat matDiffuse[] = {r, g, b, 1.0f};
+    GLfloat matSpecular[] = {specularLevel, specularLevel, specularLevel, 1.0f};
+    GLfloat matShininess[] = {shininess};
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+}
+
+// Cow-specific material functions
+void setCowWhiteMaterial()
+{
+    setMaterialFromColor(0.95f, 0.95f, 0.95f, 25.0f, 0.3f);
+}
+
+void setCowLightGrayMaterial()
+{
+    setMaterialFromColor(0.9f, 0.9f, 0.9f, 25.0f, 0.3f);
+}
+
+void setCowHoofMaterial()
+{
+    setMaterialFromColor(0.2f, 0.1f, 0.1f, 5.0f, 0.1f);
+}
+
+void setCowHoofDetailMaterial()
+{
+    setMaterialFromColor(0.1f, 0.05f, 0.05f, 5.0f, 0.1f);
+}
+
+void setCowPinkMaterial()
+{
+    setMaterialFromColor(1.0f, 0.8f, 0.6f, 15.0f, 0.2f);
+}
+
+void setCowBlackMaterial()
+{
+    setMaterialFromColor(0.1f, 0.1f, 0.1f, 10.0f, 0.1f);
+}
+
+void setCowBeigeMaterial()
+{
+    setMaterialFromColor(0.85f, 0.7f, 0.6f, 15.0f, 0.2f);
+}
+
+void setCowDarkBrownMaterial()
+{
+    setMaterialFromColor(0.2f, 0.1f, 0.1f, 8.0f, 0.1f);
+}
+
+void setCowHornMaterial()
+{
+    setMaterialFromColor(0.9f, 0.9f, 0.7f, 12.0f, 0.2f);
+}
+
+// Drawing utility materials
+void setGridMaterial()
+{
+    setMaterialFromColor(0.6f, 0.6f, 0.6f, 10.0f, 0.1f);
+}
+
+void setRedAxisMaterial()
+{
+    setMaterialFromColor(1.0f, 0.0f, 0.0f, 15.0f, 0.2f);
+}
+
+void setGreenAxisMaterial()
+{
+    setMaterialFromColor(0.0f, 1.0f, 0.0f, 15.0f, 0.2f);
+}
+
+void setBlueAxisMaterial()
+{
+    setMaterialFromColor(0.0f, 0.0f, 1.0f, 15.0f, 0.2f);
+}
+
+void setBlackTextMaterial()
+{
+    setMaterialFromColor(0.0f, 0.0f, 0.0f, 5.0f, 0.0f);
 }
 
 // Tree implementation
@@ -222,9 +314,9 @@ void drawLeaves(float x, float y, float z, float size)
 
         glTranslatef(leafX, leafY, leafZ);
 
-        // Vary leaf color slightly
+        // Vary leaf color slightly with proper material properties
         float colorVar = randomFloat(-0.1f, 0.1f);
-        glColor3f(0.2f + colorVar, 0.8f + colorVar, 0.2f + colorVar);
+        setMaterialFromColor(0.2f + colorVar, 0.8f + colorVar, 0.2f + colorVar, 30.0f, 0.3f);
 
         // Small leaf sphere
         glutSolidSphere(size * 0.15f, 6, 6);

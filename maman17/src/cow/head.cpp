@@ -3,6 +3,7 @@
 #include "cow/cow_coordinates.h"
 #include "cow/cow.h"
 #include "shapes/shapes.h"
+#include "environment/environment.h"
 #include <GLUT/glut.h>
 
 void drawFullHead()
@@ -26,7 +27,7 @@ void drawFullHead()
 void drawHead()
 {
     glPushMatrix();
-    glColor3f(0.95f, 0.95f, 0.95f); // White base color like body
+    setCowWhiteMaterial();
     glScalef(0.35f, 0.35f, 0.35f);
 
     // Use the same spots texture as the body, but mirrored for variety
@@ -42,7 +43,7 @@ void drawHeadMuzzle()
     // Position muzzle at the front of the head
     glTranslatef(0.28f, 0.0f, 0.0f);
     glScalef(0.12f, 0.08f, 0.08f);
-    glColor3f(0.85f, 0.7f, 0.6f);
+    setCowBeigeMaterial();
 
     // Draw a slightly flattened muzzle by using a custom shape
     // First draw most of the muzzle as an ellipsoid
@@ -68,7 +69,7 @@ void drawHeadEyes()
         // Position eyes on the sides of the head, slightly forward
         glTranslatef(0.15f, 0.05f, 0.21f * s);
         glScalef(0.02f, 0.02f, 0.02f);
-        glColor3f(0.1f, 0.1f, 0.1f);
+        setCowBlackMaterial();
         drawSphere(1.0);
         glPopMatrix();
     }
@@ -81,7 +82,7 @@ void drawHeadHorns()
         glPushMatrix();
         // Position horns on top of head where ears used to be
         glTranslatef(-0.05f, 0.30f, 0.15f * s);
-        glColor3f(0.9f, 0.9f, 0.7f);
+        setCowHornMaterial();
 
         // Create curved horn using multiple segments
         int segments = 6;
@@ -122,7 +123,7 @@ void drawHeadEars()
         glTranslatef(-0.05f, 0.15f, 0.25f * s); // More visible position
         glRotatef(20 * s, 0, 1, 0);             // Slight outward angle
         glRotatef(-10, 1, 0, 0);                // Slight backward tilt
-        glColor3f(1.0f, 0.8f, 0.6f);            // Much brighter, more visible color
+        setCowPinkMaterial();
 
         // Create ear shape: large oval base with pointed tip
         // Main oval part of the ear - reduced to 75% size
@@ -150,7 +151,7 @@ void drawHeadNostrils()
         // Position nostrils at the front of the muzzle
         glTranslatef(0.36f, 0.0f, 0.05f * s);
         glScalef(0.012f, 0.012f, 0.012f);
-        glColor3f(0.2f, 0.1f, 0.1f);
+        setCowDarkBrownMaterial();
         drawSphere(1.0);
         glPopMatrix();
     }

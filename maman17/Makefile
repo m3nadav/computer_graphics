@@ -6,7 +6,7 @@ LDFLAGS = -framework OpenGL -framework GLUT
 COMMON_SRCS = src/common/camera.cpp src/common/input.cpp src/common/drawing.cpp
 
 # Shapes test
-SHAPES_SRCS = src/shapes/shapes_test.cpp src/shapes/shapes.cpp $(COMMON_SRCS)
+SHAPES_SRCS = src/shapes/shapes_test.cpp src/shapes/shapes.cpp src/environment/environment.cpp $(COMMON_SRCS)
 SHAPES_TARGET = shapes_test
 
 # Visual test
