@@ -63,6 +63,13 @@ void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     drawMainScene(); // Use custom main scene drawing
+    
+    // Draw UI overlay
+    if (inputHandler)
+    {
+        inputHandler->drawUI();
+    }
+    
     glutSwapBuffers();
 }
 

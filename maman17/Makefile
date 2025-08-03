@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++11 -I./include -DGL_SILENCE_DEPRECATION
 LDFLAGS = -framework OpenGL -framework GLUT
 
 # Common source files used by all targets
-COMMON_SRCS = src/common/camera.cpp src/common/input.cpp src/common/drawing.cpp
+COMMON_SRCS = src/common/camera.cpp src/common/input.cpp src/common/drawing.cpp src/common/menu.cpp
 
 # Shapes test
 SHAPES_SRCS = src/shapes/shapes_test.cpp src/shapes/shapes.cpp src/environment/environment.cpp src/environment/lights.cpp $(COMMON_SRCS)
