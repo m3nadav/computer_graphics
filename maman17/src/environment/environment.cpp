@@ -666,6 +666,12 @@ void drawWorldGround(float worldSize)
     // Save current material state to prevent leakage
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
 
+    // Set bright material for ground to show texture clearly
+    GLfloat matFullAmbientOrDiffuse[] = {0.0f, 0.0f, 0.0f, 1.0f}; // Full ambient
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matFullAmbientOrDiffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matFullAmbientOrDiffuse);
+    glColor3f(1.0f, 1.0f, 1.0f); // Ensure white color
+
     static unsigned int worldGroundTextureID = 0;
     if (worldGroundTextureID == 0)
     {
@@ -676,7 +682,7 @@ void drawWorldGround(float worldSize)
     glBindTexture(GL_TEXTURE_2D, worldGroundTextureID);
 
     glPushMatrix();
-    glTranslatef(0.0f, -0.01f, 0.0f); // Slightly below ground level
+    glTranslatef(0.0f, 0.0f, 0.0f); // Slightly below ground level
 
     // Calculate texture repeat count for 1:1 mapping
     // The texture is 1024x1024 pixels and represents 1 world unit
