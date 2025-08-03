@@ -520,6 +520,90 @@ void drawRock(float x, float y, float z, float scale)
     glPopMatrix();
 }
 
+// Metal material for bench
+void setMetalMaterial()
+{
+    GLfloat matAmbient[] = {0.25f, 0.25f, 0.25f, 1.0f};  // Dark metallic ambient
+    GLfloat matDiffuse[] = {0.4f, 0.4f, 0.4f, 1.0f};    // Gray metallic diffuse
+    GLfloat matSpecular[] = {0.774597f, 0.774597f, 0.774597f, 1.0f}; // High metallic specular
+    GLfloat matShininess[] = {76.8f};                     // High shininess for metal
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDiffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+}
+
+// Metal bench implementation
+void drawMetalBench(float x, float y, float z, float scale)
+{
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glScalef(scale, scale, scale);
+
+    setMetalMaterial();
+
+    // Bench dimensions
+    float seatWidth = 2.0f;
+    float seatDepth = 0.5f;
+    float seatHeight = 0.1f;
+    float seatYPos = 0.4f;
+
+    float backrestWidth = 2.0f;
+    float backrestHeight = 0.8f;
+    float backrestThickness = 0.1f;
+    float backrestYPos = seatYPos + seatHeight + backrestHeight / 2;
+
+    float legWidth = 0.1f;
+    float legDepth = 0.1f;
+    float legHeight = 0.4f;
+
+    // Draw seat (horizontal rectangle)
+    glPushMatrix();
+    glTranslatef(0.0f, seatYPos, 0.0f);
+    glScalef(seatWidth, seatHeight, seatDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Draw backrest (vertical rectangle)
+    glPushMatrix();
+    glTranslatef(0.0f, backrestYPos, -seatDepth / 2 + backrestThickness / 2);
+    glScalef(backrestWidth, backrestHeight, backrestThickness);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Draw legs (4 vertical rectangles at corners)
+    // Front left leg
+    glPushMatrix();
+    glTranslatef(-seatWidth / 2 + legWidth / 2, legHeight / 2, seatDepth / 2 - legDepth / 2);
+    glScalef(legWidth, legHeight, legDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Front right leg
+    glPushMatrix();
+    glTranslatef(seatWidth / 2 - legWidth / 2, legHeight / 2, seatDepth / 2 - legDepth / 2);
+    glScalef(legWidth, legHeight, legDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Back left leg
+    glPushMatrix();
+    glTranslatef(-seatWidth / 2 + legWidth / 2, legHeight / 2, -seatDepth / 2 + legDepth / 2);
+    glScalef(legWidth, legHeight, legDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Back right leg
+    glPushMatrix();
+    glTranslatef(seatWidth / 2 - legWidth / 2, legHeight / 2, -seatDepth / 2 + legDepth / 2);
+    glScalef(legWidth, legHeight, legDepth);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    glPopMatrix();
+}
+
 void drawTexturedGroundPatch(float centerX, float centerZ, float size, unsigned int textureID)
 {
     glEnable(GL_TEXTURE_2D);

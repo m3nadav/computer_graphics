@@ -48,6 +48,10 @@ void drawMainScene()
     drawRock(15.0f, 0.0f, -12.0f, 0.9f);
     drawRock(2.0f, 0.0f, 18.0f, 1.1f);
 
+    // Draw metal benches
+    drawMetalBench(6.0f, 0.0f, -3.0f, 1.0f);
+    drawMetalBench(-10.0f, 0.0f, 6.0f, 0.8f);
+
     // Draw the cow in the center
     drawCow();
 }

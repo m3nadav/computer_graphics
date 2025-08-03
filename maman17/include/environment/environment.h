@@ -15,6 +15,10 @@ void drawGrassBlade(float height, float width, float bend, float colorVariation)
 void drawRock(float x, float y, float z, float scale = 1.0f);
 void drawIrregularRock(float scale, int complexity = 20);
 
+// Metal bench functions
+void drawMetalBench(float x, float y, float z, float scale = 1.0f);
+void setMetalMaterial();
+
 // Lighting and material setup
 void setupEnvironmentLighting();
 void setTreeMaterial();
