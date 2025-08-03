@@ -10,15 +10,9 @@ void setupEnvironmentLighting()
     glEnable(GL_LIGHT0);
 
     // Set up directional light (sun)
-    // GLfloat lightPos[] = {10.0f, 20.0f, 10.0f, 0.0f}; // Directional light
     GLfloat lightAmbient[] = {0.3f, 0.3f, 0.3f, 1.0f};
-    // GLfloat lightDiffuse[] = {0.8f, 0.8f, 0.7f, 1.0f};  // Warm sunlight
-    // GLfloat lightSpecular[] = {1.0f, 1.0f, 1.0f, 1.0f}; // Bright white specular for metallic reflections
 
-    // glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-    // glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-    // glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
 
     // Setup for rotating objects like the cow
     glEnable(GL_COLOR_MATERIAL);

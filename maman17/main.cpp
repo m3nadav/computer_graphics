@@ -8,7 +8,7 @@
 #include <cmath>
 
 // Global camera and input handler
-static CameraController camera;
+static CameraController camera(10.0f, 35.0f, 55.0f);
 static InputHandler *inputHandler = nullptr;
 
 // Custom keyboard handler (cow controls now handled by InputHandler)
@@ -16,7 +16,7 @@ void customKeyboardHandler(unsigned char key, int x, int y)
 {
     // Handle sun position controls
     handleSunControls(key, x, y);
-    
+
     // Any additional custom key handling can go here
     // Cow controls are automatically handled by InputHandler when enabled
 }
