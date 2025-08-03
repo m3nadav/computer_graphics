@@ -117,10 +117,12 @@ bool isPositionSafeForRock(float rockX, float rockZ)
     return true;
 }
 
-
 // Tree implementation
 void drawTrunk(float height, float baseRadius, float topRadius)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     setTreeMaterial();
 
     // Create trunk with texture-like appearance using multiple cylinders
@@ -171,12 +173,18 @@ void drawTrunk(float height, float baseRadius, float topRadius)
 
         glPopMatrix();
     }
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawBranch(float length, float radius, int depth, float angleX, float angleY)
 {
     if (depth <= 0 || length < 0.1f)
         return;
+
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
 
     setTreeMaterial();
 
@@ -212,10 +220,16 @@ void drawBranch(float length, float radius, int depth, float angleX, float angle
     }
 
     glPopMatrix();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawLeaves(float x, float y, float z, float size)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     // Set leaf material (green)
     GLfloat matAmbient[] = {0.1f, 0.3f, 0.1f, 1.0f};
     GLfloat matDiffuse[] = {0.2f, 0.8f, 0.2f, 1.0f};
@@ -249,10 +263,16 @@ void drawLeaves(float x, float y, float z, float size)
 
         glPopMatrix();
     }
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawTree(float x, float y, float z, float scale)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     // Set deterministic seed based on tree position
     setSeedForObject(x, y, z, 1); // objectType = 1 for trees
 
@@ -284,11 +304,17 @@ void drawTree(float x, float y, float z, float scale)
 
     glPopMatrix();
     glPopMatrix();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 // Enhanced meadow implementation
 void drawGrassBlade(float height, float width, float bend, float colorVariation)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     setGrassMaterial(colorVariation);
 
     // Create a single grass blade using triangular strips
@@ -314,10 +340,16 @@ void drawGrassBlade(float height, float width, float bend, float colorVariation)
     }
 
     glEnd();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawProceduralMeadow(float width, float depth, int grassDensity)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     // Set deterministic seed for consistent grass generation
     setSeedForObject(width, depth, grassDensity, 3); // objectType = 3 for grass
 
@@ -339,11 +371,17 @@ void drawProceduralMeadow(float width, float depth, int grassDensity)
 
         glPopMatrix();
     }
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 // Rock implementation
 void drawIrregularRock(float scale, int complexity, float colorVariation)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     setRockMaterial(colorVariation);
 
     // Create irregular rock using distorted sphere vertices
@@ -423,10 +461,16 @@ void drawIrregularRock(float scale, int complexity, float colorVariation)
     }
 
     glEnd();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawRock(float x, float y, float z, float scale, float colorVariation)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     // Set deterministic seed based on rock position
     setSeedForObject(x, y, z, 2); // objectType = 2 for rocks
 
@@ -444,10 +488,16 @@ void drawRock(float x, float y, float z, float scale, float colorVariation)
     drawIrregularRock(1.0f, 24, colorVariation);
 
     glPopMatrix();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawScatteredRocks(float x, float y, float z, int numRocks)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     // Set deterministic seed for consistent rock generation
     setSeedForObject(x, y, z, 2); // objectType = 2 for rocks
 
@@ -489,12 +539,17 @@ void drawScatteredRocks(float x, float y, float z, int numRocks)
 
         glPopMatrix();
     }
-}
 
+    // Restore previous material state
+    glPopAttrib();
+}
 
 // Metal bench implementation
 void drawMetalBench(float x, float y, float z, float scale)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     glPushMatrix();
     glTranslatef(x, y, z);
     glScalef(scale, scale, scale);
@@ -560,10 +615,16 @@ void drawMetalBench(float x, float y, float z, float scale)
     glPopMatrix();
 
     glPopMatrix();
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 void drawTexturedGroundPatch(float centerX, float centerZ, float size, unsigned int textureID)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -594,11 +655,17 @@ void drawTexturedGroundPatch(float centerX, float centerZ, float size, unsigned 
     glPopMatrix();
 
     glDisable(GL_TEXTURE_2D);
+
+    // Restore previous material state
+    glPopAttrib();
 }
 
 // World-wide ground texture
 void drawWorldGround(float worldSize)
 {
+    // Save current material state to prevent leakage
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+
     static unsigned int worldGroundTextureID = 0;
     if (worldGroundTextureID == 0)
     {
@@ -640,4 +707,7 @@ void drawWorldGround(float worldSize)
     glPopMatrix();
 
     glDisable(GL_TEXTURE_2D);
+
+    // Restore previous material state
+    glPopAttrib();
 }

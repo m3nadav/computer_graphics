@@ -11,8 +11,8 @@ void setupEnvironmentLighting()
     // Set up directional light (sun)
     GLfloat lightPos[] = {10.0f, 20.0f, 10.0f, 0.0f}; // Directional light
     GLfloat lightAmbient[] = {0.3f, 0.3f, 0.3f, 1.0f};
-    GLfloat lightDiffuse[] = {0.8f, 0.8f, 0.7f, 1.0f}; // Warm sunlight
-    GLfloat lightSpecular[] = {0.5f, 0.5f, 0.4f, 1.0f};
+    GLfloat lightDiffuse[] = {0.8f, 0.8f, 0.7f, 1.0f};  // Warm sunlight
+    GLfloat lightSpecular[] = {1.0f, 1.0f, 1.0f, 1.0f}; // Bright white specular for metallic reflections
 
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
@@ -101,13 +101,13 @@ void setRockMaterial(float colorVariation)
 void setMetalMaterial()
 {
     // Set color for GL_COLOR_MATERIAL mode (when enabled)
-    glColor3f(0.4f, 0.4f, 0.4f);
+    glColor3f(0.6f, 0.6f, 0.6f);
 
-    // Set metal material properties
-    GLfloat matAmbient[] = {0.25f, 0.25f, 0.25f, 1.0f};              // Dark metallic ambient
-    GLfloat matDiffuse[] = {0.4f, 0.4f, 0.4f, 1.0f};                 // Gray metallic diffuse
-    GLfloat matSpecular[] = {0.774597f, 0.774597f, 0.774597f, 1.0f}; // High metallic specular
-    GLfloat matShininess[] = {76.8f};                                // High shininess for metal
+    // Set shiny metal material properties (like polished chrome/steel)
+    GLfloat matAmbient[] = {0.1f, 0.1f, 0.1f, 1.0f};     // Very low ambient for metallic look
+    GLfloat matDiffuse[] = {0.2f, 0.2f, 0.2f, 1.0f};     // Low diffuse - metals don't scatter much light
+    GLfloat matSpecular[] = {0.95f, 0.95f, 0.95f, 1.0f}; // Very high white specular for mirror-like reflections
+    GLfloat matShininess[] = {128.0f};                   // Maximum shininess for tight, bright highlights
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse);

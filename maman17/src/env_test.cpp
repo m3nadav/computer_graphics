@@ -60,6 +60,20 @@ void testGrass()
     drawProceduralMeadow(4.0f, 4.0f, 200);
 }
 
+// Test: Metal bench
+void testBench()
+{
+    camera.setupGLCamera();
+
+    setupEnvironmentLighting();
+    drawWorldGround(20.0f);
+    DrawingUtils::drawGrid();
+    DrawingUtils::drawAxes();
+
+    // Draw a single metal bench at origin for detailed inspection
+    drawMetalBench(0.0f, 0.0f, 0.0f, 1.0f);
+}
+
 // Test: Multiple objects
 void testMultipleObjects()
 {
@@ -75,6 +89,9 @@ void testMultipleObjects()
     drawTree(2.0f, 0.0f, 2.0f, 1.2f);
     drawRock(-1.0f, 0.0f, 2.0f, 0.9f);
     drawRock(1.5f, 0.0f, -1.5f, 1.1f);
+
+    // Add a bench to the multiple objects test too
+    drawMetalBench(0.0f, 0.0f, 0.0f, 1.0f);
 
     // Small grass patches
     drawProceduralMeadow(6.0f, 6.0f, 300);
@@ -94,6 +111,7 @@ std::vector<std::pair<std::string, std::function<void()>>> tests = {
     {"Single Tree", testTree},
     {"Single Rock", testRock},
     {"Grass Patch", testGrass},
+    {"Metal Bench", testBench},
     {"Multiple Objects", testMultipleObjects}};
 
 int currentTest = 0;
@@ -122,7 +140,7 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(900, 700);
-    glutCreateWindow("Environment Test - Trees, Rocks, Grass with Axis Grid");
+    glutCreateWindow("Environment Test - Trees, Rocks, Grass, Benches with Axis Grid");
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.5f, 0.8f, 1.0f, 1.0f); // Sky blue background like main.cpp
 
