@@ -31,36 +31,58 @@ static float sunPositions[4][3] = {
     {15.0f, 25.0f, 15.0f}    // Position 3: (x,y,z)
 };
 
+// Light control variables
+static float lightIntensity = 1.0f;        // Multiplier for diffuse/specular (0.1 to 2.0)
+static float lightPositionX = -15.0f;      // Custom X position
+static float lightPositionY = 25.0f;       // Custom Y position  
+static float lightPositionZ = -15.0f;      // Custom Z position
+static float ambientLevel = 0.3f;          // Ambient light level (0.0 to 1.0)
+static bool useCustomPosition = false;     // Whether to use custom position or sunPositions array
+
 void setupSunLighting()
 {
     // Enable lighting
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
-    // Get current sun position from environment module
-    int currentPos = getCurrentSunPosition();
+    // Determine light position
     float sunX, sunY, sunZ;
-
-    // Use the sun positions array instead of hard-coded values
-    if (currentPos >= 0 && currentPos < 4)
+    
+    if (useCustomPosition)
     {
-        sunX = sunPositions[currentPos][0];
-        sunY = sunPositions[currentPos][1];
-        sunZ = sunPositions[currentPos][2];
+        // Use custom adjustable position
+        sunX = lightPositionX;
+        sunY = lightPositionY;
+        sunZ = lightPositionZ;
     }
     else
     {
-        // Default to position 0 if invalid
-        sunX = sunPositions[0][0];
-        sunY = sunPositions[0][1];
-        sunZ = sunPositions[0][2];
+        // Use predefined positions from 1-4 keys
+        int currentPos = getCurrentSunPosition();
+        if (currentPos >= 0 && currentPos < 4)
+        {
+            sunX = sunPositions[currentPos][0];
+            sunY = sunPositions[currentPos][1];
+            sunZ = sunPositions[currentPos][2];
+        }
+        else
+        {
+            // Default to position 0 if invalid
+            sunX = sunPositions[0][0];
+            sunY = sunPositions[0][1];
+            sunZ = sunPositions[0][2];
+        }
+        // Update custom position variables to match current preset
+        lightPositionX = sunX;
+        lightPositionY = sunY;
+        lightPositionZ = sunZ;
     }
 
-    // Set up point light source (sun)
+    // Set up point light source (sun) with adjustable properties
     GLfloat lightPos[] = {sunX, sunY, sunZ, 1.0f}; // Point light (w=1.0)
-    GLfloat lightAmbient[] = {0.3f, 0.3f, 0.3f, 1.0f};
-    GLfloat lightDiffuse[] = {0.9f, 0.85f, 0.75f, 1.0f}; // Less yellow sunlight
-    GLfloat lightSpecular[] = {0.8f, 0.75f, 0.7f, 1.0f};
+    GLfloat lightAmbient[] = {ambientLevel, ambientLevel, ambientLevel, 1.0f};
+    GLfloat lightDiffuse[] = {0.9f * lightIntensity, 0.85f * lightIntensity, 0.75f * lightIntensity, 1.0f};
+    GLfloat lightSpecular[] = {0.8f * lightIntensity, 0.75f * lightIntensity, 0.7f * lightIntensity, 1.0f};
 
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
     glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
@@ -78,38 +100,33 @@ void setupSunLighting()
 // Draw the sun as a bright sphere
 void drawSun()
 {
-    // Get current sun position from environment module
-    int currentPos = getCurrentSunPosition();
+    // Use the same position logic as setupSunLighting()
     float sunX, sunY, sunZ;
-
-    // Sun positions: 0: (-x,y,-z), 1: (-x,y,z), 2: (x,y,-z), 3: (x,y,z)
-    switch (currentPos)
+    
+    if (useCustomPosition)
     {
-    case 0:
-        sunX = -15.0f;
-        sunY = 25.0f;
-        sunZ = -15.0f;
-        break;
-    case 1:
-        sunX = -15.0f;
-        sunY = 25.0f;
-        sunZ = 15.0f;
-        break;
-    case 2:
-        sunX = 15.0f;
-        sunY = 25.0f;
-        sunZ = -15.0f;
-        break;
-    case 3:
-        sunX = 15.0f;
-        sunY = 25.0f;
-        sunZ = 15.0f;
-        break;
-    default:
-        sunX = -15.0f;
-        sunY = 25.0f;
-        sunZ = -15.0f;
-        break;
+        // Use custom adjustable position
+        sunX = lightPositionX;
+        sunY = lightPositionY;
+        sunZ = lightPositionZ;
+    }
+    else
+    {
+        // Use predefined positions from 1-4 keys
+        int currentPos = getCurrentSunPosition();
+        if (currentPos >= 0 && currentPos < 4)
+        {
+            sunX = sunPositions[currentPos][0];
+            sunY = sunPositions[currentPos][1];
+            sunZ = sunPositions[currentPos][2];
+        }
+        else
+        {
+            // Default to position 0 if invalid
+            sunX = sunPositions[0][0];
+            sunY = sunPositions[0][1];
+            sunZ = sunPositions[0][2];
+        }
     }
 
     glPushMatrix();
@@ -306,4 +323,59 @@ void setBlueAxisMaterial()
 void setBlackTextMaterial()
 {
     setMaterialFromColor(0.0f, 0.0f, 0.0f, 5.0f, 0.0f);
+}
+
+// Light control functions implementation
+void setLightIntensity(float intensity)
+{
+    if (intensity >= 0.1f && intensity <= 2.0f)
+    {
+        lightIntensity = intensity;
+    }
+}
+
+void setLightPosition(float x, float y, float z)
+{
+    lightPositionX = x;
+    lightPositionY = y;
+    lightPositionZ = z;
+    useCustomPosition = true;
+}
+
+void setAmbientLevel(float level)
+{
+    if (level >= 0.0f && level <= 1.0f)
+    {
+        ambientLevel = level;
+    }
+}
+
+float getLightIntensity()
+{
+    return lightIntensity;
+}
+
+float getLightPositionX()
+{
+    return lightPositionX;
+}
+
+float getLightPositionY()
+{
+    return lightPositionY;
+}
+
+float getLightPositionZ()
+{
+    return lightPositionZ;
+}
+
+float getAmbientLevel()
+{
+    return ambientLevel;
+}
+
+void enableCustomLightPosition(bool enable)
+{
+    useCustomPosition = enable;
 }

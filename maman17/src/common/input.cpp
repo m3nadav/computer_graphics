@@ -99,7 +99,7 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
     }
     else if (key == 'm' || key == 'M') // Menu toggle
     {
-        toggleMenu();
+        menuSystem.menuButton.isActive = !menuSystem.menuButton.isActive;
         glutPostRedisplay();
     }
     else if (key == 'h' || key == 'H') // Help
@@ -145,7 +145,7 @@ void InputHandler::handleMouse(int button, int state, int x, int y)
         {
             return; // Menu system handled the click
         }
-        
+
         // Handle other left mouse button interactions here if needed
     }
     else if (button == GLUT_RIGHT_BUTTON)

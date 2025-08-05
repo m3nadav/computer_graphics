@@ -125,15 +125,19 @@ void handleSunControls(unsigned char key, int x, int y)
     {
     case '1':
         setSunPosition(0); // (-x,y,-z)
+        enableCustomLightPosition(false); // Disable custom positioning
         break;
     case '2':
         setSunPosition(1); // (-x,y,z)
+        enableCustomLightPosition(false); // Disable custom positioning
         break;
     case '3':
         setSunPosition(2); // (x,y,-z)
+        enableCustomLightPosition(false); // Disable custom positioning
         break;
     case '4':
         setSunPosition(3); // (x,y,z)
+        enableCustomLightPosition(false); // Disable custom positioning
         break;
     }
 }
