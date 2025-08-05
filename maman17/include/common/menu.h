@@ -23,9 +23,9 @@ public:
     UIButton(float x_, float y_, float width_, float height_, const char *text_)
         : x(x_), y(y_), width(width_), height(height_), text(text_), isActive(false), parent(nullptr) {}
 
-    bool isPointInButton(int mouseX, int mouseY) const;
+    bool isButtonClicked(int mouseX, int mouseY);
     void draw();
-    void handleClick(int mouseX, int mouseY);
+    void toggleActive();
     bool isVisible() const;
 };
 
@@ -48,16 +48,23 @@ public:
     void drawUI();
 
     // Input handling - returns true if click was handled by menu system
-    bool handleMenuClick(int mouseX, int mouseY);
+    void handleMenuClick(int mouseX, int mouseY);
+
+    // Expose menu functions
+    void applyMenuClick();
+    void applyQuitClick();
+    void applyHelpClick();
+    void applyLightClick();
 
 private:
     // UI drawing methods
     void drawMenuButton();
     void drawMenuBox();
     void drawLightControls();
+    void drawHelpWindow();
     void drawValueButton(UIButton button, float value);
 
-    void handleLightValueClick(int mouseX, int mouseY, UIButton button);
+    void applyLightValueClick(int mouseX, int mouseY, UIButton button);
 
     // Helper methods
     void setupUI2D();

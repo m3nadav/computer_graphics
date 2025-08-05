@@ -85,7 +85,7 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
     // Handle common keys first
     if (key == 27) // ESC
     {
-        exit(0);
+        menuSystem.applyQuitClick();
     }
     else if (key == '+' || key == '=') // Zoom in
     {
@@ -99,13 +99,13 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
     }
     else if (key == 'm' || key == 'M') // Menu toggle
     {
-        menuSystem.menuButton.isActive = !menuSystem.menuButton.isActive;
+        menuSystem.applyMenuClick();
         glutPostRedisplay();
     }
     else if (key == 'h' || key == 'H') // Help
     {
-        // For now, just print to console - button display only as per requirements
-        std::cout << "Help: Use H for help, Esc to quit, M to toggle menu" << std::endl;
+        menuSystem.applyHelpClick();
+        glutPostRedisplay();
     }
     else
     {
@@ -140,13 +140,7 @@ void InputHandler::handleMouse(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
     {
-        // Let menu system handle the click first
-        if (menuSystem.handleMenuClick(x, y))
-        {
-            return; // Menu system handled the click
-        }
-
-        // Handle other left mouse button interactions here if needed
+        menuSystem.handleMenuClick(x, y);
     }
     else if (button == GLUT_RIGHT_BUTTON)
     {

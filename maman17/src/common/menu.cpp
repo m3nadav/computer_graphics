@@ -9,7 +9,7 @@
 #include "menu.h"
 
 // UIButton method implementations
-bool UIButton::isPointInButton(int mouseX, int mouseY) const
+bool UIButton::isButtonClicked(int mouseX, int mouseY)
 {
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
     float adjustedMouseY = windowHeight - mouseY;
@@ -22,13 +22,9 @@ void UIButton::draw()
     drawButton(*this);
 }
 
-void UIButton::handleClick(int mouseX, int mouseY)
+void UIButton::toggleActive()
 {
-    if ((parent == nullptr || parent->isActive) && isPointInButton(mouseX, mouseY))
-    {
-        isActive = !isActive;
-        glutPostRedisplay();
-    }
+    isActive = !isActive;
 }
 
 bool UIButton::isVisible() const
@@ -45,26 +41,62 @@ void MenuSystem::drawUI()
     drawMenuButton();
     drawMenuBox();
     drawLightControls();
+    // drawHelpWindow();
 
     restoreUI3D();
 }
 
-bool MenuSystem::handleMenuClick(int mouseX, int mouseY)
+void MenuSystem::handleMenuClick(int mouseX, int mouseY)
 {
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
-    menuButton.handleClick(mouseX, mouseY);
-    lightButton.handleClick(mouseX, mouseY);
-    helpButton.handleClick(mouseX, mouseY);
-    quitButton.handleClick(mouseX, mouseY);
+    if (menuButton.isButtonClicked(mouseX, mouseY))
+        applyMenuClick();
+    else if (lightButton.isButtonClicked(mouseX, mouseY))
+        applyLightClick();
+    else if (helpButton.isButtonClicked(mouseX, mouseY))
+        applyHelpClick();
+    else if (quitButton.isButtonClicked(mouseX, mouseY))
+        applyQuitClick();
+    else if (ambientButton.isButtonClicked(mouseX, mouseY))
+        applyLightValueClick(mouseX, mouseY, ambientButton);
+    else if (intensityButton.isButtonClicked(mouseX, mouseY))
+        applyLightValueClick(mouseX, mouseY, intensityButton);
+    else if (positionXButton.isButtonClicked(mouseX, mouseY))
+        applyLightValueClick(mouseX, mouseY, positionXButton);
+    else if (positionYButton.isButtonClicked(mouseX, mouseY))
+        applyLightValueClick(mouseX, mouseY, positionYButton);
+    else if (positionZButton.isButtonClicked(mouseX, mouseY))
+        applyLightValueClick(mouseX, mouseY, positionZButton);
+}
 
-    handleLightValueClick(mouseX, mouseY, ambientButton);
-    handleLightValueClick(mouseX, mouseY, intensityButton);
-    handleLightValueClick(mouseX, mouseY, positionXButton);
-    handleLightValueClick(mouseX, mouseY, positionYButton);
-    handleLightValueClick(mouseX, mouseY, positionZButton);
-    return true;
+void MenuSystem::applyMenuClick()
+{
+    menuButton.toggleActive();
+}
+
+void MenuSystem::applyQuitClick()
+{
+    quitButton.toggleActive();
+    if (quitButton.isActive)
+        exit(0);
+}
+
+void MenuSystem::applyHelpClick()
+{
+    helpButton.toggleActive();
+    if (helpButton.isActive)
+        lightButton.isActive = false;
+}
+
+void MenuSystem::applyLightClick()
+{
+    lightButton.toggleActive();
+    if (lightButton.isActive)
+    {
+        helpButton.isActive = false;
+    }
 }
 
 void MenuSystem::setupUI2D()
@@ -113,7 +145,7 @@ void MenuSystem::drawMenuButton()
 
         menuButton = UIButton(buttonX, buttonY, buttonWidth, buttonHeight, "Menu");
     }
-    drawButton(menuButton);
+    menuButton.draw();
 }
 
 void MenuSystem::drawMenuBox()
@@ -157,19 +189,19 @@ void MenuSystem::drawMenuBox()
     {
         lightButton = UIButton(itemX, menuY + 10.0f, itemWidth, itemHeight, "Light Controls", &menuButton);
     }
-    drawButton(lightButton);
+    lightButton.draw();
 
     if (helpButton.width == 0)
     {
         helpButton = UIButton(itemX, menuY + 50.0f, itemWidth, itemHeight, "Help (H)", &menuButton);
     }
-    drawButton(helpButton);
+    helpButton.draw();
 
     if (quitButton.width == 0)
     {
         quitButton = UIButton(itemX, menuY + 90.0f, itemWidth, itemHeight, "Quit (Esc)", &menuButton);
     }
-    drawButton(quitButton);
+    quitButton.draw();
 }
 
 void drawButton(UIButton button)
@@ -213,7 +245,7 @@ void renderText2D(const char *text, float x, float y)
 void MenuSystem::drawLightControls()
 {
     // Light controls are only visible when the light button is active
-    if (!lightButton.isActive)
+    if (!lightButton.isActive || !lightButton.isVisible())
         return;
 
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
@@ -331,7 +363,7 @@ void MenuSystem::drawValueButton(UIButton button, float value)
     renderText2D("- +", button.x + button.width - 40.0f, button.y + button.height / 2 - 8.0f);
 }
 
-void MenuSystem::handleLightValueClick(int mouseX, int mouseY, UIButton button)
+void MenuSystem::applyLightValueClick(int mouseX, int mouseY, UIButton button)
 {
     if (!button.isVisible())
         return;
@@ -339,8 +371,6 @@ void MenuSystem::handleLightValueClick(int mouseX, int mouseY, UIButton button)
     // Determine if click was on left (decrease) or right (increase) side of button
     float clickX = mouseX - button.x;
     float clickY = mouseY - button.y;
-    if (!button.isPointInButton(mouseX, mouseY))
-        return; // Ignore clicks outside button
 
     bool isIncrement = clickX > (button.width / 2.0f);
 
@@ -352,18 +382,18 @@ void MenuSystem::handleLightValueClick(int mouseX, int mouseY, UIButton button)
     float posZ = getLightPositionZ();
 
     // Adjust values based on type and increment/decrement
-    if (button.text == "Intensity")
+    if (strcmp(button.text, "Intensity") == 0)
     {
         float newIntensity = isIncrement ? intensity + 0.1f : intensity - 0.1f;
         setLightIntensity(newIntensity);
         enableCustomLightPosition(true); // Enable custom mode when adjusting
     }
-    else if (button.text == "Position X")
+    else if (strcmp(button.text, "Position X") == 0)
     {
         float newPosX = isIncrement ? posX + 2.0f : posX - 2.0f;
         setLightPosition(newPosX, posY, posZ);
     }
-    else if (button.text == "Position Y")
+    else if (strcmp(button.text, "Position Y") == 0)
     {
         float newPosY = isIncrement ? posY + 2.0f : posY - 2.0f;
         // Clamp Y position to reasonable range
@@ -373,12 +403,12 @@ void MenuSystem::handleLightValueClick(int mouseX, int mouseY, UIButton button)
             newPosY = 50.0f;
         setLightPosition(posX, newPosY, posZ);
     }
-    else if (button.text == "Position Z")
+    else if (strcmp(button.text, "Position Z") == 0)
     {
         float newPosZ = isIncrement ? posZ + 2.0f : posZ - 2.0f;
         setLightPosition(posX, posY, newPosZ);
     }
-    else if (button.text == "Ambient")
+    else if (strcmp(button.text, "Ambient") == 0)
     {
         float newAmbient = isIncrement ? ambient + 0.05f : ambient - 0.05f;
         setAmbientLevel(newAmbient);
