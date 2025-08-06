@@ -32,6 +32,16 @@ bool UIButton::isVisible() const
     return (parent == nullptr || parent->isActive);
 }
 
+void UIButton::updateButton(float x, float y, float width, float height, const char *text, UIButton *parent)
+{
+    this->x = x;
+    this->y = y;
+    this->width = width;
+    this->height = height;
+    this->text = text;
+    this->parent = parent;
+}
+
 MenuSystem::MenuSystem() {}
 void MenuSystem::drawUI()
 {
@@ -134,17 +144,15 @@ void MenuSystem::restoreUI3D()
 
 void MenuSystem::drawMenuButton()
 {
-    if (menuButton.width == 0)
-    {
-        int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 
-        float buttonWidth = 80.0f;
-        float buttonHeight = 30.0f;
-        float buttonX = windowWidth - buttonWidth - 10.0f;
-        float buttonY = 10.0f;
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 
-        menuButton = UIButton(buttonX, buttonY, buttonWidth, buttonHeight, "Menu");
-    }
+    float buttonWidth = 80.0f;
+    float buttonHeight = 30.0f;
+    float buttonX = windowWidth - buttonWidth - 10.0f;
+    float buttonY = 10.0f;
+
+    menuButton.updateButton(buttonX, buttonY, buttonWidth, buttonHeight, "Menu");
     menuButton.draw();
 }
 
@@ -185,22 +193,13 @@ void MenuSystem::drawMenuBox()
     float itemWidth = 180.0f;
     float itemX = menuX + 10.0f;
 
-    if (lightButton.width == 0)
-    {
-        lightButton = UIButton(itemX, menuY + 10.0f, itemWidth, itemHeight, "Light Controls", &menuButton);
-    }
+    lightButton.updateButton(itemX, menuY + 10.0f, itemWidth, itemHeight, "Light Controls", &menuButton);
     lightButton.draw();
 
-    if (helpButton.width == 0)
-    {
-        helpButton = UIButton(itemX, menuY + 50.0f, itemWidth, itemHeight, "Help (H)", &menuButton);
-    }
+    helpButton.updateButton(itemX, menuY + 50.0f, itemWidth, itemHeight, "Help (H)", &menuButton);
     helpButton.draw();
 
-    if (quitButton.width == 0)
-    {
-        quitButton = UIButton(itemX, menuY + 90.0f, itemWidth, itemHeight, "Quit (Esc)", &menuButton);
-    }
+    quitButton.updateButton(itemX, menuY + 90.0f, itemWidth, itemHeight, "Quit (Esc)", &menuButton);
     quitButton.draw();
 }
 
@@ -280,43 +279,24 @@ void MenuSystem::drawLightControls()
     float itemX = controlsX + 10.0f;
     float currentY = controlsY + 15.0f;
 
-    // Light Intensity
-    if (intensityButton.width == 0)
-    {
-        intensityButton = UIButton(itemX, currentY, itemWidth, itemHeight, "Intensity", &lightButton);
-    }
+    intensityButton.updateButton(itemX, currentY, itemWidth, itemHeight, "Intensity", &lightButton);
     drawValueButton(intensityButton, getLightIntensity());
     currentY += itemHeight + 5.0f;
 
-    // Light Position X
-    if (positionXButton.width == 0)
-    {
-        positionXButton = UIButton(itemX, currentY, itemWidth, itemHeight, "Position X", &lightButton);
-    }
+    positionXButton.updateButton(itemX, currentY, itemWidth, itemHeight, "Position X", &lightButton);
     drawValueButton(positionXButton, getLightPositionX());
     currentY += itemHeight + 5.0f;
 
-    // Light Position Y
-    if (positionYButton.width == 0)
-    {
-        positionYButton = UIButton(itemX, currentY, itemWidth, itemHeight, "Position Y", &lightButton);
-    }
+    positionYButton.updateButton(itemX, currentY, itemWidth, itemHeight, "Position Y", &lightButton);
     drawValueButton(positionYButton, getLightPositionY());
     currentY += itemHeight + 5.0f;
 
-    // Light Position Z
-    if (positionZButton.width == 0)
-    {
-        positionZButton = UIButton(itemX, currentY, itemWidth, itemHeight, "Position Z", &lightButton);
-    }
+    positionZButton.updateButton(itemX, currentY, itemWidth, itemHeight, "Position Z", &lightButton);
     drawValueButton(positionZButton, getLightPositionZ());
     currentY += itemHeight + 5.0f;
 
-    // Ambient Level
-    if (ambientButton.width == 0)
-    {
-        ambientButton = UIButton(itemX, currentY, itemWidth, itemHeight, "Ambient", &lightButton);
-    }
+    // Ambient Level - always recalculate position
+    ambientButton.updateButton(itemX, currentY, itemWidth, itemHeight, "Ambient", &lightButton);
     drawValueButton(ambientButton, getAmbientLevel());
     currentY += itemHeight + 5.0f;
 

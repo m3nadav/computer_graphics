@@ -27,6 +27,8 @@ public:
     void draw();
     void toggleActive();
     bool isVisible() const;
+    void updateButton(float x, float y, float width, float height, const char *text, UIButton *parent = nullptr);
+    void updateWindowDimensions(float width, float height);
 };
 
 // Menu system for OpenGL applications
