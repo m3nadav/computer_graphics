@@ -502,7 +502,7 @@ void MenuSystem::drawHelpWindow()
     // Title
     glColor3f(1.0f, 1.0f, 0.3f);
     float titleY = helpY + helpHeight - 30.0f;
-    renderText2D("===== CONTROLS HELP =====", helpX + helpWidth / 2 - 120.0f, titleY);
+    renderText2D("CONTROLS HELP", helpX + helpWidth / 2 - 65.0f, titleY);
 
     // Help content
     glColor3f(0.9f, 0.9f, 0.9f);
@@ -511,80 +511,90 @@ void MenuSystem::drawHelpWindow()
     float leftMargin = helpX + 20.0f;
     float rightMargin = helpX + helpWidth / 2 + 20.0f;
 
-    // Left column - General Controls
-    renderText2D("=== GENERAL ===", leftMargin, currentY);
-    currentY -= lineHeight + 5.0f;
-    renderText2D("ESC       - Exit application", leftMargin, currentY);
-    currentY -= lineHeight;
-    renderText2D("M         - Toggle menu", leftMargin, currentY);
-    currentY -= lineHeight;
-    renderText2D("H         - Show help (this window)", leftMargin, currentY);
-    currentY -= lineHeight * 1.5f;
+    // Left column - Keyboard Controls
+    glColor3f(0.8f, 0.9f, 1.0f);
+    renderText2D("KEYBOARD CONTROLS", leftMargin, currentY);
+    glColor3f(0.9f, 0.9f, 0.9f);
+    currentY -= lineHeight + 8.0f;
 
-    renderText2D("=== CAMERA ===", leftMargin, currentY);
-    currentY -= lineHeight + 5.0f;
-    renderText2D("C         - Toggle camera mode", leftMargin, currentY);
+    renderText2D("General:", leftMargin, currentY);
+    currentY -= lineHeight + 3.0f;
+    renderText2D("ESC.......Exit application", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("+/=       - Zoom in", leftMargin, currentY);
+    renderText2D("M............Toggle menu", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("-/_       - Zoom out", leftMargin, currentY);
-    currentY -= lineHeight * 1.5f;
+    renderText2D("H............Show/hide help", leftMargin, currentY);
+    currentY -= lineHeight * 1.3f;
 
-    renderText2D("=== COW MOVEMENT ===", leftMargin, currentY);
-    currentY -= lineHeight + 5.0f;
-    renderText2D("W / Up    - Move forward", leftMargin, currentY);
+    renderText2D("Movement:", leftMargin, currentY);
+    currentY -= lineHeight + 3.0f;
+    renderText2D("W........Move cow forward", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("S / Down  - Move backward", leftMargin, currentY);
+    renderText2D("S.........Move cow backward", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("A / Left  - Turn left", leftMargin, currentY);
+    renderText2D("A.........Turn cow left", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("D / Right - Turn right", leftMargin, currentY);
-    currentY -= lineHeight * 1.5f;
+    renderText2D("D.........Turn cow right", leftMargin, currentY);
+    currentY -= lineHeight * 1.3f;
 
-    renderText2D("=== COW HEAD ===", leftMargin, currentY);
-    currentY -= lineHeight + 5.0f;
-    renderText2D("I         - Head up", leftMargin, currentY);
+    renderText2D("Head Control:", leftMargin, currentY);
+    currentY -= lineHeight + 3.0f;
+    renderText2D("I..........Turn head up", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("K         - Head down", leftMargin, currentY);
+    renderText2D("K.........Turn head down", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("J         - Head left", leftMargin, currentY);
+    renderText2D("J.........Turn head left", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("L         - Head right", leftMargin, currentY);
+    renderText2D("L.........Turn head right", leftMargin, currentY);
 
-    // Right column - Mouse and Sun Controls
+    // Right column - Camera & Lighting
     currentY = titleY - 35.0f;
-    renderText2D("=== MOUSE ===", rightMargin, currentY);
-    currentY -= lineHeight + 5.0f;
-    renderText2D("Left Click      - Menu interactions", rightMargin, currentY);
+    glColor3f(0.8f, 0.9f, 1.0f);
+    renderText2D("CAMERA & LIGHTING", rightMargin, currentY);
+    glColor3f(0.9f, 0.9f, 0.9f);
+    currentY -= lineHeight + 8.0f;
+
+    renderText2D("Camera:", rightMargin, currentY);
+    currentY -= lineHeight + 3.0f;
+    renderText2D("+/=.......Zoom in", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("Right Click+Drag - Rotate camera", rightMargin, currentY);
+    renderText2D("-/_.......Zoom out", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("C...........Toggle camera mode", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("Right Drag.Rotate view", rightMargin, currentY);
+    currentY -= lineHeight * 1.3f;
+
+    renderText2D("Sun Position:", rightMargin, currentY);
+    currentY -= lineHeight + 3.0f;
+    renderText2D("1.........Top-left position", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("2.........Top-right position", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("3.........Bottom-left position", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("4.........Bottom-right position", rightMargin, currentY);
     currentY -= lineHeight * 1.5f;
 
-    renderText2D("=== SUN/LIGHTING ===", rightMargin, currentY);
-    currentY -= lineHeight + 5.0f;
-    renderText2D("1         - Sun position 1", rightMargin, currentY);
-    currentY -= lineHeight;
-    renderText2D("2         - Sun position 2", rightMargin, currentY);
-    currentY -= lineHeight;
-    renderText2D("3         - Sun position 3", rightMargin, currentY);
-    currentY -= lineHeight;
-    renderText2D("4         - Sun position 4", rightMargin, currentY);
-    currentY -= lineHeight * 1.5f;
+    glColor3f(0.8f, 0.9f, 1.0f);
+    renderText2D("MENU CONTROLS", rightMargin, currentY);
+    glColor3f(0.9f, 0.9f, 0.9f);
+    currentY -= lineHeight + 8.0f;
 
-    renderText2D("=== MENU LIGHT CONTROLS ===", rightMargin, currentY);
-    currentY -= lineHeight + 5.0f;
-    renderText2D("Click - or + buttons on light controls", rightMargin, currentY);
+    renderText2D("Light Adjustment:", rightMargin, currentY);
+    currentY -= lineHeight + 3.0f;
+    renderText2D("Click +/- buttons to adjust:", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("to adjust:", rightMargin, currentY);
+    renderText2D("• Light intensity", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("- Light intensity", rightMargin, currentY);
+    renderText2D("• Light position (X/Y/Z)", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("- Light position X/Y/Z", rightMargin, currentY);
-    currentY -= lineHeight;
-    renderText2D("- Ambient lighting level", rightMargin, currentY);
-    currentY -= lineHeight * 1.5f;
+    renderText2D("• Ambient lighting level", rightMargin, currentY);
+    currentY -= lineHeight * 1.3f;
 
-    renderText2D("Click the - or + buttons directly!", rightMargin, currentY);
+    renderText2D("Interface:", rightMargin, currentY);
+    currentY -= lineHeight + 3.0f;
+    renderText2D("Left Click.Menu interactions", rightMargin, currentY);
     currentY -= lineHeight * 2.0f;
 
     // Close instruction at bottom
