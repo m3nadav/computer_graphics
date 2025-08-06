@@ -3,7 +3,14 @@
 
 #include <tuple>
 
-// Camera control system for orbital camera with zoom
+// Camera modes
+enum CameraMode
+{
+    ORBITAL_CAMERA,
+    COW_EYE_CAMERA
+};
+
+// Camera control system for orbital camera with zoom and cow eye camera
 class CameraController
 {
 public:
@@ -23,6 +30,14 @@ public:
     std::tuple<float, float, float> calculatePosition() const;
     void setupGLCamera() const; // Sets up gluLookAt for current camera position
 
+    // Camera mode control
+    void setCameraMode(CameraMode mode) { currentMode = mode; }
+    CameraMode getCameraMode() const { return currentMode; }
+    void toggleCameraMode(); // Toggle between orbital and cow eye camera
+
+    // Cow eye camera functions
+    void setupCowEyeCamera() const; // Sets up gluLookAt for cow eye camera
+
     // Getters for current state
     float getDistance() const { return distance; }
     float getAngleX() const { return angleX; }
@@ -38,6 +53,7 @@ private:
     float angleY; // Horizontal angle (azimuth)
     float minDistance;
     float maxDistance;
+    CameraMode currentMode;
 
     void clampValues();
 };

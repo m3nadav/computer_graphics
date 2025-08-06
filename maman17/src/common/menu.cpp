@@ -523,6 +523,8 @@ void MenuSystem::drawHelpWindow()
 
     renderText2D("=== CAMERA ===", leftMargin, currentY);
     currentY -= lineHeight + 5.0f;
+    renderText2D("C         - Toggle camera mode", leftMargin, currentY);
+    currentY -= lineHeight;
     renderText2D("+/=       - Zoom in", leftMargin, currentY);
     currentY -= lineHeight;
     renderText2D("-/_       - Zoom out", leftMargin, currentY);

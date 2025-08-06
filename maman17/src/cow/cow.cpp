@@ -177,11 +177,11 @@ void handleHeadMovement(unsigned char key, int x, int y)
         break;
     case 'j': // Head left
     case 'J':
-        headRotationY = std::max(headRotationY - HEAD_ROTATION_SPEED, -HEAD_MAX_Y_ROTATION);
+        headRotationY = std::min(headRotationY + HEAD_ROTATION_SPEED, HEAD_MAX_Y_ROTATION);
         break;
     case 'l': // Head right
     case 'L':
-        headRotationY = std::min(headRotationY + HEAD_ROTATION_SPEED, HEAD_MAX_Y_ROTATION);
+        headRotationY = std::max(headRotationY - HEAD_ROTATION_SPEED, -HEAD_MAX_Y_ROTATION);
         break;
     default:
         return; // Don't redraw if no head movement
