@@ -107,6 +107,11 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
         menuSystem.applyHelpClick();
         glutPostRedisplay();
     }
+    else if (key == 'c' || key == 'C') // Camera toggle
+    {
+        cameraController.toggleCameraMode();
+        glutPostRedisplay();
+    }
     else
     {
         // Try cow controls if enabled
