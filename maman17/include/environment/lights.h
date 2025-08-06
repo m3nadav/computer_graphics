@@ -6,6 +6,17 @@ void setupEnvironmentLighting();
 void setupSunLighting();
 void drawSun();
 
+// Light control functions
+void setLightIntensity(float intensity);
+void setLightPosition(float x, float y, float z);
+void setAmbientLevel(float level);
+float getLightIntensity();
+float getLightPositionX();
+float getLightPositionY(); 
+float getLightPositionZ();
+float getAmbientLevel();
+void enableCustomLightPosition(bool enable);
+
 // Material functions
 void setMaterialFromColor(float r, float g, float b, float shininess = 20.0f, float specularLevel = 0.2f);
 

@@ -1,80 +1,112 @@
 #include "common/menu.h"
+#include "environment/lights.h"
 #include <GLUT/glut.h>
 #include <iostream>
 #include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include "menu.h"
 
-MenuSystem::MenuSystem() : menuVisible(false)
+// UIButton method implementations
+bool UIButton::isButtonClicked(int mouseX, int mouseY)
 {
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    float adjustedMouseY = windowHeight - mouseY;
+    return (mouseX >= x && mouseX <= x + width &&
+            adjustedMouseY >= y && adjustedMouseY <= y + height);
 }
 
+void UIButton::draw()
+{
+    drawButton(*this);
+}
+
+void UIButton::toggleActive()
+{
+    isActive = !isActive;
+}
+
+bool UIButton::isVisible() const
+{
+    return (parent == nullptr || parent->isActive);
+}
+
+void UIButton::updateButton(float x, float y, float width, float height, const char *text, UIButton *parent)
+{
+    this->x = x;
+    this->y = y;
+    this->width = width;
+    this->height = height;
+    this->text = text;
+    this->parent = parent;
+}
+
+MenuSystem::MenuSystem() {}
 void MenuSystem::drawUI()
 {
     setupUI2D();
-    
+
     // Draw menu button
     drawMenuButton();
-    
-    // Draw menu box if visible
-    if (menuVisible)
-    {
-        drawMenuBox();
-    }
-    
+    drawMenuBox();
+    drawLightControls();
+    drawHelpWindow();
+
     restoreUI3D();
 }
 
-bool MenuSystem::handleMenuClick(int mouseX, int mouseY)
+void MenuSystem::handleMenuClick(int mouseX, int mouseY)
 {
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-    
-    // Check if menu button was clicked (top-right corner)
-    float buttonWidth = 80.0f;
-    float buttonHeight = 30.0f;
-    float buttonX = windowWidth - buttonWidth - 10.0f;
-    float buttonY = 10.0f;
-    
-    if (isPointInButton(mouseX, mouseY, buttonX, buttonY, buttonWidth, buttonHeight))
+
+    if (menuButton.isButtonClicked(mouseX, mouseY))
+        applyMenuClick();
+    else if (lightButton.isButtonClicked(mouseX, mouseY))
+        applyLightClick();
+    else if (helpButton.isButtonClicked(mouseX, mouseY))
+        applyHelpClick();
+    else if (quitButton.isButtonClicked(mouseX, mouseY))
+        applyQuitClick();
+    else if (ambientButton.isButtonClicked(mouseX, mouseY))
+        applyLightValueClick(mouseX, mouseY, ambientButton);
+    else if (intensityButton.isButtonClicked(mouseX, mouseY))
+        applyLightValueClick(mouseX, mouseY, intensityButton);
+    else if (positionXButton.isButtonClicked(mouseX, mouseY))
+        applyLightValueClick(mouseX, mouseY, positionXButton);
+    else if (positionYButton.isButtonClicked(mouseX, mouseY))
+        applyLightValueClick(mouseX, mouseY, positionYButton);
+    else if (positionZButton.isButtonClicked(mouseX, mouseY))
+        applyLightValueClick(mouseX, mouseY, positionZButton);
+}
+
+void MenuSystem::applyMenuClick()
+{
+    menuButton.toggleActive();
+}
+
+void MenuSystem::applyQuitClick()
+{
+    quitButton.toggleActive();
+    if (quitButton.isActive)
+        exit(0);
+}
+
+void MenuSystem::applyHelpClick()
+{
+    helpButton.toggleActive();
+    if (helpButton.isActive)
+        lightButton.isActive = false;
+}
+
+void MenuSystem::applyLightClick()
+{
+    lightButton.toggleActive();
+    if (lightButton.isActive)
     {
-        toggleMenu();
-        glutPostRedisplay();
-        return true;
+        helpButton.isActive = false;
     }
-    
-    // Check menu item clicks if menu is visible
-    if (menuVisible)
-    {
-        float menuX = windowWidth - 200.0f;
-        float menuY = 50.0f;
-        float itemHeight = 35.0f;
-        float itemWidth = 180.0f;
-        
-        // Adjust coordinates for OpenGL (flip Y)
-        int adjustedY = windowHeight - mouseY;
-        
-        // Check "Adjust Ambient Light" button
-        if (isPointInButton(mouseX, adjustedY, menuX, menuY, itemWidth, itemHeight))
-        {
-            std::cout << "Adjust Ambient Light clicked" << std::endl;
-            return true;
-        }
-        
-        // Check "Help" button
-        if (isPointInButton(mouseX, adjustedY, menuX, menuY + itemHeight + 5, itemWidth, itemHeight))
-        {
-            std::cout << "Help clicked - Use H for help, Esc to quit, M to toggle menu" << std::endl;
-            return true;
-        }
-        
-        // Check "Quit" button
-        if (isPointInButton(mouseX, adjustedY, menuX, menuY + 2*(itemHeight + 5), itemWidth, itemHeight))
-        {
-            std::cout << "Quit clicked" << std::endl;
-            exit(0);
-        }
-    }
-    
-    return false; // Click was not handled by menu system
 }
 
 void MenuSystem::setupUI2D()
@@ -82,19 +114,19 @@ void MenuSystem::setupUI2D()
     // Save current OpenGL state
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     glPushMatrix();
-    
+
     // Setup 2D orthographic projection for UI
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    
+
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
     gluOrtho2D(0, windowWidth, 0, windowHeight);
-    
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
+
     // Disable depth testing and lighting for UI
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
@@ -112,25 +144,31 @@ void MenuSystem::restoreUI3D()
 
 void MenuSystem::drawMenuButton()
 {
+
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
-    
+
     float buttonWidth = 80.0f;
     float buttonHeight = 30.0f;
     float buttonX = windowWidth - buttonWidth - 10.0f;
     float buttonY = 10.0f;
-    
-    drawButton(buttonX, buttonY, buttonWidth, buttonHeight, "Menu");
+
+    menuButton.updateButton(buttonX, buttonY, buttonWidth, buttonHeight, "Menu");
+    menuButton.draw();
 }
 
 void MenuSystem::drawMenuBox()
 {
+    // Menu box is only visible when the menu button is active
+    if (!menuButton.isActive)
+        return;
+
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
-    
+
     float menuWidth = 200.0f;
     float menuHeight = 130.0f;
     float menuX = windowWidth - menuWidth - 10.0f;
     float menuY = 50.0f;
-    
+
     // Draw menu background
     glColor3f(0.2f, 0.2f, 0.2f);
     glBegin(GL_QUADS);
@@ -139,7 +177,7 @@ void MenuSystem::drawMenuBox()
     glVertex2f(menuX + menuWidth, menuY + menuHeight);
     glVertex2f(menuX, menuY + menuHeight);
     glEnd();
-    
+
     // Draw menu border
     glColor3f(0.8f, 0.8f, 0.8f);
     glLineWidth(2.0f);
@@ -149,64 +187,405 @@ void MenuSystem::drawMenuBox()
     glVertex2f(menuX + menuWidth, menuY + menuHeight);
     glVertex2f(menuX, menuY + menuHeight);
     glEnd();
-    
+
     // Draw menu items
     float itemHeight = 35.0f;
     float itemWidth = 180.0f;
     float itemX = menuX + 10.0f;
-    
-    // Adjust Ambient Light button
-    drawButton(itemX, menuY + 10.0f, itemWidth, itemHeight, "Adjust Ambient Light");
-    
-    // Help button with keyboard shortcut
-    drawButton(itemX, menuY + 50.0f, itemWidth, itemHeight, "Help (H)");
-    
-    // Quit button with keyboard shortcut
-    drawButton(itemX, menuY + 90.0f, itemWidth, itemHeight, "Quit (Esc)");
+
+    lightButton.updateButton(itemX, menuY + 10.0f, itemWidth, itemHeight, "Light Controls", &menuButton);
+    lightButton.draw();
+
+    helpButton.updateButton(itemX, menuY + 50.0f, itemWidth, itemHeight, "Help (H)", &menuButton);
+    helpButton.draw();
+
+    quitButton.updateButton(itemX, menuY + 90.0f, itemWidth, itemHeight, "Quit (Esc)", &menuButton);
+    quitButton.draw();
 }
 
-void MenuSystem::drawButton(float x, float y, float width, float height, const char* text)
+void drawButton(UIButton button)
 {
+    if (!button.isVisible())
+        return;
+
     // Draw button background
     glColor3f(0.5f, 0.5f, 0.5f);
     glBegin(GL_QUADS);
-    glVertex2f(x, y);
-    glVertex2f(x + width, y);
-    glVertex2f(x + width, y + height);
-    glVertex2f(x, y + height);
+    glVertex2f(button.x, button.y);
+    glVertex2f(button.x + button.width, button.y);
+    glVertex2f(button.x + button.width, button.y + button.height);
+    glVertex2f(button.x, button.y + button.height);
     glEnd();
-    
+
     // Draw button border
     glColor3f(0.9f, 0.9f, 0.9f);
     glLineWidth(1.0f);
     glBegin(GL_LINE_LOOP);
-    glVertex2f(x, y);
-    glVertex2f(x + width, y);
-    glVertex2f(x + width, y + height);
-    glVertex2f(x, y + height);
+    glVertex2f(button.x, button.y);
+    glVertex2f(button.x + button.width, button.y);
+    glVertex2f(button.x + button.width, button.y + button.height);
+    glVertex2f(button.x, button.y + button.height);
     glEnd();
-    
+
     // Draw button text
     glColor3f(1.0f, 1.0f, 1.0f);
-    renderText2D(text, x + 10.0f, y + height/2 - 5.0f);
+    renderText2D(button.text, button.x + 10.0f, button.y + button.height / 2 - 5.0f);
 }
 
-void MenuSystem::renderText2D(const char* text, float x, float y)
+void renderText2D(const char *text, float x, float y)
 {
     glRasterPos2f(x, y);
-    for (const char* c = text; *c != '\0'; c++)
+    for (const char *c = text; *c != '\0'; c++)
     {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *c);
     }
 }
 
-bool MenuSystem::isPointInButton(int mouseX, int mouseY, float buttonX, float buttonY, float width, float height)
+void MenuSystem::drawLightControls()
 {
+    // Light controls are only visible when the light button is active
+    if (!lightButton.isActive || !lightButton.isVisible())
+        return;
+
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+
+    float controlsWidth = 300.0f;
+    float controlsHeight = 280.0f;
+    float controlsX = windowWidth - controlsWidth - 220.0f; // Left of main menu
+    float controlsY = 50.0f;                                // Same Y as main menu
+
+    // Draw light controls background
+    glColor3f(0.15f, 0.15f, 0.15f);
+    glBegin(GL_QUADS);
+    glVertex2f(controlsX, controlsY);
+    glVertex2f(controlsX + controlsWidth, controlsY);
+    glVertex2f(controlsX + controlsWidth, controlsY + controlsHeight);
+    glVertex2f(controlsX, controlsY + controlsHeight);
+    glEnd();
+
+    // Draw light controls border
+    glColor3f(0.8f, 0.8f, 0.8f);
+    glLineWidth(2.0f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(controlsX, controlsY);
+    glVertex2f(controlsX + controlsWidth, controlsY);
+    glVertex2f(controlsX + controlsWidth, controlsY + controlsHeight);
+    glVertex2f(controlsX, controlsY + controlsHeight);
+    glEnd();
+
+    // Draw control items
+    float itemHeight = 35.0f;
+    float itemWidth = 280.0f;
+    float itemX = controlsX + 10.0f;
+    float currentY = controlsY + 15.0f;
+
+    intensityButton.updateButton(itemX, currentY, itemWidth, itemHeight, "Intensity", &lightButton);
+    drawValueButton(intensityButton, getLightIntensity());
+    currentY += itemHeight + 5.0f;
+
+    positionXButton.updateButton(itemX, currentY, itemWidth, itemHeight, "Position X", &lightButton);
+    drawValueButton(positionXButton, getLightPositionX());
+    currentY += itemHeight + 5.0f;
+
+    positionYButton.updateButton(itemX, currentY, itemWidth, itemHeight, "Position Y", &lightButton);
+    drawValueButton(positionYButton, getLightPositionY());
+    currentY += itemHeight + 5.0f;
+
+    positionZButton.updateButton(itemX, currentY, itemWidth, itemHeight, "Position Z", &lightButton);
+    drawValueButton(positionZButton, getLightPositionZ());
+    currentY += itemHeight + 5.0f;
+
+    // Ambient Level - always recalculate position
+    ambientButton.updateButton(itemX, currentY, itemWidth, itemHeight, "Ambient", &lightButton);
+    drawValueButton(ambientButton, getAmbientLevel());
+    currentY += itemHeight + 5.0f;
+
+    // Instructions
+    glColor3f(0.9f, 0.9f, 0.9f);
+    renderText2D("Click values to adjust", itemX, currentY + 10.0f);
+    renderText2D("Keys 1-4: preset positions", itemX, currentY + 25.0f);
+}
+
+void MenuSystem::drawValueButton(UIButton button, float value)
+{
+    if (!button.isVisible())
+        return;
+
+    // Calculate dimensions for sub-buttons
+    float buttonSize = button.height - 4.0f; // Square buttons slightly smaller than main button height
+    float leftButtonX = button.x + 2.0f;
+    float rightButtonX = button.x + button.width - buttonSize - 2.0f;
+    float buttonY = button.y + 2.0f;
+
+    // Draw main button background
+    glColor3f(0.4f, 0.4f, 0.4f);
+    glBegin(GL_QUADS);
+    glVertex2f(button.x, button.y);
+    glVertex2f(button.x + button.width, button.y);
+    glVertex2f(button.x + button.width, button.y + button.height);
+    glVertex2f(button.x, button.y + button.height);
+    glEnd();
+
+    // Draw main button border
+    glColor3f(0.7f, 0.7f, 0.7f);
+    glLineWidth(1.0f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(button.x, button.y);
+    glVertex2f(button.x + button.width, button.y);
+    glVertex2f(button.x + button.width, button.y + button.height);
+    glVertex2f(button.x, button.y + button.height);
+    glEnd();
+
+    // Draw decrease button (left side) - light colored square
+    glColor3f(0.8f, 0.8f, 0.8f);
+    glBegin(GL_QUADS);
+    glVertex2f(leftButtonX, buttonY);
+    glVertex2f(leftButtonX + buttonSize, buttonY);
+    glVertex2f(leftButtonX + buttonSize, buttonY + buttonSize);
+    glVertex2f(leftButtonX, buttonY + buttonSize);
+    glEnd();
+
+    // Draw decrease button border
+    glColor3f(0.5f, 0.5f, 0.5f);
+    glLineWidth(1.0f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(leftButtonX, buttonY);
+    glVertex2f(leftButtonX + buttonSize, buttonY);
+    glVertex2f(leftButtonX + buttonSize, buttonY + buttonSize);
+    glVertex2f(leftButtonX, buttonY + buttonSize);
+    glEnd();
+
+    // Draw increase button (right side) - light colored square
+    glColor3f(0.8f, 0.8f, 0.8f);
+    glBegin(GL_QUADS);
+    glVertex2f(rightButtonX, buttonY);
+    glVertex2f(rightButtonX + buttonSize, buttonY);
+    glVertex2f(rightButtonX + buttonSize, buttonY + buttonSize);
+    glVertex2f(rightButtonX, buttonY + buttonSize);
+    glEnd();
+
+    // Draw increase button border
+    glColor3f(0.5f, 0.5f, 0.5f);
+    glLineWidth(1.0f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(rightButtonX, buttonY);
+    glVertex2f(rightButtonX + buttonSize, buttonY);
+    glVertex2f(rightButtonX + buttonSize, buttonY + buttonSize);
+    glVertex2f(rightButtonX, buttonY + buttonSize);
+    glEnd();
+
+    // Draw - symbol in left button
+    glColor3f(0.2f, 0.2f, 0.2f);
+    renderText2D("-", leftButtonX + buttonSize / 2 - 4.0f, buttonY + buttonSize / 2 + 5.0f);
+
+    // Draw + symbol in right button
+    glColor3f(0.2f, 0.2f, 0.2f);
+    renderText2D("+", rightButtonX + buttonSize / 2 - 4.0f, buttonY + buttonSize / 2 + 5.0f);
+
+    // Draw label at center-left of main button
+    glColor3f(1.0f, 1.0f, 1.0f);
+    float centerX = button.x + button.width / 2.0f;
+    float labelWidth = strlen(button.text) * 6.0f; // Estimate text width
+    renderText2D(button.text, centerX - labelWidth / 2.0f, button.y + button.height / 2 + 5.0f);
+
+    // Draw value below the label
+    char valueStr[32];
+    snprintf(valueStr, sizeof(valueStr), "%.2f", value);
+    float valueWidth = strlen(valueStr) * 6.0f; // Estimate text width
+    renderText2D(valueStr, centerX - valueWidth / 2.0f, button.y + button.height / 2 - 8.0f);
+}
+
+void MenuSystem::applyLightValueClick(int mouseX, int mouseY, UIButton button)
+{
+    if (!button.isVisible())
+        return;
+
+    // Calculate dimensions for sub-buttons (same as in drawValueButton)
+    float buttonSize = button.height - 4.0f;
+    float leftButtonX = button.x + 2.0f;
+    float rightButtonX = button.x + button.width - buttonSize - 2.0f;
+    float buttonY = button.y + 2.0f;
+
+    // Convert mouse Y coordinate (GLUT uses inverted Y)
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-    
-    // Convert mouse Y coordinate (GLUT uses top-left origin, OpenGL uses bottom-left)
     float adjustedMouseY = windowHeight - mouseY;
-    
-    return (mouseX >= buttonX && mouseX <= buttonX + width &&
-            adjustedMouseY >= buttonY && adjustedMouseY <= buttonY + height);
+
+    // Check if click was specifically on the decrease button (left)
+    bool clickedDecrease = (mouseX >= leftButtonX && mouseX <= leftButtonX + buttonSize &&
+                            adjustedMouseY >= buttonY && adjustedMouseY <= buttonY + buttonSize);
+
+    // Check if click was specifically on the increase button (right)
+    bool clickedIncrease = (mouseX >= rightButtonX && mouseX <= rightButtonX + buttonSize &&
+                            adjustedMouseY >= buttonY && adjustedMouseY <= buttonY + buttonSize);
+
+    // Only proceed if one of the specific buttons was clicked
+    if (!clickedDecrease && !clickedIncrease)
+        return;
+
+    // Get current values
+    float ambient = getAmbientLevel();
+    float intensity = getLightIntensity();
+    float posX = getLightPositionX();
+    float posY = getLightPositionY();
+    float posZ = getLightPositionZ();
+
+    // Adjust values based on type and which button was clicked
+    if (strcmp(button.text, "Intensity") == 0)
+    {
+        float newIntensity = clickedIncrease ? intensity + 0.1f : intensity - 0.1f;
+        setLightIntensity(newIntensity);
+        enableCustomLightPosition(true); // Enable custom mode when adjusting
+    }
+    else if (strcmp(button.text, "Position X") == 0)
+    {
+        float newPosX = clickedIncrease ? posX + 2.0f : posX - 2.0f;
+        setLightPosition(newPosX, posY, posZ);
+    }
+    else if (strcmp(button.text, "Position Y") == 0)
+    {
+        float newPosY = clickedIncrease ? posY + 2.0f : posY - 2.0f;
+        // Clamp Y position to reasonable range
+        if (newPosY < 1.0f)
+            newPosY = 1.0f;
+        if (newPosY > 50.0f)
+            newPosY = 50.0f;
+        setLightPosition(posX, newPosY, posZ);
+    }
+    else if (strcmp(button.text, "Position Z") == 0)
+    {
+        float newPosZ = clickedIncrease ? posZ + 2.0f : posZ - 2.0f;
+        setLightPosition(posX, posY, newPosZ);
+    }
+    else if (strcmp(button.text, "Ambient") == 0)
+    {
+        float newAmbient = clickedIncrease ? ambient + 0.05f : ambient - 0.05f;
+        setAmbientLevel(newAmbient);
+        enableCustomLightPosition(true); // Enable custom mode when adjusting
+    }
+
+    glutPostRedisplay(); // Trigger a redraw to show changes
+}
+
+void MenuSystem::drawHelpWindow()
+{
+    // Help window is only visible when the help button is active
+    if (!helpButton.isActive)
+        return;
+
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+
+    float helpWidth = 480.0f;
+    float helpHeight = 520.0f;
+    float helpX = (windowWidth - helpWidth) / 2.0f;   // Center horizontally
+    float helpY = (windowHeight - helpHeight) / 2.0f; // Center vertically
+
+    // Draw help window background
+    glColor3f(0.1f, 0.1f, 0.15f);
+    glBegin(GL_QUADS);
+    glVertex2f(helpX, helpY);
+    glVertex2f(helpX + helpWidth, helpY);
+    glVertex2f(helpX + helpWidth, helpY + helpHeight);
+    glVertex2f(helpX, helpY + helpHeight);
+    glEnd();
+
+    // Draw help window border
+    glColor3f(0.8f, 0.8f, 0.8f);
+    glLineWidth(3.0f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(helpX, helpY);
+    glVertex2f(helpX + helpWidth, helpY);
+    glVertex2f(helpX + helpWidth, helpY + helpHeight);
+    glVertex2f(helpX, helpY + helpHeight);
+    glEnd();
+
+    // Title
+    glColor3f(1.0f, 1.0f, 0.3f);
+    float titleY = helpY + helpHeight - 30.0f;
+    renderText2D("===== CONTROLS HELP =====", helpX + helpWidth / 2 - 120.0f, titleY);
+
+    // Help content
+    glColor3f(0.9f, 0.9f, 0.9f);
+    float currentY = titleY - 35.0f;
+    float lineHeight = 18.0f;
+    float leftMargin = helpX + 20.0f;
+    float rightMargin = helpX + helpWidth / 2 + 20.0f;
+
+    // Left column - General Controls
+    renderText2D("=== GENERAL ===", leftMargin, currentY);
+    currentY -= lineHeight + 5.0f;
+    renderText2D("ESC       - Exit application", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("M         - Toggle menu", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("H         - Show help (this window)", leftMargin, currentY);
+    currentY -= lineHeight * 1.5f;
+
+    renderText2D("=== CAMERA ===", leftMargin, currentY);
+    currentY -= lineHeight + 5.0f;
+    renderText2D("+/=       - Zoom in", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("-/_       - Zoom out", leftMargin, currentY);
+    currentY -= lineHeight * 1.5f;
+
+    renderText2D("=== COW MOVEMENT ===", leftMargin, currentY);
+    currentY -= lineHeight + 5.0f;
+    renderText2D("W / Up    - Move forward", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("S / Down  - Move backward", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("A / Left  - Turn left", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("D / Right - Turn right", leftMargin, currentY);
+    currentY -= lineHeight * 1.5f;
+
+    renderText2D("=== COW HEAD ===", leftMargin, currentY);
+    currentY -= lineHeight + 5.0f;
+    renderText2D("I         - Head up", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("K         - Head down", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("J         - Head left", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("L         - Head right", leftMargin, currentY);
+
+    // Right column - Mouse and Sun Controls
+    currentY = titleY - 35.0f;
+    renderText2D("=== MOUSE ===", rightMargin, currentY);
+    currentY -= lineHeight + 5.0f;
+    renderText2D("Left Click      - Menu interactions", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("Right Click+Drag - Rotate camera", rightMargin, currentY);
+    currentY -= lineHeight * 1.5f;
+
+    renderText2D("=== SUN/LIGHTING ===", rightMargin, currentY);
+    currentY -= lineHeight + 5.0f;
+    renderText2D("1         - Sun position 1", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("2         - Sun position 2", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("3         - Sun position 3", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("4         - Sun position 4", rightMargin, currentY);
+    currentY -= lineHeight * 1.5f;
+
+    renderText2D("=== MENU LIGHT CONTROLS ===", rightMargin, currentY);
+    currentY -= lineHeight + 5.0f;
+    renderText2D("Click - or + buttons on light controls", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("to adjust:", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("- Light intensity", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("- Light position X/Y/Z", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("- Ambient lighting level", rightMargin, currentY);
+    currentY -= lineHeight * 1.5f;
+
+    renderText2D("Click the - or + buttons directly!", rightMargin, currentY);
+    currentY -= lineHeight * 2.0f;
+
+    // Close instruction at bottom
+    glColor3f(1.0f, 0.8f, 0.3f);
+    renderText2D("Click 'Help (H)' button again or press H to close", helpX + helpWidth / 2 - 180.0f, helpY + 15.0f);
 }

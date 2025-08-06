@@ -37,8 +37,6 @@ public:
 
     // Menu system
     void drawUI();
-    void toggleMenu() { menuSystem.toggleMenu(); }
-    bool isMenuVisible() const { return menuSystem.isMenuVisible(); }
 
 private:
     CameraController &cameraController;
@@ -63,7 +61,7 @@ private:
 
     // Menu system
     MenuSystem menuSystem;
-    
+
     // Static callback wrappers for GLUT
     static void keyboardWrapper(unsigned char key, int x, int y);
     static void mouseWrapper(int button, int state, int x, int y);
