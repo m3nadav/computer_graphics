@@ -2,6 +2,17 @@
 #include "environment/environment.h"
 #include <GLUT/glut.h>
 
+// Define missing constants for separate specular color on some platforms
+#ifndef GL_LIGHT_MODEL_COLOR_CONTROL
+#define GL_LIGHT_MODEL_COLOR_CONTROL 0x81F8
+#endif
+#ifndef GL_SEPARATE_SPECULAR_COLOR
+#define GL_SEPARATE_SPECULAR_COLOR 0x81FA
+#endif
+#ifndef GL_SINGLE_COLOR
+#define GL_SINGLE_COLOR 0x81F9
+#endif
+
 // Lighting and material setup
 void setupEnvironmentLighting()
 {
@@ -20,6 +31,10 @@ void setupEnvironmentLighting()
     glEnable(GL_NORMALIZE);                          // Auto-normalize normals after transformations
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // Light both sides of polygons
     glDisable(GL_CULL_FACE);                         // Render all polygons for proper lighting
+
+    // Improve specular behavior on flat geometry to look more metallic
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+    glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 }
 
 // Sun lighting setup
@@ -32,12 +47,12 @@ static float sunPositions[4][3] = {
 };
 
 // Light control variables
-static float lightIntensity = 1.0f;        // Multiplier for diffuse/specular (0.1 to 2.0)
-static float lightPositionX = -15.0f;      // Custom X position
-static float lightPositionY = 25.0f;       // Custom Y position  
-static float lightPositionZ = -15.0f;      // Custom Z position
-static float ambientLevel = 0.3f;          // Ambient light level (0.0 to 1.0)
-static bool useCustomPosition = false;     // Whether to use custom position or sunPositions array
+static float lightIntensity = 1.0f;    // Multiplier for diffuse/specular (0.1 to 2.0)
+static float lightPositionX = -15.0f;  // Custom X position
+static float lightPositionY = 25.0f;   // Custom Y position
+static float lightPositionZ = -15.0f;  // Custom Z position
+static float ambientLevel = 0.3f;      // Ambient light level (0.0 to 1.0)
+static bool useCustomPosition = false; // Whether to use custom position or sunPositions array
 
 void setupSunLighting()
 {
@@ -47,7 +62,7 @@ void setupSunLighting()
 
     // Determine light position
     float sunX, sunY, sunZ;
-    
+
     if (useCustomPosition)
     {
         // Use custom adjustable position
@@ -95,6 +110,10 @@ void setupSunLighting()
     glEnable(GL_NORMALIZE);                          // Auto-normalize normals after transformations
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // Light both sides of polygons
     glDisable(GL_CULL_FACE);                         // Render all polygons for proper lighting
+
+    // Improve specular behavior on flat geometry to look more metallic
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+    glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 }
 
 // Draw the sun as a bright sphere
@@ -102,7 +121,7 @@ void drawSun()
 {
     // Use the same position logic as setupSunLighting()
     float sunX, sunY, sunZ;
-    
+
     if (useCustomPosition)
     {
         // Use custom adjustable position
@@ -230,13 +249,13 @@ void setRockMaterial(float colorVariation)
 void setMetalMaterial()
 {
     // Set color for GL_COLOR_MATERIAL mode (when enabled)
-    glColor3f(0.6f, 0.6f, 0.6f);
+    glColor3f(0.3f, 0.6f, 1.0f); // Slightly bright blue
 
-    // Set shiny metal material properties (broader reflections for multi-angle visibility)
-    GLfloat matAmbient[] = {0.15f, 0.15f, 0.15f, 1.0f}; // Slightly higher ambient for visibility
-    GLfloat matDiffuse[] = {0.1f, 0.1f, 0.1f, 1.0f};    // Slightly higher diffuse for broader lighting
-    GLfloat matSpecular[] = {0.9f, 0.9f, 0.9f, 1.0f};   // High white specular for metallic reflections
-    GLfloat matShininess[] = {64.0f};                   // Reduced shininess for broader highlights
+    // More metallic: low diffuse, modest ambient, very high specular, higher shininess
+    GLfloat matAmbient[] = {0.12f, 0.12f, 0.12f, 1.0f};
+    GLfloat matDiffuse[] = {0.06f, 0.06f, 0.06f, 1.0f};
+    GLfloat matSpecular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat matShininess[] = {96.0f};
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, matAmbient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, matDiffuse);

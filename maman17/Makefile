@@ -51,7 +51,7 @@ test-main: $(MAIN_TARGET)
 
 test-env: $(ENV_TARGET)
 	@echo "Running environment test..."
-	./$(ENV_TARGET)
+	./$(ENV_TARGET) 5
 
 test: test-shapes test-visual
 

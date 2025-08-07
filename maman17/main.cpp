@@ -53,7 +53,7 @@ void drawMainScene()
     drawScatteredRocks(worldSize, 0.0f, worldSize, 10);
 
     // Draw metal benches
-    drawMetalBench(-4, 0.0f, -6, 1.0f);
+    drawMetalBench(-4, 0.0f, -6, 1.0f, 30.0f);
 
     // Draw the cow in the center
     drawCow();
@@ -63,13 +63,13 @@ void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     drawMainScene(); // Use custom main scene drawing
-    
+
     // Draw UI overlay
     if (inputHandler)
     {
         inputHandler->drawUI();
     }
-    
+
     glutSwapBuffers();
 }
 

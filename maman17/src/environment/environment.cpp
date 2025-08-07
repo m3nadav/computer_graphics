@@ -124,19 +124,19 @@ void handleSunControls(unsigned char key, int x, int y)
     switch (key)
     {
     case '1':
-        setSunPosition(0); // (-x,y,-z)
+        setSunPosition(0);                // (-x,y,-z)
         enableCustomLightPosition(false); // Disable custom positioning
         break;
     case '2':
-        setSunPosition(1); // (-x,y,z)
+        setSunPosition(1);                // (-x,y,z)
         enableCustomLightPosition(false); // Disable custom positioning
         break;
     case '3':
-        setSunPosition(2); // (x,y,-z)
+        setSunPosition(2);                // (x,y,-z)
         enableCustomLightPosition(false); // Disable custom positioning
         break;
     case '4':
-        setSunPosition(3); // (x,y,z)
+        setSunPosition(3);                // (x,y,z)
         enableCustomLightPosition(false); // Disable custom positioning
         break;
     }
@@ -584,74 +584,148 @@ void drawScatteredRocks(float x, float y, float z, int numRocks)
 }
 
 // Metal bench implementation
-void drawMetalBench(float x, float y, float z, float scale)
+void drawMetalBench(float x, float y, float z, float scale, float rotateY)
 {
     // Save current material state to prevent leakage
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
 
     glPushMatrix();
     glTranslatef(x, y, z);
+    glRotatef(rotateY, 0.0f, 1.0f, 0.0f);
     glScalef(scale, scale, scale);
 
     setMetalMaterial();
 
-    // Bench dimensions
-    float seatWidth = 2.0f;
-    float seatDepth = 0.5f;
-    float seatHeight = 0.1f;
-    float seatYPos = 0.4f;
+    // Bench proportions
+    const float seatWidth = 2.0f;
+    const float seatDepth = 0.5f;
+    const float seatYPos = 0.4f; // Seat top height (also leg height)
+    const float legRadius = 0.06f;
+    const float railRadius = 0.04f;
+    const float slatRadius = 0.03f;
+    const int seatSlatCount = 7;
+    const int backSlatCount = 6;
+    const float backrestHeight = 0.7f;
+    const float backTiltDegrees = 12.0f; // Slight lean for comfort
 
-    float backrestWidth = 2.0f;
-    float backrestHeight = 0.8f;
-    float backrestThickness = 0.1f;
-    float backrestYPos = seatYPos + seatHeight + backrestHeight / 2;
+    // Convenience offsets
+    const float halfW = seatWidth * 0.5f;
+    const float halfD = seatDepth * 0.5f;
+    // Calculate actual seat slat edge coordinates
+    // Seat slats span X from -seatWidth/2 to +seatWidth/2
+    const float slatXLeft = -halfW; // -1.0
+    const float slatXRight = halfW; // +1.0
 
-    float legWidth = 0.1f;
-    float legDepth = 0.1f;
-    float legHeight = 0.4f;
+    // Seat slats Z positions: zPos = -halfD + (0.15f * seatDepth) + t * (seatDepth - 0.30f * seatDepth)
+    // Front slat (t=1): -0.25 + 0.075 + 1.0 * 0.35 = 0.175
+    // Back slat (t=0): -0.25 + 0.075 + 0.0 * 0.35 = -0.175
+    const float slatZFront = -halfD + (0.15f * seatDepth) + 1.0f * (seatDepth - 0.30f * seatDepth); // 0.175
+    const float slatZBack = -halfD + (0.15f * seatDepth) + 0.0f * (seatDepth - 0.30f * seatDepth);  // -0.175
 
-    // Draw seat (horizontal rectangle)
+    // Position legs at the actual seat slat edges
+    const float legXLeft = slatXLeft;
+    const float legXRight = slatXRight;
+    const float legZFront = slatZFront;
+    const float legZBack = slatZBack;
+
+    // 1) Legs: four tubular posts (vertical)
+    auto drawVerticalPost = [&](float px, float pz, float height, float radius)
+    {
+        glPushMatrix();
+        glTranslatef(px, 0.0f, pz);
+        // Align cylinder axis (Z) to +Y by rotating -90° about X
+        glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+        // Cylinder draws from origin in +Z, which after rotation is +Y
+        // So the cylinder base is at y=0, which is what we want for legs
+        drawCylinder(radius, radius, height);
+        glPopMatrix();
+    };
+
+    // Front-left, front-right, back-left, back-right
+    drawVerticalPost(legXLeft, legZFront, seatYPos, legRadius);
+    drawVerticalPost(legXRight, legZFront, seatYPos, legRadius);
+    drawVerticalPost(legXLeft, legZBack, seatYPos, legRadius);
+    drawVerticalPost(legXRight, legZBack, seatYPos, legRadius);
+
+    // 2) Seat rails: two horizontal tubes connecting left-right at front and back
+    auto drawHorizontalRailX = [&](float py, float pz, float length, float radius)
+    {
+        glPushMatrix();
+        glTranslatef(-length * 0.5f, py, pz);
+        // Align cylinder axis (Z) to X by rotating +90° about Y
+        glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+        drawCylinder(radius, radius, length);
+        glPopMatrix();
+    };
+
+    drawHorizontalRailX(seatYPos - slatRadius * 1.2f, legZFront, seatWidth, railRadius);
+    drawHorizontalRailX(seatYPos - slatRadius * 1.2f, legZBack, seatWidth, railRadius);
+
+    // 2b) Seat side rails along depth (Z) to connect front and back legs
+    auto drawHorizontalRailZ = [&](float px, float py, float length, float radius)
+    {
+        glPushMatrix();
+        glTranslatef(px, py, 0.0f);
+        // Axis is already Z; center the rail on Z
+        glTranslatef(0.0f, 0.0f, -length * 0.5f);
+        drawCylinder(radius, radius, length);
+        glPopMatrix();
+    };
+
+    // Z-rails connect front and back legs at their actual positions
+    float actualSeatDepth = slatZFront - slatZBack; // 0.35
+    drawHorizontalRailZ(legXLeft, seatYPos - slatRadius * 1.3f, actualSeatDepth, railRadius);
+    drawHorizontalRailZ(legXRight, seatYPos - slatRadius * 1.3f, actualSeatDepth, railRadius);
+
+    // 3) Seat slats: several rounded tubes spanning left-right, distributed along depth
+    for (int i = 0; i < seatSlatCount; ++i)
+    {
+        float t = (seatSlatCount == 1) ? 0.5f : (float)i / (seatSlatCount - 1);
+        float zPos = -halfD + (0.15f * seatDepth) + t * (seatDepth - 0.30f * seatDepth); // inset a bit from edges
+
+        glPushMatrix();
+        glTranslatef(-halfW, seatYPos, zPos);
+        glRotatef(90.0f, 0.0f, 1.0f, 0.0f); // make axis X
+        drawCylinder(slatRadius, slatRadius, seatWidth);
+        glPopMatrix();
+    }
+
+    // 4) Backrest frame: two vertical posts from back legs up to backrest height
+    drawVerticalPost(legXLeft, legZBack, seatYPos + backrestHeight + 0.05f, legRadius * 0.9f);
+    drawVerticalPost(legXRight, legZBack, seatYPos + backrestHeight + 0.05f, legRadius * 0.9f);
+
+    // 5) Backrest slats: horizontal tubes across width, tilted back slightly
+    for (int i = 0; i < backSlatCount; ++i)
+    {
+        float t = (backSlatCount == 1) ? 0.5f : (float)i / (backSlatCount - 1);
+        float yPos = seatYPos + 0.10f + t * (backrestHeight - 0.20f); // leave small margins top/bottom
+
+        glPushMatrix();
+        // Position roughly at the back plane, then tilt about X to lean back
+        glTranslatef(-halfW, yPos, legZBack);
+        glRotatef(-backTiltDegrees, 1.0f, 0.0f, 0.0f);
+        glRotatef(90.0f, 0.0f, 1.0f, 0.0f); // axis along X
+        drawCylinder(slatRadius, slatRadius, seatWidth);
+        glPopMatrix();
+    }
+
+    // 6) Top backrest rail across width (tilted to match backrest)
     glPushMatrix();
-    glTranslatef(0.0f, seatYPos, 0.0f);
-    glScalef(seatWidth, seatHeight, seatDepth);
-    glutSolidCube(1.0f);
+    glTranslatef(-halfW, seatYPos + backrestHeight, legZBack);
+    glRotatef(-backTiltDegrees, 1.0f, 0.0f, 0.0f);
+    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+    drawCylinder(railRadius, railRadius, seatWidth);
     glPopMatrix();
 
-    // Draw backrest (vertical rectangle)
-    glPushMatrix();
-    glTranslatef(0.0f, backrestYPos, -seatDepth / 2 + backrestThickness / 2);
-    glScalef(backrestWidth, backrestHeight, backrestThickness);
-    glutSolidCube(1.0f);
-    glPopMatrix();
-
-    // Draw legs (4 vertical rectangles at corners)
-    // Front left leg
-    glPushMatrix();
-    glTranslatef(-seatWidth / 2 + legWidth / 2, legHeight / 2, seatDepth / 2 - legDepth / 2);
-    glScalef(legWidth, legHeight, legDepth);
-    glutSolidCube(1.0f);
-    glPopMatrix();
-
-    // Front right leg
-    glPushMatrix();
-    glTranslatef(seatWidth / 2 - legWidth / 2, legHeight / 2, seatDepth / 2 - legDepth / 2);
-    glScalef(legWidth, legHeight, legDepth);
-    glutSolidCube(1.0f);
-    glPopMatrix();
-
-    // Back left leg
-    glPushMatrix();
-    glTranslatef(-seatWidth / 2 + legWidth / 2, legHeight / 2, -seatDepth / 2 + legDepth / 2);
-    glScalef(legWidth, legHeight, legDepth);
-    glutSolidCube(1.0f);
-    glPopMatrix();
-
-    // Back right leg
-    glPushMatrix();
-    glTranslatef(seatWidth / 2 - legWidth / 2, legHeight / 2, -seatDepth / 2 + legDepth / 2);
-    glScalef(legWidth, legHeight, legDepth);
-    glutSolidCube(1.0f);
-    glPopMatrix();
+    // 7) Lower braces near ground for stability
+    // Front X brace
+    drawHorizontalRailX(legRadius * 1.2f, legZFront, seatWidth, railRadius * 0.8f);
+    // Back X brace
+    drawHorizontalRailX(legRadius * 1.2f, legZBack, seatWidth, railRadius * 0.8f);
+    // Left Z brace
+    drawHorizontalRailZ(legXLeft, legRadius * 1.2f, actualSeatDepth, railRadius * 0.8f);
+    // Right Z brace
+    drawHorizontalRailZ(legXRight, legRadius * 1.2f, actualSeatDepth, railRadius * 0.8f);
 
     glPopMatrix();
 
