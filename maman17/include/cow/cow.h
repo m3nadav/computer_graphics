@@ -16,7 +16,6 @@ float getCowZ();
 float getCowRotation();
 
 // Head movement functions
-void handleHeadMovement(unsigned char key, int x, int y); // Legacy function (calls handleCowBodyMovement)
 float getHeadRotationX(); // Up/down rotation (around Z-axis)
 float getHeadRotationY(); // Left/right rotation (around Y-axis)
 

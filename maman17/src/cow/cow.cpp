@@ -234,11 +234,6 @@ void handleCowBodyMovement(unsigned char key, int x, int y)
     glutPostRedisplay(); // Request redraw only if movement occurred
 }
 
-// Legacy function name for backwards compatibility
-void handleHeadMovement(unsigned char key, int x, int y)
-{
-    handleCowBodyMovement(key, x, y);
-}
 
 // Head rotation getters
 float getHeadRotationX() { return headRotationX; }
