@@ -1,5 +1,6 @@
 #include "cow/tail.h"
 #include "cow/cow_coordinates.h"
+#include "cow/cow.h"
 #include "shapes/shapes.h"
 #include "scene/scene.h"
 #include "environment/environment.h"
@@ -507,6 +508,11 @@ void drawTail()
     // Setup tail position and color
     glPushMatrix();
     glTranslatef(COW_TAIL_X, COW_TAIL_Y, COW_TAIL_Z);
+    
+    // Apply user-controlled tail rotations
+    glRotatef(getTailRotationZ(), 0.0f, 0.0f, 1.0f); // SHIFT+I/K rotation around Z-axis
+    glRotatef(getTailRotationX(), 1.0f, 0.0f, 0.0f); // SHIFT+J/L rotation around X-axis
+    
     setCowLightGrayMaterial();
 
     // Get current tail variation control points

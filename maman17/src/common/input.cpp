@@ -133,7 +133,7 @@ void InputHandler::handleCowControls(unsigned char key, int x, int y)
 // Forward to cow control functions if they exist
 #ifdef COW_CONTROLS_AVAILABLE
     handleCowMovement(key, x, y);
-    handleHeadMovement(key, x, y);
+    handleCowBodyMovement(key, x, y);
 #endif
 }
 
