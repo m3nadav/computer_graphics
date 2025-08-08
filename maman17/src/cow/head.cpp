@@ -67,11 +67,43 @@ void drawHeadEyes()
     for (int s = -1; s <= 1; s += 2)
     {
         glPushMatrix();
-        // Position eyes on the sides of the head, slightly forward
-        glTranslatef(0.15f, 0.05f, 0.21f * s);
-        glScalef(0.02f, 0.02f, 0.02f);
+        // Position eyes higher than nose (nose at y=0.0f) and wider spaced
+        // Head ellipsoid radius = 0.35f, at y=0.12f, z=0.12f, surface X ≈ 0.29f
+        // Place eyes slightly outside surface for visibility
+        glTranslatef(0.30f, 0.12f, 0.12f * s);
+
+        // Create eye socket (rotated 90 degrees around Y-axis to align with head surface)
+        glPushMatrix();
+        glTranslatef(-0.005f, 0.0f, 0.0f); // Less recessed for flatter look
+        setCowPinkMaterial();              // Eye socket color
+        glScalef(0.01f, 0.04f, 0.05f);     // Rotated: depth in X, height in Y, width in Z
+        drawEllipsoid(1.0, 1.0, 1.0);
+        glPopMatrix();
+
+        // Draw white eyeball (sclera) - positioned on rotated socket surface
+        glPushMatrix();
+        glTranslatef(0.005f, 0.0f, 0.0f); // Less forward projection
+        setCowWhiteMaterial();
+        glScalef(0.008f, 0.035f, 0.035f); // Rotated: very flat X depth, height Y, width Z
+        drawEllipsoid(1.0, 1.0, 1.0);
+        glPopMatrix();
+
+        // Draw black pupil with iris - on rotated surface
+        glPushMatrix();
+        glTranslatef(0.010f, 0.0f, 0.0f); // Less forward projection
         setCowBlackMaterial();
+        glScalef(0.005f, 0.012f, 0.015f); // Rotated: flat X depth, pupil size Y and Z
+        drawEllipsoid(1.0, 1.0, 1.0);
+        glPopMatrix();
+
+        // Add small highlight for realism - on rotated surface
+        glPushMatrix();
+        glTranslatef(0.015f, 0.005f, -0.002f * s); // Less forward projection
+        setCowWhiteMaterial();
+        glScalef(0.003f, 0.006f, 0.006f); // Rotated: flat X depth, highlight size Y and Z
         drawSphere(1.0);
+        glPopMatrix();
+
         glPopMatrix();
     }
 }
