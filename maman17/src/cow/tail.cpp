@@ -510,8 +510,8 @@ void drawTail()
     glTranslatef(COW_TAIL_X, COW_TAIL_Y, COW_TAIL_Z);
     
     // Apply user-controlled tail rotations
-    glRotatef(getTailRotationX(), 0.0f, 0.0f, 1.0f); // SHIFT+I/K rotation around Z-axis
-    glRotatef(getTailRotationY(), 1.0f, 0.0f, 0.0f); // SHIFT+J/L rotation around X-axis
+    glRotatef(getTailRotationZ(), 0.0f, 0.0f, 1.0f); // SHIFT+I/K rotation around Z-axis
+    glRotatef(getTailRotationX(), 1.0f, 0.0f, 0.0f); // SHIFT+J/L rotation around X-axis
     
     setCowLightGrayMaterial();
 

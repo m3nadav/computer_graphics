@@ -20,8 +20,8 @@ static float headRotationX = 0.0f; // Up/down rotation around Z-axis (-30 to +30
 static float headRotationY = 0.0f; // Left/right rotation around Y-axis (-45 to +45 degrees)
 
 // Global tail movement variables
-static float tailRotationX = 0.0f; // SHIFT+I/K rotation around Z-axis (-90 to +90 degrees)
-static float tailRotationY = 0.0f; // SHIFT+J/L rotation around X-axis (-90 to +90 degrees)
+static float tailRotationZ = 0.0f; // SHIFT+I/K rotation around Z-axis (-90 to +90 degrees)
+static float tailRotationX = 0.0f; // SHIFT+J/L rotation around X-axis (-90 to +90 degrees)
 
 void initCowMovement()
 {
@@ -30,8 +30,8 @@ void initCowMovement()
     cowRotation = 0.0f;
     headRotationX = 0.0f;
     headRotationY = 0.0f;
+    tailRotationZ = 0.0f;
     tailRotationX = 0.0f;
-    tailRotationY = 0.0f;
 }
 
 // Movement constants - easily tweakable
@@ -173,36 +173,8 @@ float getCowX() { return cowX; }
 float getCowZ() { return cowZ; }
 float getCowRotation() { return cowRotation; }
 
-// Helper function for tail movement
-void handleTailMovement(unsigned char key, int x, int y)
-{
-    switch (key)
-    {
-    case 'i': // Tail rotation (Z-axis negative)
-    case 'I':
-        tailRotationX = std::max(tailRotationX - TAIL_ROTATION_SPEED, -TAIL_MAX_ROTATION);
-        break;
-    case 'k': // Tail rotation (Z-axis positive) - limited to prevent disappearing inside cow
-    case 'K':
-        tailRotationX = std::min(tailRotationX + TAIL_ROTATION_SPEED, TAIL_MAX_K_ROTATION);
-        break;
-    case 'j': // Tail rotation (X-axis positive)
-    case 'J':
-        tailRotationY = std::min(tailRotationY + TAIL_ROTATION_SPEED, TAIL_MAX_ROTATION);
-        break;
-    case 'l': // Tail rotation (X-axis negative)
-    case 'L':
-        tailRotationY = std::max(tailRotationY - TAIL_ROTATION_SPEED, -TAIL_MAX_ROTATION);
-        break;
-    default:
-        return; // Don't redraw if no tail movement
-    }
-
-    glutPostRedisplay(); // Request redraw only if tail moved
-}
-
-// Head movement handler for separate head controls
-void handleHeadMovement(unsigned char key, int x, int y)
+// Unified cow body movement handler (head and tail controls)
+void handleCowBodyMovement(unsigned char key, int x, int y)
 {
     // Check if Shift modifier is pressed
     int modifiers = glutGetModifiers();
@@ -211,34 +183,61 @@ void handleHeadMovement(unsigned char key, int x, int y)
     if (shiftPressed)
     {
         // Shift is pressed, handle tail movement
-        handleTailMovement(key, x, y);
-        return;
+        switch (key)
+        {
+        case 'i': // Tail rotation (Z-axis negative)
+        case 'I':
+            tailRotationZ = std::max(tailRotationZ - TAIL_ROTATION_SPEED, -TAIL_MAX_ROTATION);
+            break;
+        case 'k': // Tail rotation (Z-axis positive) - limited to prevent disappearing inside cow
+        case 'K':
+            tailRotationZ = std::min(tailRotationZ + TAIL_ROTATION_SPEED, TAIL_MAX_K_ROTATION);
+            break;
+        case 'j': // Tail rotation (X-axis positive)
+        case 'J':
+            tailRotationX = std::min(tailRotationX + TAIL_ROTATION_SPEED, TAIL_MAX_ROTATION);
+            break;
+        case 'l': // Tail rotation (X-axis negative)
+        case 'L':
+            tailRotationX = std::max(tailRotationX - TAIL_ROTATION_SPEED, -TAIL_MAX_ROTATION);
+            break;
+        default:
+            return; // Don't redraw if no tail movement
+        }
     }
-
-    // No shift, handle head movement (original behavior)
-    switch (key)
+    else
     {
-    case 'i': // Head up (rotate to look up)
-    case 'I':
-        headRotationX = std::min(headRotationX + HEAD_ROTATION_SPEED, HEAD_MAX_X_ROTATION);
-        break;
-    case 'k': // Head down (rotate to look down)
-    case 'K':
-        headRotationX = std::max(headRotationX - HEAD_ROTATION_SPEED, -HEAD_MAX_X_ROTATION);
-        break;
-    case 'j': // Head left
-    case 'J':
-        headRotationY = std::min(headRotationY + HEAD_ROTATION_SPEED, HEAD_MAX_Y_ROTATION);
-        break;
-    case 'l': // Head right
-    case 'L':
-        headRotationY = std::max(headRotationY - HEAD_ROTATION_SPEED, -HEAD_MAX_Y_ROTATION);
-        break;
-    default:
-        return; // Don't redraw if no head movement
+        // No shift, handle head movement
+        switch (key)
+        {
+        case 'i': // Head up (rotate to look up)
+        case 'I':
+            headRotationX = std::min(headRotationX + HEAD_ROTATION_SPEED, HEAD_MAX_X_ROTATION);
+            break;
+        case 'k': // Head down (rotate to look down)
+        case 'K':
+            headRotationX = std::max(headRotationX - HEAD_ROTATION_SPEED, -HEAD_MAX_X_ROTATION);
+            break;
+        case 'j': // Head left
+        case 'J':
+            headRotationY = std::min(headRotationY + HEAD_ROTATION_SPEED, HEAD_MAX_Y_ROTATION);
+            break;
+        case 'l': // Head right
+        case 'L':
+            headRotationY = std::max(headRotationY - HEAD_ROTATION_SPEED, -HEAD_MAX_Y_ROTATION);
+            break;
+        default:
+            return; // Don't redraw if no head movement
+        }
     }
 
-    glutPostRedisplay(); // Request redraw only if head moved
+    glutPostRedisplay(); // Request redraw only if movement occurred
+}
+
+// Legacy function name for backwards compatibility
+void handleHeadMovement(unsigned char key, int x, int y)
+{
+    handleCowBodyMovement(key, x, y);
 }
 
 // Head rotation getters
@@ -246,8 +245,8 @@ float getHeadRotationX() { return headRotationX; }
 float getHeadRotationY() { return headRotationY; }
 
 // Tail rotation getters
+float getTailRotationZ() { return tailRotationZ; }
 float getTailRotationX() { return tailRotationX; }
-float getTailRotationY() { return tailRotationY; }
 
 void drawCow()
 {
