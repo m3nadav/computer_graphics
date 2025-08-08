@@ -6,6 +6,7 @@
 #include "environment/environment.h"
 #include "environment/lights.h"
 #include <GLUT/glut.h>
+#include <cmath>
 
 void drawFullHead()
 {
@@ -108,41 +109,163 @@ void drawHeadEyes()
     }
 }
 
+// Constants for spline-based horn rendering
+const int HORN_CONTROL_POINTS = 5;
+const int HORN_SEGMENTS = 15;
+const int HORN_RADIAL_SEGMENTS = 8;
+const float HORN_BASE_RADIUS = 0.02f;
+const float HORN_TAPER_FACTOR = 0.8f;
+
+// Helper function to calculate position on horn spline using 4th degree polynomial
+void calculateHornSplinePosition(float t, float controlPoints[5][3], float pos[3])
+{
+    // 4th degree polynomial: P(t) = (1-t)⁴P₀ + 4(1-t)³tP₁ + 6(1-t)²t²P₂ + 4(1-t)t³P₃ + t⁴P₄
+    float t_4 = t * t * t * t;
+    float t_3 = t * t * t;
+    float t_2 = t * t;
+    float t_1 = t;
+    
+    for (int j = 0; j < 3; j++)
+    {
+        pos[j] = (1 - t_1) * (1 - t_1) * (1 - t_1) * (1 - t_1) * controlPoints[0][j] +
+                 4 * (1 - t_1) * (1 - t_1) * (1 - t_1) * t_1 * controlPoints[1][j] +
+                 6 * (1 - t_1) * (1 - t_1) * t_2 * controlPoints[2][j] +
+                 4 * (1 - t_1) * t_3 * controlPoints[3][j] +
+                 t_4 * controlPoints[4][j];
+    }
+}
+
+// Helper function to calculate perpendicular vectors for horn cone cross-section
+void calculateHornPerpendicularVectors(float dx, float dy, float dz, float right[3], float forward[3])
+{
+    // Calculate perpendicular vectors for cone cross-section
+    float up[3] = {0, 1, 0};
+    
+    // Calculate right vector using cross product
+    right[0] = dy * up[2] - dz * up[1];
+    right[1] = dz * up[0] - dx * up[2];
+    right[2] = dx * up[1] - dy * up[0];
+    
+    float rightLen = sqrt(right[0] * right[0] + right[1] * right[1] + right[2] * right[2]);
+    if (rightLen > 0.001f)
+    {
+        right[0] /= rightLen;
+        right[1] /= rightLen;
+        right[2] /= rightLen;
+    }
+    
+    // Calculate forward vector using cross product
+    forward[0] = dy * right[2] - dz * right[1];
+    forward[1] = dz * right[0] - dx * right[2];
+    forward[2] = dx * right[1] - dy * right[0];
+}
+
+// Helper function to draw a single horn cone segment
+void drawHornConeSegment(float pos1[3], float pos2[3], float radius1, float radius2, float right[3], float forward[3])
+{
+    // Create triangles around the cone circumference
+    for (int k = 0; k < HORN_RADIAL_SEGMENTS; k++)
+    {
+        float angle1 = 2.0f * M_PI * k / HORN_RADIAL_SEGMENTS;
+        float angle2 = 2.0f * M_PI * (k + 1) / HORN_RADIAL_SEGMENTS;
+        
+        float cos1 = cos(angle1), sin1 = sin(angle1);
+        float cos2 = cos(angle2), sin2 = sin(angle2);
+        
+        // Calculate points on cone surface
+        float p1[3], p2[3], p3[3], p4[3];
+        
+        // Current ring
+        for (int j = 0; j < 3; j++)
+        {
+            p1[j] = pos1[j] + radius1 * (cos1 * right[j] + sin1 * forward[j]);
+            p2[j] = pos1[j] + radius1 * (cos2 * right[j] + sin2 * forward[j]);
+        }
+        
+        // Next ring
+        for (int j = 0; j < 3; j++)
+        {
+            p3[j] = pos2[j] + radius2 * (cos1 * right[j] + sin1 * forward[j]);
+            p4[j] = pos2[j] + radius2 * (cos2 * right[j] + sin2 * forward[j]);
+        }
+        
+        // Draw two triangles for this section
+        glVertex3f(p1[0], p1[1], p1[2]);
+        glVertex3f(p3[0], p3[1], p3[2]);
+        glVertex3f(p2[0], p2[1], p2[2]);
+        
+        glVertex3f(p2[0], p2[1], p2[2]);
+        glVertex3f(p3[0], p3[1], p3[2]);
+        glVertex3f(p4[0], p4[1], p4[2]);
+    }
+}
+
+// Helper function to draw the horn cone surface
+void drawHornCone(float controlPoints[5][3])
+{
+    glBegin(GL_TRIANGLES);
+    
+    // Generate cone surface following the spline
+    for (int i = 0; i < HORN_SEGMENTS; i++)
+    {
+        float t1 = (float)i / HORN_SEGMENTS;
+        float t2 = (float)(i + 1) / HORN_SEGMENTS;
+        
+        // Calculate current and next positions on spline
+        float pos1[3], pos2[3];
+        calculateHornSplinePosition(t1, controlPoints, pos1);
+        calculateHornSplinePosition(t2, controlPoints, pos2);
+        
+        // Calculate radii (taper from base to tip)
+        float radius1 = HORN_BASE_RADIUS * (1.0f - t1 * HORN_TAPER_FACTOR);
+        float radius2 = HORN_BASE_RADIUS * (1.0f - t2 * HORN_TAPER_FACTOR);
+        
+        // Calculate direction for proper orientation
+        float dx = pos2[0] - pos1[0];
+        float dy = pos2[1] - pos1[1];
+        float dz = pos2[2] - pos1[2];
+        float len = sqrt(dx * dx + dy * dy + dz * dz);
+        
+        if (len > 0.001f)
+        {
+            dx /= len;
+            dy /= len;
+            dz /= len; // Normalize direction
+            
+            // Calculate perpendicular vectors for cone cross-section
+            float right[3], forward[3];
+            calculateHornPerpendicularVectors(dx, dy, dz, right, forward);
+            
+            // Draw the cone segment
+            drawHornConeSegment(pos1, pos2, radius1, radius2, right, forward);
+        }
+    }
+    
+    glEnd();
+}
+
 void drawHeadHorns()
 {
     for (int s = -1; s <= 1; s += 2)
     {
         glPushMatrix();
-        // Position horns on top of head where ears used to be
+        // Position horns on top of head
         glTranslatef(-0.05f, 0.30f, 0.15f * s);
         setCowHornMaterial();
-
-        // Create curved horn using multiple segments
-        int segments = 6;
-        float segmentHeight = 0.018f;
-        float baseRadius = 0.02f;
-
-        for (int i = 0; i < segments; i++)
-        {
-            glPushMatrix();
-
-            // Calculate position and rotation for curved effect
-            float t = (float)i / (segments - 1);
-            float curveAngle = t * 25.0f * s; // Curve outward, mirrored
-            float yOffset = i * segmentHeight;
-            float radius = baseRadius * (1.0f - t * 0.6f); // Taper to point
-
-            // Apply curve transformation
-            glTranslatef(0.0f, yOffset, 0.0f);
-            glRotatef(curveAngle, 1, 0, 0); // Curve forward and outward
-            glRotatef(15 * s, 0, 0, 1);     // Slight outward angle
-
-            // Draw horn segment as tapered cylinder
-            drawCylinder(radius, radius * 0.8f, segmentHeight);
-
-            glPopMatrix();
-        }
-
+        
+        // Define control points for realistic bull horn geometry
+        // Horns curve outward then back toward center while growing up and slightly forward
+        float controlPoints[HORN_CONTROL_POINTS][3] = {
+            {0.0f, 0.0f, 0.0f},                    // Base point at head
+            {0.01f * s, 0.02f, 0.03f * s},         // Start curving up and slightly outward
+            {0.03f * s, 0.05f, 0.06f * s},         // Maximum outward curve, growing up
+            {0.02f * s, 0.08f, 0.04f * s},         // Start curving back toward center
+            {0.0f * s, 0.11f, 0.01f * s}           // End pointing slightly forward and inward
+        };
+        
+        // Draw the horn using spline-based cone surface
+        drawHornCone(controlPoints);
+        
         glPopMatrix();
     }
 }
