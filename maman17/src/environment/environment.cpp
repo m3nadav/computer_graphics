@@ -222,30 +222,23 @@ void drawBranch(float length, float radius, int depth, float angleX, float angle
     if (depth <= 0 || length < 0.1f)
         return;
 
-    // Save current material state to prevent leakage
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
-
     setTreeMaterial();
 
-    // Draw branch segment
     glPushMatrix();
     glRotatef(angleX, 1.0f, 0.0f, 0.0f);
     glRotatef(angleY, 0.0f, 1.0f, 0.0f);
 
-    // Draw the branch cylinder
     drawCylinder(radius, radius * 0.7f, length);
 
-    // Move to end of branch
     glTranslatef(0.0f, length, 0.0f);
 
-    // Add leaves at branch endpoints
     if (depth == 1)
     {
         drawLeaves(0.0f, 0.0f, 0.0f, radius * 3.0f);
     }
     else
     {
-        // Create sub-branches
         int numSubBranches = 2 + rand() % 3;
         for (int i = 0; i < numSubBranches; i++)
         {
@@ -259,17 +252,13 @@ void drawBranch(float length, float radius, int depth, float angleX, float angle
     }
 
     glPopMatrix();
-
-    // Restore previous material state
     glPopAttrib();
 }
 
 void drawLeaves(float x, float y, float z, float size)
 {
-    // Save current material state to prevent leakage
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
 
-    // Set leaf material (green)
     GLfloat matAmbient[] = {0.1f, 0.3f, 0.1f, 1.0f};
     GLfloat matDiffuse[] = {0.2f, 0.8f, 0.2f, 1.0f};
     GLfloat matSpecular[] = {0.1f, 0.2f, 0.1f, 1.0f};
@@ -280,56 +269,45 @@ void drawLeaves(float x, float y, float z, float size)
     glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
     glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
 
-    // Create cluster of leaves using small spheres
     int numLeaves = 20 + rand() % 15;
     for (int i = 0; i < numLeaves; i++)
     {
         glPushMatrix();
 
-        // Random position around center
         float leafX = x + randomFloat(-size, size);
         float leafY = y + randomFloat(-size * 0.5f, size * 0.5f);
         float leafZ = z + randomFloat(-size, size);
 
         glTranslatef(leafX, leafY, leafZ);
 
-        // Vary leaf color slightly with proper material properties
         float colorVar = randomFloat(-0.1f, 0.1f);
         setMaterialFromColor(0.2f + colorVar, 0.8f + colorVar, 0.2f + colorVar, 30.0f, 0.3f);
 
-        // Small leaf sphere
         glutSolidSphere(size * 0.15f, 6, 6);
 
         glPopMatrix();
     }
 
-    // Restore previous material state
     glPopAttrib();
 }
 
 void drawTree(float x, float y, float z, float scale)
 {
-    // Save current material state to prevent leakage
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
 
-    // Set deterministic seed based on tree position
-    setSeedForObject(x, y, z, 1); // objectType = 1 for trees
+    setSeedForObject(x, y, z, 1);
 
     glPushMatrix();
     glTranslatef(x, y, z);
     glScalef(scale, scale, scale);
 
-    // Draw trunk
     float trunkHeight = 3.0f;
     float trunkBaseRadius = 0.3f;
     float trunkTopRadius = 0.2f;
 
     drawTrunk(trunkHeight, trunkBaseRadius, trunkTopRadius);
 
-    // Draw main branches from top of trunk
-    glPushMatrix();
-    glTranslatef(0.0f, trunkHeight, 0.0f);
-
+    // Position branches to emerge from trunk surface at top
     int numMainBranches = 4 + rand() % 3;
     for (int i = 0; i < numMainBranches; i++)
     {
@@ -338,13 +316,19 @@ void drawTree(float x, float y, float z, float scale)
         float branchLength = randomFloat(1.5f, 2.5f);
         float branchRadius = trunkTopRadius * 0.6f;
 
+        glPushMatrix();
+        
+        // Position branch origin on trunk circumference at top
+        float branchOriginX = trunkTopRadius * cos(angleY * M_PI / 180.0f);
+        float branchOriginZ = trunkTopRadius * sin(angleY * M_PI / 180.0f);
+        glTranslatef(branchOriginX, trunkHeight, branchOriginZ);
+        
         drawBranch(branchLength, branchRadius, 3, angleX, angleY);
+        
+        glPopMatrix();
     }
 
     glPopMatrix();
-    glPopMatrix();
-
-    // Restore previous material state
     glPopAttrib();
 }
 
