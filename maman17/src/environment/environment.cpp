@@ -246,19 +246,19 @@ void drawBranch(float length, float radius, int depth, float angleX, float angle
         float subLength = length * randomFloat(0.6f, 0.8f);
         float subRadius = radius * 0.7f;
         
-        // Branch 1: Forward-left with slight upward tilt
+        // Branch 1: Forward-left with upward tilt
         drawBranch(subLength, subRadius, depth - 1, 
-                   randomFloat(20.0f, 40.0f),    // X: upward tilt
+                   randomFloat(-40.0f, -20.0f),  // X: negative for upward tilt
                    randomFloat(-60.0f, -30.0f)); // Y: left direction
         
-        // Branch 2: Forward-right with slight upward tilt  
+        // Branch 2: Forward-right with upward tilt  
         drawBranch(subLength, subRadius, depth - 1,
-                   randomFloat(20.0f, 40.0f),    // X: upward tilt
+                   randomFloat(-40.0f, -20.0f),  // X: negative for upward tilt
                    randomFloat(30.0f, 60.0f));   // Y: right direction
         
         // Branch 3: More upward with slight random Y rotation
         drawBranch(subLength, subRadius, depth - 1,
-                   randomFloat(50.0f, 80.0f),    // X: steeper upward angle
+                   randomFloat(-80.0f, -50.0f),  // X: steeper negative for more upward
                    randomFloat(-20.0f, 20.0f));  // Y: slight random variation
     }
 
@@ -327,7 +327,7 @@ void drawTree(float x, float y, float z, float scale)
     glTranslatef(0.0f, trunkHeight, 0.0f);
     glRotatef(0.0f, 0.0f, 1.0f, 0.0f);
     glTranslatef(trunkTopRadius, 0.0f, 0.0f);
-    drawBranch(branchLength, branchRadius, 3, randomFloat(25.0f, 45.0f), 0.0f);
+    drawBranch(branchLength, branchRadius, 3, randomFloat(-45.0f, -25.0f), 0.0f);
     glPopMatrix();
     
     // Branch 2: East direction with upward tilt
@@ -335,7 +335,7 @@ void drawTree(float x, float y, float z, float scale)
     glTranslatef(0.0f, trunkHeight, 0.0f);
     glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
     glTranslatef(trunkTopRadius, 0.0f, 0.0f);
-    drawBranch(branchLength, branchRadius, 3, randomFloat(25.0f, 45.0f), 0.0f);
+    drawBranch(branchLength, branchRadius, 3, randomFloat(-45.0f, -25.0f), 0.0f);
     glPopMatrix();
     
     // Branch 3: South direction with upward tilt
@@ -343,7 +343,7 @@ void drawTree(float x, float y, float z, float scale)
     glTranslatef(0.0f, trunkHeight, 0.0f);
     glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
     glTranslatef(trunkTopRadius, 0.0f, 0.0f);
-    drawBranch(branchLength, branchRadius, 3, randomFloat(25.0f, 45.0f), 0.0f);
+    drawBranch(branchLength, branchRadius, 3, randomFloat(-45.0f, -25.0f), 0.0f);
     glPopMatrix();
     
     // Branch 4: West direction with upward tilt
@@ -351,7 +351,7 @@ void drawTree(float x, float y, float z, float scale)
     glTranslatef(0.0f, trunkHeight, 0.0f);
     glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
     glTranslatef(trunkTopRadius, 0.0f, 0.0f);
-    drawBranch(branchLength, branchRadius, 3, randomFloat(25.0f, 45.0f), 0.0f);
+    drawBranch(branchLength, branchRadius, 3, randomFloat(-45.0f, -25.0f), 0.0f);
     glPopMatrix();
 
     glPopMatrix();
