@@ -245,21 +245,21 @@ void drawBranch(float length, float radius, int depth, float angleX, float angle
         // Always create 3 sub-branches positioned orthogonally to avoid same-plane clustering
         float subLength = length * randomFloat(0.6f, 0.8f);
         float subRadius = radius * 0.7f;
-        
+
         // Branch 1: Forward-left with upward tilt
-        drawBranch(subLength, subRadius, depth - 1, 
+        drawBranch(subLength, subRadius, depth - 1,
                    randomFloat(-40.0f, -20.0f),  // X: negative for upward tilt
                    randomFloat(-60.0f, -30.0f)); // Y: left direction
-        
-        // Branch 2: Forward-right with upward tilt  
+
+        // Branch 2: Forward-right with upward tilt
         drawBranch(subLength, subRadius, depth - 1,
-                   randomFloat(-40.0f, -20.0f),  // X: negative for upward tilt
-                   randomFloat(30.0f, 60.0f));   // Y: right direction
-        
+                   randomFloat(-40.0f, -20.0f), // X: negative for upward tilt
+                   randomFloat(30.0f, 60.0f));  // Y: right direction
+
         // Branch 3: More upward with slight random Y rotation
         drawBranch(subLength, subRadius, depth - 1,
-                   randomFloat(-80.0f, -50.0f),  // X: steeper negative for more upward
-                   randomFloat(-20.0f, 20.0f));  // Y: slight random variation
+                   randomFloat(-80.0f, -50.0f), // X: steeper negative for more upward
+                   randomFloat(-20.0f, 20.0f)); // Y: slight random variation
     }
 
     glPopMatrix();
@@ -280,7 +280,7 @@ void drawLeaves(float x, float y, float z, float size)
     glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
     glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
 
-    int numLeaves = 20 + rand() % 15;
+    int numLeaves = 40 + rand() % 5;
     for (int i = 0; i < numLeaves; i++)
     {
         glPushMatrix();
@@ -321,7 +321,7 @@ void drawTree(float x, float y, float z, float scale)
     // Create 4 main branches in orthogonal arrangement around trunk top
     float branchLength = randomFloat(1.5f, 2.5f);
     float branchRadius = trunkTopRadius * 0.6f;
-    
+
     // Branch 1: North direction with upward tilt
     glPushMatrix();
     glTranslatef(0.0f, trunkHeight, 0.0f);
@@ -329,7 +329,7 @@ void drawTree(float x, float y, float z, float scale)
     glTranslatef(trunkTopRadius, 0.0f, 0.0f);
     drawBranch(branchLength, branchRadius, 3, randomFloat(-45.0f, -25.0f), 0.0f);
     glPopMatrix();
-    
+
     // Branch 2: East direction with upward tilt
     glPushMatrix();
     glTranslatef(0.0f, trunkHeight, 0.0f);
@@ -337,7 +337,7 @@ void drawTree(float x, float y, float z, float scale)
     glTranslatef(trunkTopRadius, 0.0f, 0.0f);
     drawBranch(branchLength, branchRadius, 3, randomFloat(-45.0f, -25.0f), 0.0f);
     glPopMatrix();
-    
+
     // Branch 3: South direction with upward tilt
     glPushMatrix();
     glTranslatef(0.0f, trunkHeight, 0.0f);
@@ -345,7 +345,7 @@ void drawTree(float x, float y, float z, float scale)
     glTranslatef(trunkTopRadius, 0.0f, 0.0f);
     drawBranch(branchLength, branchRadius, 3, randomFloat(-45.0f, -25.0f), 0.0f);
     glPopMatrix();
-    
+
     // Branch 4: West direction with upward tilt
     glPushMatrix();
     glTranslatef(0.0f, trunkHeight, 0.0f);
