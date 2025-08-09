@@ -318,12 +318,13 @@ void drawTree(float x, float y, float z, float scale)
 
         glPushMatrix();
         
-        // Position branch origin on trunk circumference at top
-        float branchOriginX = trunkTopRadius * cos(angleY * M_PI / 180.0f);
-        float branchOriginZ = trunkTopRadius * sin(angleY * M_PI / 180.0f);
-        glTranslatef(branchOriginX, trunkHeight, branchOriginZ);
+        // Move to trunk top and position branch at circumference
+        glTranslatef(0.0f, trunkHeight, 0.0f);
+        glRotatef(angleY, 0.0f, 1.0f, 0.0f);
+        glTranslatef(trunkTopRadius, 0.0f, 0.0f);
         
-        drawBranch(branchLength, branchRadius, 3, angleX, angleY);
+        // Draw branch with only X-axis rotation (angleY already applied above)
+        drawBranch(branchLength, branchRadius, 3, angleX, 0.0f);
         
         glPopMatrix();
     }
