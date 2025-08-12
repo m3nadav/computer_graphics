@@ -49,6 +49,7 @@ private:
 
     // Mouse state
     bool rightMouseDown;
+    bool leftMouseDown;
     int lastMouseX;
     int lastMouseY;
 

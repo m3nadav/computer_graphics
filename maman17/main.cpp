@@ -11,11 +11,38 @@
 static CameraController camera(10.0f, 35.0f, 55.0f);
 static InputHandler *inputHandler = nullptr;
 
+// LAMP POST CONTROLS:
+// - Left Mouse Drag: Rotate lamp direction (yaw and pitch)
+// - L key: Toggle lamp on/off
+// - [ key: Decrease lamp intensity
+// - ] key: Increase lamp intensity
+
 // Custom keyboard handler (cow controls now handled by InputHandler)
 void customKeyboardHandler(unsigned char key, int x, int y)
 {
     // Handle sun position controls
     handleSunControls(key, x, y);
+
+    // Handle lamp controls
+    switch (key)
+    {
+    case '[':
+        // Decrease lamp intensity
+        {
+            float intensity = getLampIntensity();
+            setLampIntensity(intensity - 0.2f);
+            glutPostRedisplay();
+        }
+        break;
+    case ']':
+        // Increase lamp intensity
+        {
+            float intensity = getLampIntensity();
+            setLampIntensity(intensity + 0.2f);
+            glutPostRedisplay();
+        }
+        break;
+    }
 
     // Any additional custom key handling can go here
     // Cow controls are automatically handled by InputHandler when enabled
@@ -32,6 +59,9 @@ void drawMainScene()
 
     // Setup sun lighting
     setupSunLighting();
+
+    // Setup lamp post lighting
+    setupLampLighting();
 
     // Draw the sun in the sky
     drawSun();
@@ -53,7 +83,7 @@ void drawMainScene()
     drawScatteredRocks(worldSize, 0.0f, worldSize, 10);
 
     // Draw metal benches
-    drawMetalBench(-4, 0.0f, -6, 1.0f, 30.0f);
+    drawMetalAndLamp(-4, 0.0f, -6, 1.0f, 30.0f);
 
     // Draw the cow in the center
     drawCow();

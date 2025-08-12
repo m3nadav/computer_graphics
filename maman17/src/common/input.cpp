@@ -1,4 +1,5 @@
 #include "common/input.h"
+#include "environment/lights.h"
 #include <GLUT/glut.h>
 #include <cstdlib>
 #include <iostream>
@@ -12,7 +13,7 @@
 InputHandler *InputHandler::instance = nullptr;
 
 InputHandler::InputHandler(CameraController &camera)
-    : cameraController(camera), rightMouseDown(false), lastMouseX(0), lastMouseY(0),
+    : cameraController(camera), rightMouseDown(false), leftMouseDown(false), lastMouseX(0), lastMouseY(0),
       timerActive(false), timerInterval(50), startingScene(0), cowControlsEnabled(false)
 {
     instance = this; // Set static instance for GLUT callbacks
@@ -143,9 +144,31 @@ void InputHandler::handleCowControls(unsigned char key, int x, int y)
 
 void InputHandler::handleMouse(int button, int state, int x, int y)
 {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    if (button == GLUT_LEFT_BUTTON)
     {
-        menuSystem.handleMenuClick(x, y);
+        if (state == GLUT_DOWN)
+        {
+            // Handle menu clicks and lamp control
+            menuSystem.handleMenuClick(x, y);
+            
+            // Also enable lamp control - user can control lamp even when menu is active
+            leftMouseDown = true;
+            lastMouseX = x;
+            lastMouseY = y;
+        }
+        else if (state == GLUT_UP)
+        {
+            leftMouseDown = false;
+            
+            // Check if mouse is over the lamp when released - toggle lamp if so
+            if (isMouseOverLamp(x, y))
+            {
+                static bool lampOn = true;
+                lampOn = !lampOn;
+                enableLampLight(lampOn);
+                glutPostRedisplay();
+            }
+        }
     }
     else if (button == GLUT_RIGHT_BUTTON)
     {
@@ -170,6 +193,27 @@ void InputHandler::handleMotion(int x, int y)
         int deltaY = y - lastMouseY;
 
         cameraController.rotate(deltaX, deltaY);
+
+        lastMouseX = x;
+        lastMouseY = y;
+
+        glutPostRedisplay();
+    }
+    else if (leftMouseDown)
+    {
+        int deltaX = x - lastMouseX;
+        int deltaY = y - lastMouseY;
+
+        // Control lamp direction with left mouse drag
+        float currentAngleX, currentAngleZ;
+        getLampDirection(&currentAngleX, &currentAngleZ);
+        
+        // Horizontal mouse movement controls yaw (Z rotation)
+        // Vertical mouse movement controls pitch (X rotation)
+        float newAngleZ = currentAngleZ + deltaX * 0.5f;  // Sensitivity factor
+        float newAngleX = currentAngleX - deltaY * 0.5f;  // Inverted Y for intuitive control
+        
+        setLampDirection(newAngleX, newAngleZ);
 
         lastMouseX = x;
         lastMouseY = y;

@@ -593,15 +593,16 @@ void drawScatteredRocks(float x, float y, float z, int numRocks)
     glPopAttrib();
 }
 
-// Metal bench implementation
+float benchHalfWidth = 0.0f;
+float benchHalfDepth = 0.0f;
+
+// Metal bench implementation (at origin, no rotation)
 void drawMetalBench(float x, float y, float z, float scale, float rotateY)
 {
     // Save current material state to prevent leakage
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
 
     glPushMatrix();
-    glTranslatef(x, y, z);
-    glRotatef(rotateY, 0.0f, 1.0f, 0.0f);
     glScalef(scale, scale, scale);
 
     setMetalMaterial();
@@ -619,18 +620,18 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
     const float backTiltDegrees = 12.0f; // Slight lean for comfort
 
     // Convenience offsets
-    const float halfW = seatWidth * 0.5f;
-    const float halfD = seatDepth * 0.5f;
+    benchHalfWidth = seatWidth * 0.5f;
+    benchHalfDepth = seatDepth * 0.5f;
     // Calculate actual seat slat edge coordinates
     // Seat slats span X from -seatWidth/2 to +seatWidth/2
-    const float slatXLeft = -halfW; // -1.0
-    const float slatXRight = halfW; // +1.0
+    const float slatXLeft = -benchHalfWidth; // -1.0
+    const float slatXRight = benchHalfWidth; // +1.0
 
     // Seat slats Z positions: zPos = -halfD + (0.15f * seatDepth) + t * (seatDepth - 0.30f * seatDepth)
     // Front slat (t=1): -0.25 + 0.075 + 1.0 * 0.35 = 0.175
     // Back slat (t=0): -0.25 + 0.075 + 0.0 * 0.35 = -0.175
-    const float slatZFront = -halfD + (0.15f * seatDepth) + 1.0f * (seatDepth - 0.30f * seatDepth); // 0.175
-    const float slatZBack = -halfD + (0.15f * seatDepth) + 0.0f * (seatDepth - 0.30f * seatDepth);  // -0.175
+    const float slatZFront = -benchHalfDepth + (0.15f * seatDepth) + 1.0f * (seatDepth - 0.30f * seatDepth); // 0.175
+    const float slatZBack = -benchHalfDepth + (0.15f * seatDepth) + 0.0f * (seatDepth - 0.30f * seatDepth);  // -0.175
 
     // Position legs at the actual seat slat edges
     const float legXLeft = slatXLeft;
@@ -691,10 +692,10 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
     for (int i = 0; i < seatSlatCount; ++i)
     {
         float t = (seatSlatCount == 1) ? 0.5f : (float)i / (seatSlatCount - 1);
-        float zPos = -halfD + (0.15f * seatDepth) + t * (seatDepth - 0.30f * seatDepth); // inset a bit from edges
+        float zPos = -benchHalfDepth + (0.15f * seatDepth) + t * (seatDepth - 0.30f * seatDepth); // inset a bit from edges
 
         glPushMatrix();
-        glTranslatef(-halfW, seatYPos, zPos);
+        glTranslatef(-benchHalfWidth, seatYPos, zPos);
         glRotatef(90.0f, 0.0f, 1.0f, 0.0f); // make axis X
         drawCylinder(slatRadius, slatRadius, seatWidth);
         glPopMatrix();
@@ -712,7 +713,7 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
 
         glPushMatrix();
         // Position roughly at the back plane, then tilt about X to lean back
-        glTranslatef(-halfW, yPos, legZBack);
+        glTranslatef(-benchHalfWidth, yPos, legZBack);
         glRotatef(-backTiltDegrees, 1.0f, 0.0f, 0.0f);
         glRotatef(90.0f, 0.0f, 1.0f, 0.0f); // axis along X
         drawCylinder(slatRadius, slatRadius, seatWidth);
@@ -721,7 +722,7 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
 
     // 6) Top backrest rail across width (tilted to match backrest)
     glPushMatrix();
-    glTranslatef(-halfW, seatYPos + backrestHeight, legZBack);
+    glTranslatef(-benchHalfWidth, seatYPos + backrestHeight, legZBack);
     glRotatef(-backTiltDegrees, 1.0f, 0.0f, 0.0f);
     glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
     drawCylinder(railRadius, railRadius, seatWidth);
@@ -839,4 +840,134 @@ void drawWorldGround(float worldSize)
 
     // Restore previous material state
     glPopAttrib();
+}
+
+// ========================================
+// LIGHTING VISUAL ELEMENTS (moved from lights.cpp)
+// ========================================
+
+// Draw the sun as a bright sphere
+void drawSun()
+{
+    // Use the same position logic as setupSunLighting()
+    float sunX, sunY, sunZ;
+
+    if (getUseCustomPosition())
+    {
+        // Use custom adjustable position
+        sunX = getLightPositionX();
+        sunY = getLightPositionY();
+        sunZ = getLightPositionZ();
+    }
+    else
+    {
+        // Use predefined positions from 1-4 keys
+        int currentPos = getCurrentSunPosition();
+        float *sunPositions = getSunPositions();
+        if (currentPos >= 0 && currentPos < 4)
+        {
+            sunX = sunPositions[currentPos * 3 + 0];
+            sunY = sunPositions[currentPos * 3 + 1];
+            sunZ = sunPositions[currentPos * 3 + 2];
+        }
+        else
+        {
+            // Default to position 0 if invalid
+            sunX = sunPositions[0];
+            sunY = sunPositions[1];
+            sunZ = sunPositions[2];
+        }
+    }
+
+    glPushMatrix();
+    glTranslatef(sunX, sunY, sunZ);
+
+    // Disable lighting for the sun itself so it appears bright
+    glDisable(GL_LIGHTING);
+
+    // Set bright yellow color for the sun
+    glColor3f(1.0f, 1.0f, 0.3f);
+
+    // Draw sun as a sphere
+    glutSolidSphere(2.0f, 20, 20);
+
+    // Re-enable lighting for other objects
+    glEnable(GL_LIGHTING);
+
+    glPopMatrix();
+}
+
+void drawLampPost(float benchX, float benchY, float benchZ, float scale, float benchRotation)
+{
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+    glPushMatrix();
+
+    float lampHeight = getLampHeight();
+    glScalef(scale, scale, scale);
+
+    // Draw lamp post pole
+    setMaterialFromColor(0.2f, 0.2f, 0.2f, 10.0f, 0.3f); // Dark metallic material
+    glPushMatrix();
+    glTranslatef(0.0f, lampHeight * 0.5f, 0.0f);
+    glScalef(0.05f, lampHeight, 0.05f);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Draw lamp head (bulb housing)
+    setMaterialFromColor(0.3f, 0.3f, 0.3f, 20.0f, 0.5f);
+    glPushMatrix();
+    glTranslatef(0.0f, lampHeight - 0.2f, 0.0f);
+
+    // Rotate lamp head based on direction
+    glRotatef(getLampDirectionZ(), 0.0f, 1.0f, 0.0f); // Yaw rotation
+    glRotatef(getLampDirectionX(), 1.0f, 0.0f, 0.0f); // Pitch rotation
+
+    glScalef(0.3f, 0.2f, 0.3f);
+    glutSolidCube(1.0f);
+    glPopMatrix();
+
+    // Draw bright bulb inside lamp head
+    glDisable(GL_LIGHTING);
+    glColor3f(1.0f, 1.0f, 0.7f); // Warm white/yellow
+    glPushMatrix();
+    glTranslatef(0.0f, lampHeight - 0.2f, 0.0f);
+
+    // Rotate bulb with lamp head
+    glRotatef(getLampDirectionZ(), 0.0f, 1.0f, 0.0f);
+    glRotatef(getLampDirectionX(), 1.0f, 0.0f, 0.0f);
+
+    glutSolidSphere(0.08f, 10, 10);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+
+    glPopMatrix();
+    glPopAttrib();
+}
+
+// Wrapper function that handles positioning and rotation for both bench and lamp
+void drawMetalAndLamp(float x, float y, float z, float scale, float rotateY)
+{
+    glPushMatrix();
+
+    // Apply world transformation (translation and rotation)
+    glTranslatef(x, y, z);
+    glRotatef(rotateY, 0.0f, 1.0f, 0.0f);
+
+    // Draw the bench at origin
+    drawMetalBench(0.0f, 0.0f, 0.0f, scale, 0.0f);
+
+    // Calculate lamp position relative to bench
+    // The lamp should be positioned behind the bench backrest
+    float seatWidth = 2.0f * scale; // Bench dimensions
+    float seatDepth = 0.5f * scale;
+    float lampOffsetX = seatWidth * 0.5f + 0.175f * scale; // Behind and to the side
+    float lampOffsetZ = -seatDepth * 0.5f;                 // At the back of the bench
+
+    // Draw the lamp post at calculated position
+    glPushMatrix();
+    glTranslatef(lampOffsetX, 0.0f, lampOffsetZ);
+    drawLampPost(0.0f, 0.0f, 0.0f, scale, 0.0f);
+    glPopMatrix();
+
+    glPopMatrix();
 }

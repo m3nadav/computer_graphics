@@ -1,6 +1,7 @@
 #include "environment/lights.h"
 #include "environment/environment.h"
 #include <GLUT/glut.h>
+#include <cmath>
 
 // Define missing constants for separate specular color on some platforms
 #ifndef GL_LIGHT_MODEL_COLOR_CONTROL
@@ -53,6 +54,20 @@ static float lightPositionY = 25.0f;   // Custom Y position
 static float lightPositionZ = -15.0f;  // Custom Z position
 static float ambientLevel = 0.3f;      // Ambient light level (0.0 to 1.0)
 static bool useCustomPosition = false; // Whether to use custom position or sunPositions array
+
+// Lamp light control variables
+static float lampIntensity = 1.5f;            // Lamp light intensity (0.1 to 3.0)
+static float lampDirectionX = 0.0f;           // Lamp direction angle around X axis (pitch)
+static float lampDirectionZ = 0.0f;           // Lamp direction angle around Z axis (yaw)
+static bool lampEnabled = true;               // Whether lamp light is enabled
+static const float LAMP_HEIGHT = 3.0f;        // Height of lamp above bench
+static const float BACKREST_OFFSET = -0.175f; // Offset from bench center to backrest
+
+// Current bench parameters (updated by drawLampPost)
+static float currentBenchX = -4.0f;
+static float currentBenchY = 0.0f;
+static float currentBenchZ = -6.0f;
+static float currentBenchRotation = 30.0f;
 
 void setupSunLighting()
 {
@@ -116,54 +131,58 @@ void setupSunLighting()
     glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 }
 
-// Draw the sun as a bright sphere
-void drawSun()
+// ========================================
+// LAMP POST LIGHTING SYSTEM
+// ========================================
+
+void setupLampLighting()
 {
-    // Use the same position logic as setupSunLighting()
-    float sunX, sunY, sunZ;
-
-    if (useCustomPosition)
+    if (!lampEnabled)
     {
-        // Use custom adjustable position
-        sunX = lightPositionX;
-        sunY = lightPositionY;
-        sunZ = lightPositionZ;
-    }
-    else
-    {
-        // Use predefined positions from 1-4 keys
-        int currentPos = getCurrentSunPosition();
-        if (currentPos >= 0 && currentPos < 4)
-        {
-            sunX = sunPositions[currentPos][0];
-            sunY = sunPositions[currentPos][1];
-            sunZ = sunPositions[currentPos][2];
-        }
-        else
-        {
-            // Default to position 0 if invalid
-            sunX = sunPositions[0][0];
-            sunY = sunPositions[0][1];
-            sunZ = sunPositions[0][2];
-        }
+        glDisable(GL_LIGHT1);
+        return;
     }
 
-    glPushMatrix();
-    glTranslatef(sunX, sunY, sunZ);
+    // Enable the second light source for the lamp
+    glEnable(GL_LIGHT1);
 
-    // Disable lighting for the sun itself so it appears bright
-    glDisable(GL_LIGHTING);
+    // Calculate lamp position (above the bench backrest, accounting for bench rotation)
+    // Transform the backrest offset position by the bench rotation
+    float cosRot = cos(currentBenchRotation * M_PI / 180.0f);
+    float sinRot = sin(currentBenchRotation * M_PI / 180.0f);
 
-    // Set bright yellow color for the sun
-    glColor3f(1.0f, 1.0f, 0.3f);
+    float lampX = currentBenchX + BACKREST_OFFSET * (-sinRot); // Transform backrest offset
+    float lampY = currentBenchY + LAMP_HEIGHT;
+    float lampZ = currentBenchZ + BACKREST_OFFSET * cosRot;
 
-    // Draw sun as a sphere
-    glutSolidSphere(2.0f, 20, 20);
+    // Calculate lamp direction based on rotation angles
+    float dirX = sin(lampDirectionX * M_PI / 180.0f);
+    float dirY = -cos(lampDirectionX * M_PI / 180.0f) * cos(lampDirectionZ * M_PI / 180.0f);
+    float dirZ = cos(lampDirectionX * M_PI / 180.0f) * sin(lampDirectionZ * M_PI / 180.0f);
 
-    // Re-enable lighting for other objects
-    glEnable(GL_LIGHTING);
+    // Set up spotlight parameters
+    GLfloat lampPos[] = {lampX, lampY, lampZ, 1.0f}; // Point light position
+    GLfloat lampDir[] = {dirX, dirY, dirZ};          // Spotlight direction
 
-    glPopMatrix();
+    // Warm white light color with high intensity
+    GLfloat lampDiffuse[] = {1.0f * lampIntensity, 0.95f * lampIntensity, 0.8f * lampIntensity, 1.0f};
+    GLfloat lampSpecular[] = {1.0f * lampIntensity, 0.95f * lampIntensity, 0.8f * lampIntensity, 1.0f};
+    GLfloat lampAmbient[] = {0.1f, 0.1f, 0.1f, 1.0f}; // Minimal ambient contribution
+
+    glLightfv(GL_LIGHT1, GL_POSITION, lampPos);
+    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, lampDir);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, lampDiffuse);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, lampSpecular);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, lampAmbient);
+
+    // Configure spotlight cone
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 45.0f);  // 45-degree cone
+    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.0f); // Moderate falloff
+
+    // Set attenuation for realistic distance falloff
+    glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.0f);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.1f);
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.02f);
 }
 
 // Helper function to set material properties from RGB color
@@ -397,4 +416,124 @@ float getAmbientLevel()
 void enableCustomLightPosition(bool enable)
 {
     useCustomPosition = enable;
+}
+
+// Lamp light control functions implementation
+void setLampIntensity(float intensity)
+{
+    if (intensity >= 0.1f && intensity <= 3.0f)
+    {
+        lampIntensity = intensity;
+    }
+}
+
+void setLampDirection(float angleX, float angleZ)
+{
+    // Clamp pitch angle to prevent lamp from pointing too far up or down
+    if (angleX < -60.0f)
+        angleX = -60.0f;
+    if (angleX > 30.0f)
+        angleX = 30.0f;
+
+    // Allow full 360-degree rotation for yaw
+    while (angleZ < 0.0f)
+        angleZ += 360.0f;
+    while (angleZ >= 360.0f)
+        angleZ -= 360.0f;
+
+    lampDirectionX = angleX;
+    lampDirectionZ = angleZ;
+}
+
+void getLampDirection(float *angleX, float *angleZ)
+{
+    if (angleX)
+        *angleX = lampDirectionX;
+    if (angleZ)
+        *angleZ = lampDirectionZ;
+}
+
+float getLampIntensity()
+{
+    return lampIntensity;
+}
+
+void enableLampLight(bool enable)
+{
+    lampEnabled = enable;
+}
+
+// Accessor functions for variables needed by moved functions
+float *getSunPositions()
+{
+    return (float *)sunPositions;
+}
+
+bool getUseCustomPosition()
+{
+    return useCustomPosition;
+}
+
+float getLampDirectionX()
+{
+    return lampDirectionX;
+}
+
+float getLampDirectionZ()
+{
+    return lampDirectionZ;
+}
+
+float getLampHeight()
+{
+    return LAMP_HEIGHT;
+}
+
+void updateCurrentBenchParameters(float x, float y, float z, float rotation)
+{
+    currentBenchX = x;
+    currentBenchY = y;
+    currentBenchZ = z;
+    currentBenchRotation = rotation;
+}
+
+// Check if mouse coordinates are over the lamp post
+bool isMouseOverLamp(int screenX, int screenY)
+{
+    // Get current viewport
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    // Get current modelview and projection matrices
+    GLdouble modelview[16], projection[16];
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+
+    // Calculate actual lamp position (same logic as setupLampLighting)
+    float cosRot = cos(currentBenchRotation * M_PI / 180.0f);
+    float sinRot = sin(currentBenchRotation * M_PI / 180.0f);
+
+    double lampWorldX = currentBenchX + BACKREST_OFFSET * (-sinRot);
+    double lampWorldY = currentBenchY + LAMP_HEIGHT;
+    double lampWorldZ = currentBenchZ + BACKREST_OFFSET * cosRot;
+
+    // Project lamp position to screen coordinates
+    GLdouble screenXd, screenYd, screenZd;
+    if (gluProject(lampWorldX, lampWorldY, lampWorldZ,
+                   modelview, projection, viewport,
+                   &screenXd, &screenYd, &screenZd) != GL_TRUE)
+    {
+        return false; // Projection failed
+    }
+
+    // Convert OpenGL screen coordinates (origin bottom-left) to window coordinates (origin top-left)
+    int screenYConverted = viewport[3] - (int)screenYd;
+
+    // Check if mouse is within lamp radius (allow some tolerance)
+    float lampScreenRadius = 30.0f; // pixels
+    float dx = screenX - screenXd;
+    float dy = screenY - screenYConverted;
+    float distance = sqrt(dx * dx + dy * dy);
+
+    return distance <= lampScreenRadius;
 }
