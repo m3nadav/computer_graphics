@@ -113,6 +113,13 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
         cameraController.toggleCameraMode();
         glutPostRedisplay();
     }
+    else if (key == 't' || key == 'T') // Toggle lamp light
+    {
+        static bool lampOn = true;
+        lampOn = !lampOn;
+        enableLampLight(lampOn);
+        glutPostRedisplay();
+    }
     else
     {
         // Try cow controls if enabled
@@ -159,15 +166,6 @@ void InputHandler::handleMouse(int button, int state, int x, int y)
         else if (state == GLUT_UP)
         {
             leftMouseDown = false;
-            
-            // Check if mouse is over the lamp when released - toggle lamp if so
-            if (isMouseOverLamp(x, y))
-            {
-                static bool lampOn = true;
-                lampOn = !lampOn;
-                enableLampLight(lampOn);
-                glutPostRedisplay();
-            }
         }
     }
     else if (button == GLUT_RIGHT_BUTTON)

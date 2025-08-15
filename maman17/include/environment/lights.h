@@ -26,8 +26,6 @@ void getLampDirection(float *angleX, float *angleZ);
 float getLampIntensity();
 void enableLampLight(bool enable);
 
-// Mouse interaction with lamp
-bool isMouseOverLamp(int screenX, int screenY);
 
 // Accessor functions for variables needed by moved functions
 float *getSunPositions();
