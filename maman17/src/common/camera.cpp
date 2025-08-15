@@ -11,12 +11,14 @@
 #endif
 
 CameraController::CameraController()
-    : distance(5.0f), angleX(35.0f), angleY(55.0f), minDistance(1.0f), maxDistance(100.0f), currentMode(ORBITAL_CAMERA)
+    : distance(5.0f), angleX(35.0f), angleY(55.0f), minDistance(1.0f), maxDistance(100.0f), currentMode(ORBITAL_CAMERA),
+      anchorX(0.0f), anchorY(0.0f), anchorZ(0.0f)
 {
 }
 
 CameraController::CameraController(float distance, float angleX, float angleY)
-    : distance(distance), angleX(angleX), angleY(angleY), minDistance(1.0f), maxDistance(100.0f), currentMode(ORBITAL_CAMERA)
+    : distance(distance), angleX(angleX), angleY(angleY), minDistance(1.0f), maxDistance(100.0f), currentMode(ORBITAL_CAMERA),
+      anchorX(0.0f), anchorY(0.0f), anchorZ(0.0f)
 {
     clampValues();
 }
@@ -69,9 +71,9 @@ void CameraController::setupGLCamera() const
         float x = std::get<0>(pos);
         float y = std::get<1>(pos);
         float z = std::get<2>(pos);
-        gluLookAt(x, y, z,        // Eye position (orbital camera)
-                  0.0, 0.0, 0.0,  // Look at center
-                  0.0, 1.0, 0.0); // Up vector
+        gluLookAt(x + anchorX, y + anchorY, z + anchorZ,  // Eye position (orbital camera around anchor)
+                  anchorX, anchorY, anchorZ,               // Look at anchor point
+                  0.0, 1.0, 0.0);                          // Up vector
     }
 }
 
@@ -88,12 +90,34 @@ void CameraController::setAngles(float x, float y)
     clampValues();
 }
 
+void CameraController::moveAnchor(float deltaX, float deltaY, float deltaZ)
+{
+    anchorX += deltaX;
+    anchorY += deltaY;
+    anchorZ += deltaZ;
+}
+
+void CameraController::setAnchor(float x, float y, float z)
+{
+    anchorX = x;
+    anchorY = y;
+    anchorZ = z;
+}
+
+std::tuple<float, float, float> CameraController::getAnchor() const
+{
+    return {anchorX, anchorY, anchorZ};
+}
+
 void CameraController::resetToDefaults()
 {
     distance = 5.0f;
     angleX = 35.0f;
     angleY = 55.0f;
     currentMode = ORBITAL_CAMERA;
+    anchorX = 0.0f;
+    anchorY = 0.0f;
+    anchorZ = 0.0f;
     clampValues();
 }
 

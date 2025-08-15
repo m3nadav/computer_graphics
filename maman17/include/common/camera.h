@@ -47,6 +47,11 @@ public:
     void setDistance(float dist);
     void setAngles(float x, float y);
     
+    // Anchor point control methods
+    void moveAnchor(float deltaX, float deltaY, float deltaZ);
+    void setAnchor(float x, float y, float z);
+    std::tuple<float, float, float> getAnchor() const;
+    
     // Reset to default values
     void resetToDefaults();
 
@@ -57,6 +62,11 @@ private:
     float minDistance;
     float maxDistance;
     CameraMode currentMode;
+    
+    // Anchor point coordinates (where the camera looks at)
+    float anchorX;
+    float anchorY; 
+    float anchorZ;
 
     void clampValues();
 };
