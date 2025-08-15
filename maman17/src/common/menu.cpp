@@ -536,8 +536,6 @@ void MenuSystem::drawHelpWindow()
     renderText2D("A.....................Turn left", leftMargin, currentY);
     currentY -= lineHeight;
     renderText2D("D.....................Turn right", leftMargin, currentY);
-    currentY -= lineHeight;
-    renderText2D("Arrows...............Same as WASD", leftMargin, currentY);
     currentY -= lineHeight + 5.0f;
 
     glColor3f(0.8f, 0.9f, 1.0f);
@@ -577,9 +575,9 @@ void MenuSystem::drawHelpWindow()
     currentY -= lineHeight;
     renderText2D("C.........................Toggle mode", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("Right Mouse.....Rotate view", rightMargin, currentY);
+    renderText2D("Arrows...............Move camera anchor", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("CTRL+Arrows..Move anchor", rightMargin, currentY);
+    renderText2D("Right Mouse.....Rotate view", rightMargin, currentY);
     currentY -= lineHeight + 5.0f;
 
     glColor3f(0.8f, 0.9f, 1.0f);
