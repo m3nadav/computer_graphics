@@ -475,8 +475,8 @@ void MenuSystem::drawHelpWindow()
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
-    float helpWidth = 480.0f;
-    float helpHeight = 520.0f;
+    float helpWidth = 510.0f;
+    float helpHeight = 450.0f;
     float helpX = (windowWidth - helpWidth) / 2.0f;   // Center horizontally
     float helpY = (windowHeight - helpHeight) / 2.0f; // Center vertically
 
@@ -506,98 +506,121 @@ void MenuSystem::drawHelpWindow()
 
     // Help content
     glColor3f(0.9f, 0.9f, 0.9f);
-    float currentY = titleY - 35.0f;
-    float lineHeight = 18.0f;
+    float currentY = titleY - 30.0f;
+    float lineHeight = 15.0f;
     float leftMargin = helpX + 20.0f;
-    float rightMargin = helpX + helpWidth / 2 + 20.0f;
+    float rightMargin = helpX + helpWidth / 2 + 10.0f;
 
-    // Left column - Keyboard Controls
+    // Left column - General & Cow Controls
     glColor3f(0.8f, 0.9f, 1.0f);
-    renderText2D("KEYBOARD CONTROLS", leftMargin, currentY);
+    renderText2D("GENERAL", leftMargin, currentY);
     glColor3f(0.9f, 0.9f, 0.9f);
-    currentY -= lineHeight + 8.0f;
-
-    renderText2D("General:", leftMargin, currentY);
     currentY -= lineHeight + 3.0f;
-    renderText2D("ESC.......Exit application", leftMargin, currentY);
+    renderText2D("ESC...............Exit", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("M............Toggle menu", leftMargin, currentY);
+    renderText2D("M....................Menu", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("H............Show/hide help", leftMargin, currentY);
-    currentY -= lineHeight * 1.3f;
+    renderText2D("H.....................Help", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("R.....................Reset scene", leftMargin, currentY);
+    currentY -= lineHeight + 5.0f;
 
-    renderText2D("Movement:", leftMargin, currentY);
+    glColor3f(0.8f, 0.9f, 1.0f);
+    renderText2D("COW MOVEMENT", leftMargin, currentY);
+    glColor3f(0.9f, 0.9f, 0.9f);
     currentY -= lineHeight + 3.0f;
-    renderText2D("W........Move cow forward", leftMargin, currentY);
+    renderText2D("W....................Forward", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("S.........Move cow backward", leftMargin, currentY);
+    renderText2D("S.....................Backward", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("A.........Turn cow left", leftMargin, currentY);
+    renderText2D("A.....................Turn left", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("D.........Turn cow right", leftMargin, currentY);
-    currentY -= lineHeight * 1.3f;
+    renderText2D("D.....................Turn right", leftMargin, currentY);
+    currentY -= lineHeight + 5.0f;
 
-    renderText2D("Head Control:", leftMargin, currentY);
+    glColor3f(0.8f, 0.9f, 1.0f);
+    renderText2D("COW HEAD", leftMargin, currentY);
+    glColor3f(0.9f, 0.9f, 0.9f);
     currentY -= lineHeight + 3.0f;
-    renderText2D("I..........Turn head up", leftMargin, currentY);
+    renderText2D("SHIFT+W......Head up", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("K.........Turn head down", leftMargin, currentY);
+    renderText2D("SHIFT+S.......Head down", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("J.........Turn head left", leftMargin, currentY);
+    renderText2D("SHIFT+A.......Head left", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("L.........Turn head right", leftMargin, currentY);
+    renderText2D("SHIFT+D.......Head right", leftMargin, currentY);
+    currentY -= lineHeight + 5.0f;
+
+    glColor3f(0.8f, 0.9f, 1.0f);
+    renderText2D("COW TAIL", leftMargin, currentY);
+    glColor3f(0.9f, 0.9f, 0.9f);
+    currentY -= lineHeight + 3.0f;
+    renderText2D("ALT+W..........Tail up", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("ALT+S...........Tail down", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("ALT+A...........Tail left", leftMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("ALT+D...........Tail right", leftMargin, currentY);
 
     // Right column - Camera & Lighting
-    currentY = titleY - 35.0f;
+    currentY = titleY - 30.0f;
     glColor3f(0.8f, 0.9f, 1.0f);
-    renderText2D("CAMERA & LIGHTING", rightMargin, currentY);
+    renderText2D("CAMERA", rightMargin, currentY);
     glColor3f(0.9f, 0.9f, 0.9f);
-    currentY -= lineHeight + 8.0f;
-
-    renderText2D("Camera:", rightMargin, currentY);
     currentY -= lineHeight + 3.0f;
-    renderText2D("+/=.......Zoom in", rightMargin, currentY);
+    renderText2D("+/=......................Zoom in", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("-/_.......Zoom out", rightMargin, currentY);
+    renderText2D("-/_......................Zoom out", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("C...........Toggle camera mode", rightMargin, currentY);
+    renderText2D("C.........................Toggle mode", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("Right Drag.Rotate view", rightMargin, currentY);
-    currentY -= lineHeight * 1.3f;
-
-    renderText2D("Sun Position:", rightMargin, currentY);
-    currentY -= lineHeight + 3.0f;
-    renderText2D("1.........Top-left position", rightMargin, currentY);
-    currentY -= lineHeight;
-    renderText2D("2.........Top-right position", rightMargin, currentY);
-    currentY -= lineHeight;
-    renderText2D("3.........Bottom-left position", rightMargin, currentY);
-    currentY -= lineHeight;
-    renderText2D("4.........Bottom-right position", rightMargin, currentY);
-    currentY -= lineHeight * 1.5f;
+    renderText2D("Right Mouse.....Rotate view", rightMargin, currentY);
+    currentY -= lineHeight + 5.0f;
 
     glColor3f(0.8f, 0.9f, 1.0f);
-    renderText2D("MENU CONTROLS", rightMargin, currentY);
+    renderText2D("LAMP", rightMargin, currentY);
     glColor3f(0.9f, 0.9f, 0.9f);
-    currentY -= lineHeight + 8.0f;
-
-    renderText2D("Light Adjustment:", rightMargin, currentY);
     currentY -= lineHeight + 3.0f;
-    renderText2D("Click +/- buttons to adjust:", rightMargin, currentY);
+    renderText2D("T.........................Toggle light", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("I...........................Direction up", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("K.........................Direction down", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("J.........................Direction left", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("L.........................Direction right", rightMargin, currentY);
+    currentY -= lineHeight + 5.0f;
+
+    glColor3f(0.8f, 0.9f, 1.0f);
+    renderText2D("SUN POSITION", rightMargin, currentY);
+    glColor3f(0.9f, 0.9f, 0.9f);
+    currentY -= lineHeight + 3.0f;
+    renderText2D("1..........................Top-left", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("2..........................Top-right", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("3..........................Bottom-left", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("4..........................Bottom-right", rightMargin, currentY);
+    currentY -= lineHeight + 5.0f;
+
+    glColor3f(0.8f, 0.9f, 1.0f);
+    renderText2D("MENU", rightMargin, currentY);
+    glColor3f(0.9f, 0.9f, 0.9f);
+    currentY -= lineHeight + 3.0f;
+    renderText2D("Left Click...........Menu buttons", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("Click the light control +/- to adjust:", rightMargin, currentY);
     currentY -= lineHeight;
     renderText2D("• Light intensity", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("• Light position (X/Y/Z)", rightMargin, currentY);
+    renderText2D("• Light position", rightMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("• Ambient lighting level", rightMargin, currentY);
-    currentY -= lineHeight * 1.3f;
-
-    renderText2D("Interface:", rightMargin, currentY);
-    currentY -= lineHeight + 3.0f;
-    renderText2D("Left Click.Menu interactions", rightMargin, currentY);
-    currentY -= lineHeight * 2.0f;
+    renderText2D("• Ambient level", rightMargin, currentY);
 
     // Close instruction at bottom
     glColor3f(1.0f, 0.8f, 0.3f);
-    renderText2D("Click 'Help (H)' button again or press H to close", helpX + helpWidth / 2 - 180.0f, helpY + 15.0f);
+    renderText2D("Press H to close", helpX + helpWidth / 2 - 50.0f, helpY + 15.0f);
 }

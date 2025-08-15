@@ -1,4 +1,5 @@
 #include "common/input.h"
+#include "environment/lights.h"
 #include <GLUT/glut.h>
 #include <cstdlib>
 #include <iostream>
@@ -12,7 +13,7 @@
 InputHandler *InputHandler::instance = nullptr;
 
 InputHandler::InputHandler(CameraController &camera)
-    : cameraController(camera), rightMouseDown(false), lastMouseX(0), lastMouseY(0),
+    : cameraController(camera), rightMouseDown(false), leftMouseDown(false), lastMouseX(0), lastMouseY(0),
       timerActive(false), timerInterval(50), startingScene(0), cowControlsEnabled(false)
 {
     instance = this; // Set static instance for GLUT callbacks
@@ -112,12 +113,65 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
         cameraController.toggleCameraMode();
         glutPostRedisplay();
     }
+    else if (key == 't' || key == 'T') // Toggle lamp light
+    {
+        static bool lampOn = true;
+        lampOn = !lampOn;
+        enableLampLight(lampOn);
+        glutPostRedisplay();
+    }
+    else if (key == 'r' || key == 'R') // Reset scene
+    {
+        // Reset camera to defaults
+        cameraController.resetToDefaults();
+        
+        // Reset all lighting to defaults
+        resetLightingToDefaults();
+        
+        // Reset cow position and rotations (if available)
+        #ifdef COW_CONTROLS_AVAILABLE
+        initCowMovement();
+        #endif
+        
+        glutPostRedisplay();
+    }
+    else if (key == 'i' || key == 'I') // Lamp direction up (pitch)
+    {
+        float currentAngleX, currentAngleZ;
+        getLampDirection(&currentAngleX, &currentAngleZ);
+        setLampDirection(currentAngleX + 5.0f, currentAngleZ);
+        glutPostRedisplay();
+    }
+    else if (key == 'k' || key == 'K') // Lamp direction down (pitch)
+    {
+        float currentAngleX, currentAngleZ;
+        getLampDirection(&currentAngleX, &currentAngleZ);
+        setLampDirection(currentAngleX - 5.0f, currentAngleZ);
+        glutPostRedisplay();
+    }
+    else if (key == 'j' || key == 'J') // Lamp direction left (yaw)
+    {
+        float currentAngleX, currentAngleZ;
+        getLampDirection(&currentAngleX, &currentAngleZ);
+        setLampDirection(currentAngleX, currentAngleZ - 5.0f);
+        glutPostRedisplay();
+    }
+    else if (key == 'l' || key == 'L') // Lamp direction right (yaw)
+    {
+        float currentAngleX, currentAngleZ;
+        getLampDirection(&currentAngleX, &currentAngleZ);
+        setLampDirection(currentAngleX, currentAngleZ + 5.0f);
+        glutPostRedisplay();
+    }
     else
     {
         // Try cow controls if enabled
         if (cowControlsEnabled)
         {
-            handleCowControls(key, x, y);
+            if (handleCowControls(key, x, y))
+            {
+                return; // If cow controls handled the key, don't pass to custom callback
+            }
         }
 
         // Pass to custom callback for additional handling
@@ -128,12 +182,21 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
     }
 }
 
-void InputHandler::handleCowControls(unsigned char key, int x, int y)
+bool InputHandler::handleCowControls(unsigned char key, int x, int y)
 {
 // Forward to cow control functions if they exist
 #ifdef COW_CONTROLS_AVAILABLE
+    // First try body movement (head/tail with modifiers) - returns true if handled
+    if (handleCowBodyMovement(key, x, y))
+    {
+        return true; // Key was handled by body movement
+    }
+    
+    // If not handled by body movement, try regular cow movement
     handleCowMovement(key, x, y);
-    handleCowBodyMovement(key, x, y);
+    return true; // Assume handled if we got here
+#else
+    return false; // Cow controls not available
 #endif
 }
 
@@ -143,9 +206,14 @@ void InputHandler::handleCowControls(unsigned char key, int x, int y)
 
 void InputHandler::handleMouse(int button, int state, int x, int y)
 {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    if (button == GLUT_LEFT_BUTTON)
     {
-        menuSystem.handleMenuClick(x, y);
+        if (state == GLUT_DOWN)
+        {
+            // Handle menu clicks only (lamp control now via IJKL keys)
+            menuSystem.handleMenuClick(x, y);
+        }
+        // Note: Left mouse drag removed - no longer tracking for lamp control
     }
     else if (button == GLUT_RIGHT_BUTTON)
     {
@@ -176,6 +244,7 @@ void InputHandler::handleMotion(int x, int y)
 
         glutPostRedisplay();
     }
+    // Note: Left mouse drag lamp control removed - now using IJKL keys for lamp direction
 }
 
 // ========================================
