@@ -120,12 +120,58 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
         enableLampLight(lampOn);
         glutPostRedisplay();
     }
+    else if (key == 'r' || key == 'R') // Reset scene
+    {
+        // Reset camera to defaults
+        cameraController.resetToDefaults();
+        
+        // Reset all lighting to defaults
+        resetLightingToDefaults();
+        
+        // Reset cow position and rotations (if available)
+        #ifdef COW_CONTROLS_AVAILABLE
+        initCowMovement();
+        #endif
+        
+        glutPostRedisplay();
+    }
+    else if (key == 'i' || key == 'I') // Lamp direction up (pitch)
+    {
+        float currentAngleX, currentAngleZ;
+        getLampDirection(&currentAngleX, &currentAngleZ);
+        setLampDirection(currentAngleX + 5.0f, currentAngleZ);
+        glutPostRedisplay();
+    }
+    else if (key == 'k' || key == 'K') // Lamp direction down (pitch)
+    {
+        float currentAngleX, currentAngleZ;
+        getLampDirection(&currentAngleX, &currentAngleZ);
+        setLampDirection(currentAngleX - 5.0f, currentAngleZ);
+        glutPostRedisplay();
+    }
+    else if (key == 'j' || key == 'J') // Lamp direction left (yaw)
+    {
+        float currentAngleX, currentAngleZ;
+        getLampDirection(&currentAngleX, &currentAngleZ);
+        setLampDirection(currentAngleX, currentAngleZ - 5.0f);
+        glutPostRedisplay();
+    }
+    else if (key == 'l' || key == 'L') // Lamp direction right (yaw)
+    {
+        float currentAngleX, currentAngleZ;
+        getLampDirection(&currentAngleX, &currentAngleZ);
+        setLampDirection(currentAngleX, currentAngleZ + 5.0f);
+        glutPostRedisplay();
+    }
     else
     {
         // Try cow controls if enabled
         if (cowControlsEnabled)
         {
-            handleCowControls(key, x, y);
+            if (handleCowControls(key, x, y))
+            {
+                return; // If cow controls handled the key, don't pass to custom callback
+            }
         }
 
         // Pass to custom callback for additional handling
@@ -136,12 +182,21 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
     }
 }
 
-void InputHandler::handleCowControls(unsigned char key, int x, int y)
+bool InputHandler::handleCowControls(unsigned char key, int x, int y)
 {
 // Forward to cow control functions if they exist
 #ifdef COW_CONTROLS_AVAILABLE
+    // First try body movement (head/tail with modifiers) - returns true if handled
+    if (handleCowBodyMovement(key, x, y))
+    {
+        return true; // Key was handled by body movement
+    }
+    
+    // If not handled by body movement, try regular cow movement
     handleCowMovement(key, x, y);
-    handleCowBodyMovement(key, x, y);
+    return true; // Assume handled if we got here
+#else
+    return false; // Cow controls not available
 #endif
 }
 
@@ -155,18 +210,10 @@ void InputHandler::handleMouse(int button, int state, int x, int y)
     {
         if (state == GLUT_DOWN)
         {
-            // Handle menu clicks and lamp control
+            // Handle menu clicks only (lamp control now via IJKL keys)
             menuSystem.handleMenuClick(x, y);
-            
-            // Also enable lamp control - user can control lamp even when menu is active
-            leftMouseDown = true;
-            lastMouseX = x;
-            lastMouseY = y;
         }
-        else if (state == GLUT_UP)
-        {
-            leftMouseDown = false;
-        }
+        // Note: Left mouse drag removed - no longer tracking for lamp control
     }
     else if (button == GLUT_RIGHT_BUTTON)
     {
@@ -197,27 +244,7 @@ void InputHandler::handleMotion(int x, int y)
 
         glutPostRedisplay();
     }
-    else if (leftMouseDown)
-    {
-        int deltaX = x - lastMouseX;
-        int deltaY = y - lastMouseY;
-
-        // Control lamp direction with left mouse drag
-        float currentAngleX, currentAngleZ;
-        getLampDirection(&currentAngleX, &currentAngleZ);
-        
-        // Horizontal mouse movement controls yaw (Z rotation)
-        // Vertical mouse movement controls pitch (X rotation)
-        float newAngleZ = currentAngleZ + deltaX * 0.5f;  // Sensitivity factor
-        float newAngleX = currentAngleX - deltaY * 0.5f;  // Inverted Y for intuitive control
-        
-        setLampDirection(newAngleX, newAngleZ);
-
-        lastMouseX = x;
-        lastMouseY = y;
-
-        glutPostRedisplay();
-    }
+    // Note: Left mouse drag lamp control removed - now using IJKL keys for lamp direction
 }
 
 // ========================================

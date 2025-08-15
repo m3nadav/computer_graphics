@@ -75,7 +75,7 @@ private:
 
     // Keyboard handling methods
     void handleKeyboard(unsigned char key, int x, int y);
-    void handleCowControls(unsigned char key, int x, int y);
+    bool handleCowControls(unsigned char key, int x, int y);
 
     // Mouse handling methods
     void handleMouse(int button, int state, int x, int y);

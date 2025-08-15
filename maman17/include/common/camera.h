@@ -46,6 +46,9 @@ public:
     // Setters for direct control
     void setDistance(float dist);
     void setAngles(float x, float y);
+    
+    // Reset to default values
+    void resetToDefaults();
 
 private:
     float distance;

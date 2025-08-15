@@ -26,6 +26,9 @@ void getLampDirection(float *angleX, float *angleZ);
 float getLampIntensity();
 void enableLampLight(bool enable);
 
+// Reset functions
+void resetLightingToDefaults();
+
 
 // Accessor functions for variables needed by moved functions
 float *getSunPositions();

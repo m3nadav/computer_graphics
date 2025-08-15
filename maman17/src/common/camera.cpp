@@ -88,6 +88,15 @@ void CameraController::setAngles(float x, float y)
     clampValues();
 }
 
+void CameraController::resetToDefaults()
+{
+    distance = 5.0f;
+    angleX = 35.0f;
+    angleY = 55.0f;
+    currentMode = ORBITAL_CAMERA;
+    clampValues();
+}
+
 void CameraController::clampValues()
 {
     // Clamp distance

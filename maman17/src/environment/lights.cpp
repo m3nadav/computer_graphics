@@ -497,3 +497,20 @@ void updateCurrentBenchParameters(float x, float y, float z, float rotation)
     currentBenchRotation = rotation;
 }
 
+void resetLightingToDefaults()
+{
+    // Reset sun lighting to defaults
+    lightIntensity = 1.0f;
+    lightPositionX = -15.0f;
+    lightPositionY = 25.0f;
+    lightPositionZ = -15.0f;
+    ambientLevel = 0.3f;
+    useCustomPosition = false;
+    
+    // Reset lamp lighting to defaults
+    lampIntensity = 1.5f;
+    lampDirectionX = 0.0f;
+    lampDirectionZ = 0.0f;
+    lampEnabled = true;
+}
+
