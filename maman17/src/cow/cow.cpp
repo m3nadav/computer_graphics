@@ -99,22 +99,12 @@ MovementAction mapRegularKey(unsigned char key)
     }
 }
 
-// Function to map special keys to actions
+// Function to map special keys to actions - ARROW KEYS DISABLED FOR COW MOVEMENT
 MovementAction mapSpecialKey(int key)
 {
-    switch (key)
-    {
-    case GLUT_KEY_UP:
-        return MOVE_FORWARD;
-    case GLUT_KEY_DOWN:
-        return MOVE_BACKWARD;
-    case GLUT_KEY_LEFT:
-        return TURN_LEFT;
-    case GLUT_KEY_RIGHT:
-        return TURN_RIGHT;
-    default:
-        return NO_ACTION;
-    }
+    // Arrow keys no longer control cow movement - they are reserved for camera
+    // Cow can still be controlled via WASD keys in handleCowMovement
+    return NO_ACTION;
 }
 
 // Single function to execute movement actions

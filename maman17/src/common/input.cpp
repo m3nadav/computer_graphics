@@ -217,51 +217,34 @@ bool InputHandler::handleCowControls(unsigned char key, int x, int y)
 
 void InputHandler::handleSpecialKeys(int key, int x, int y)
 {
-    // Get current modifier state
-    int modifiers = glutGetModifiers();
-    ctrlPressed = (modifiers & GLUT_ACTIVE_CTRL);
-    
     // Define camera anchor movement step size
     const float ANCHOR_MOVE_STEP = 1.0f;
     
-    if (ctrlPressed)
+    // Arrow keys now directly control camera anchor point with direction-relative movement
+    switch (key)
     {
-        // Ctrl + Arrow keys control camera anchor point
-        switch (key)
-        {
-        case GLUT_KEY_UP:
-            cameraController.moveAnchor(0.0f, 0.0f, -ANCHOR_MOVE_STEP); // Move anchor forward (negative Z)
-            glutPostRedisplay();
-            return;
-        case GLUT_KEY_DOWN:
-            cameraController.moveAnchor(0.0f, 0.0f, ANCHOR_MOVE_STEP); // Move anchor backward (positive Z)
-            glutPostRedisplay();
-            return;
-        case GLUT_KEY_LEFT:
-            cameraController.moveAnchor(-ANCHOR_MOVE_STEP, 0.0f, 0.0f); // Move anchor left (negative X)
-            glutPostRedisplay();
-            return;
-        case GLUT_KEY_RIGHT:
-            cameraController.moveAnchor(ANCHOR_MOVE_STEP, 0.0f, 0.0f); // Move anchor right (positive X)
-            glutPostRedisplay();
-            return;
-        }
+    case GLUT_KEY_UP:
+        cameraController.moveAnchorForward(ANCHOR_MOVE_STEP);
+        glutPostRedisplay();
+        return;
+    case GLUT_KEY_DOWN:
+        cameraController.moveAnchorBackward(ANCHOR_MOVE_STEP);
+        glutPostRedisplay();
+        return;
+    case GLUT_KEY_LEFT:
+        cameraController.moveAnchorLeft(ANCHOR_MOVE_STEP);
+        glutPostRedisplay();
+        return;
+    case GLUT_KEY_RIGHT:
+        cameraController.moveAnchorRight(ANCHOR_MOVE_STEP);
+        glutPostRedisplay();
+        return;
     }
-    else
+    
+    // Pass to custom special key callback if set
+    if (specialKeyCallback)
     {
-        // Regular arrow keys control cow movement (if cow controls enabled)
-        if (cowControlsEnabled)
-        {
-#ifdef COW_CONTROLS_AVAILABLE
-            handleCowSpecialKeys(key, x, y);
-#endif
-        }
-        
-        // Pass to custom special key callback if set
-        if (specialKeyCallback)
-        {
-            specialKeyCallback(key, x, y);
-        }
+        specialKeyCallback(key, x, y);
     }
 }
 

@@ -71,9 +71,9 @@ void CameraController::setupGLCamera() const
         float x = std::get<0>(pos);
         float y = std::get<1>(pos);
         float z = std::get<2>(pos);
-        gluLookAt(x + anchorX, y + anchorY, z + anchorZ,  // Eye position (orbital camera around anchor)
-                  anchorX, anchorY, anchorZ,               // Look at anchor point
-                  0.0, 1.0, 0.0);                          // Up vector
+        gluLookAt(x + anchorX, y + anchorY, z + anchorZ, // Eye position (orbital camera around anchor)
+                  anchorX, anchorY, anchorZ,             // Look at anchor point
+                  0.0, 1.0, 0.0);                        // Up vector
     }
 }
 
@@ -107,6 +107,50 @@ void CameraController::setAnchor(float x, float y, float z)
 std::tuple<float, float, float> CameraController::getAnchor() const
 {
     return {anchorX, anchorY, anchorZ};
+}
+
+void CameraController::moveAnchorForward(float distance)
+{
+    // Calculate forward direction based on current camera orientation
+    float angleYRad = angleY * M_PI / 180.0f;
+    float angleXRad = angleX * M_PI / 180.0f;
+
+    // Forward direction is the direction the camera is looking
+    // In spherical coordinates, forward is the opposite of the camera position vector
+    float forwardX = -cos(angleYRad) * cos(angleXRad);
+    float forwardZ = -sin(angleYRad) * cos(angleXRad);
+
+    anchorX += forwardX * distance;
+    anchorZ += forwardZ * distance;
+}
+
+void CameraController::moveAnchorBackward(float distance)
+{
+    // Move backward is opposite of forward
+    moveAnchorForward(-distance);
+}
+
+void CameraController::moveAnchorLeft(float distance)
+{
+    // Calculate right direction (perpendicular to forward in XZ plane)
+    float angleYRad = angleY * M_PI / 180.0f;
+    
+    // Right vector is 90 degrees clockwise from forward in XZ plane
+    float rightX = -sin(angleYRad);
+    float rightZ = cos(angleYRad);
+    
+    // Left is opposite of right
+    float leftX = -rightX;
+    float leftZ = -rightZ;
+    
+    anchorX += leftX * distance;
+    anchorZ += leftZ * distance;
+}
+
+void CameraController::moveAnchorRight(float distance)
+{
+    // Move right is opposite of left
+    moveAnchorLeft(-distance);
 }
 
 void CameraController::resetToDefaults()

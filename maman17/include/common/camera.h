@@ -52,6 +52,12 @@ public:
     void setAnchor(float x, float y, float z);
     std::tuple<float, float, float> getAnchor() const;
     
+    // Direction-relative anchor movement methods
+    void moveAnchorForward(float distance);
+    void moveAnchorBackward(float distance);
+    void moveAnchorLeft(float distance);
+    void moveAnchorRight(float distance);
+    
     // Reset to default values
     void resetToDefaults();
 
