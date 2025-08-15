@@ -475,8 +475,8 @@ void MenuSystem::drawHelpWindow()
     int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
-    float helpWidth = 600.0f;
-    float helpHeight = 480.0f;
+    float helpWidth = 510.0f;
+    float helpHeight = 450.0f;
     float helpX = (windowWidth - helpWidth) / 2.0f;   // Center horizontally
     float helpY = (windowHeight - helpHeight) / 2.0f; // Center vertically
 
@@ -555,13 +555,13 @@ void MenuSystem::drawHelpWindow()
     renderText2D("COW TAIL", leftMargin, currentY);
     glColor3f(0.9f, 0.9f, 0.9f);
     currentY -= lineHeight + 3.0f;
-    renderText2D("CTRL+W.......Tail up", leftMargin, currentY);
+    renderText2D("ALT+W..........Tail up", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("CTRL+S........Tail down", leftMargin, currentY);
+    renderText2D("ALT+S...........Tail down", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("CTRL+A........Tail left", leftMargin, currentY);
+    renderText2D("ALT+A...........Tail left", leftMargin, currentY);
     currentY -= lineHeight;
-    renderText2D("CTRL+D........Tail right", leftMargin, currentY);
+    renderText2D("ALT+D...........Tail right", leftMargin, currentY);
 
     // Right column - Camera & Lighting
     currentY = titleY - 30.0f;

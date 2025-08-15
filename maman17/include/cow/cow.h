@@ -23,7 +23,7 @@ float getHeadRotationY(); // Left/right rotation (around Y-axis)
 bool handleCowBodyMovement(unsigned char key, int x, int y);
 
 // Tail movement functions
-float getTailRotationZ(); // SHIFT+I/K rotation (around Z-axis)
-float getTailRotationX(); // SHIFT+J/L rotation (around X-axis)
+float getTailRotationZ(); // Up/down rotation (around Z-axis)
+float getTailRotationX(); // Left/right rotation (around X-axis)
 
 #endif // COW_H

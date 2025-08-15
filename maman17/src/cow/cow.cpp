@@ -163,13 +163,14 @@ void handleCowMovement(unsigned char key, int x, int y)
     int modifiers = glutGetModifiers();
     bool shiftPressed = (modifiers & GLUT_ACTIVE_SHIFT) != 0;
     bool ctrlPressed = (modifiers & GLUT_ACTIVE_CTRL) != 0;
-    
+    bool altPressed = (modifiers & GLUT_ACTIVE_ALT) != 0;
+
     // Don't process if modifiers are pressed (handled by body movement)
-    if (shiftPressed || ctrlPressed)
+    if (shiftPressed || ctrlPressed || altPressed)
     {
         return;
     }
-    
+
     MovementAction action = mapRegularKey(key);
     executeCowAction(action);
 }
@@ -190,7 +191,7 @@ bool handleCowBodyMovement(unsigned char key, int x, int y)
     // Check modifiers
     int modifiers = glutGetModifiers();
     bool shiftPressed = (modifiers & GLUT_ACTIVE_SHIFT) != 0;
-    bool ctrlPressed = (modifiers & GLUT_ACTIVE_CTRL) != 0;
+    bool altPressed = (modifiers & GLUT_ACTIVE_ALT) != 0;
 
     if (shiftPressed)
     {
@@ -202,7 +203,7 @@ bool handleCowBodyMovement(unsigned char key, int x, int y)
             headRotationX = std::min(headRotationX + HEAD_ROTATION_SPEED, HEAD_MAX_X_ROTATION);
             glutPostRedisplay();
             return true; // Handled, don't process as regular movement
-        case 's': // Head down (rotate to look down)
+        case 's':        // Head down (rotate to look down)
         case 'S':
             headRotationX = std::max(headRotationX - HEAD_ROTATION_SPEED, -HEAD_MAX_X_ROTATION);
             glutPostRedisplay();
@@ -221,9 +222,9 @@ bool handleCowBodyMovement(unsigned char key, int x, int y)
             return false; // Not handled
         }
     }
-    else if (ctrlPressed)
+    else if (altPressed)
     {
-        // Ctrl + WASD for tail movement
+        // Ctrl/Alt + WASD for tail movement (trying both for macOS compatibility)
         switch (key)
         {
         case 'w': // Tail rotation (Z-axis negative)
@@ -231,7 +232,7 @@ bool handleCowBodyMovement(unsigned char key, int x, int y)
             tailRotationZ = std::max(tailRotationZ - TAIL_ROTATION_SPEED, -TAIL_MAX_ROTATION);
             glutPostRedisplay();
             return true; // Handled, don't process as regular movement
-        case 's': // Tail rotation (Z-axis positive) - limited to prevent disappearing inside cow
+        case 's':        // Tail rotation (Z-axis positive) - limited to prevent disappearing inside cow
         case 'S':
             tailRotationZ = std::min(tailRotationZ + TAIL_ROTATION_SPEED, TAIL_MAX_K_ROTATION);
             glutPostRedisplay();
@@ -253,7 +254,6 @@ bool handleCowBodyMovement(unsigned char key, int x, int y)
 
     return false; // No modifier keys pressed or key not handled
 }
-
 
 // Head rotation getters
 float getHeadRotationX() { return headRotationX; }
