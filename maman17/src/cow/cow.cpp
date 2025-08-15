@@ -67,96 +67,6 @@ Vector2D getCowForwardDirection()
     return Vector2D(forwardX, forwardZ);
 }
 
-// Movement actions enum
-enum MovementAction
-{
-    MOVE_FORWARD,
-    MOVE_BACKWARD,
-    TURN_LEFT,
-    TURN_RIGHT,
-    NO_ACTION
-};
-
-// Function to map regular keys to actions
-MovementAction mapRegularKey(unsigned char key)
-{
-    switch (key)
-    {
-    case 'w':
-    case 'W':
-        return MOVE_FORWARD;
-    case 's':
-    case 'S':
-        return MOVE_BACKWARD;
-    case 'a':
-    case 'A':
-        return TURN_LEFT;
-    case 'd':
-    case 'D':
-        return TURN_RIGHT;
-    default:
-        return NO_ACTION;
-    }
-}
-
-// Function to map special keys to actions
-MovementAction mapSpecialKey(int key)
-{
-    switch (key)
-    {
-    case GLUT_KEY_UP:
-        return MOVE_FORWARD;
-    case GLUT_KEY_DOWN:
-        return MOVE_BACKWARD;
-    case GLUT_KEY_LEFT:
-        return TURN_LEFT;
-    case GLUT_KEY_RIGHT:
-        return TURN_RIGHT;
-    default:
-        return NO_ACTION;
-    }
-}
-
-// Single function to execute movement actions
-void executeCowAction(MovementAction action)
-{
-    switch (action)
-    {
-    case MOVE_FORWARD:
-    {
-        // Use the head-tail direction as the forward direction
-        Vector2D direction = getCowForwardDirection();
-        cowX += COW_MOVEMENT_SPEED * direction.x;
-        cowZ += COW_MOVEMENT_SPEED * direction.z;
-        break;
-    }
-    case MOVE_BACKWARD:
-    {
-        // Move backward relative to head-tail direction
-        Vector2D direction = getCowForwardDirection();
-        cowX -= COW_MOVEMENT_SPEED * direction.x;
-        cowZ -= COW_MOVEMENT_SPEED * direction.z;
-        break;
-    }
-    case TURN_LEFT:
-        cowRotation += COW_STEERING_ANGLE;
-        break;
-    case TURN_RIGHT:
-        cowRotation -= COW_STEERING_ANGLE;
-        break;
-    case NO_ACTION:
-        break; // No action needed
-    }
-
-    // Keep rotation between 0 and 360 degrees
-    if (cowRotation >= 360.0f)
-        cowRotation -= 360.0f;
-    if (cowRotation < 0.0f)
-        cowRotation += 360.0f;
-
-    glutPostRedisplay(); // Request redraw
-}
-
 void handleCowMovement(unsigned char key, int x, int y)
 {
     // Only process cow movement if no modifier keys are pressed
@@ -171,14 +81,45 @@ void handleCowMovement(unsigned char key, int x, int y)
         return;
     }
 
-    MovementAction action = mapRegularKey(key);
-    executeCowAction(action);
-}
+    switch (key)
+    {
+    case 'w':
+    case 'W':
+    {
+        // Use the head-tail direction as the forward direction
+        Vector2D direction = getCowForwardDirection();
+        cowX += COW_MOVEMENT_SPEED * direction.x;
+        cowZ += COW_MOVEMENT_SPEED * direction.z;
+        break;
+    }
+    case 's':
+    case 'S':
+    {
+        // Move backward relative to head-tail direction
+        Vector2D direction = getCowForwardDirection();
+        cowX -= COW_MOVEMENT_SPEED * direction.x;
+        cowZ -= COW_MOVEMENT_SPEED * direction.z;
+        break;
+    }
+    case 'a':
+    case 'A':
+        cowRotation += COW_STEERING_ANGLE;
+        break;
+    case 'd':
+    case 'D':
+        cowRotation -= COW_STEERING_ANGLE;
+        break;
+    default:
+        break;
+    }
 
-void handleCowSpecialKeys(int key, int x, int y)
-{
-    MovementAction action = mapSpecialKey(key);
-    executeCowAction(action);
+    // Keep rotation between 0 and 360 degrees
+    if (cowRotation >= 360.0f)
+        cowRotation -= 360.0f;
+    if (cowRotation < 0.0f)
+        cowRotation += 360.0f;
+
+    glutPostRedisplay(); // Request redraw
 }
 
 float getCowX() { return cowX; }

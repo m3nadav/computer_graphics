@@ -575,6 +575,8 @@ void MenuSystem::drawHelpWindow()
     currentY -= lineHeight;
     renderText2D("C.........................Toggle mode", rightMargin, currentY);
     currentY -= lineHeight;
+    renderText2D("Arrows...............Move camera anchor", rightMargin, currentY);
+    currentY -= lineHeight;
     renderText2D("Right Mouse.....Rotate view", rightMargin, currentY);
     currentY -= lineHeight + 5.0f;
 

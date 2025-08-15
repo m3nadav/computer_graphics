@@ -133,8 +133,7 @@ int main(int argc, char **argv)
 
     // Set up GLUT callbacks
     glutDisplayFunc(display);
-    inputHandler->setupGLUTCallbacks();
-    glutSpecialFunc(handleCowSpecialKeys); // Keep special keys for cow movement
+    inputHandler->setupGLUTCallbacks(); // This now includes special key handling
 
     // Start timer for cow animations
     inputHandler->startTimer(50);

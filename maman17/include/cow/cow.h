@@ -8,7 +8,6 @@ void drawCow();
 void initCowMovement();
 void updateCowPosition();
 void handleCowMovement(unsigned char key, int x, int y);
-void handleCowSpecialKeys(int key, int x, int y);
 
 // Cow state getters
 float getCowX();

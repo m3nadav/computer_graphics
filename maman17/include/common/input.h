@@ -18,6 +18,9 @@ public:
 
     // Set up GLUT callbacks
     void setupGLUTCallbacks();
+    
+    // Special key handling (for arrow keys)
+    void handleSpecialKeys(int key, int x, int y);
 
     // Callback configuration
     void setKeyboardCallback(KeyboardCallback callback) { keyboardCallback = callback; }
@@ -52,6 +55,9 @@ private:
     bool leftMouseDown;
     int lastMouseX;
     int lastMouseY;
+    
+    // Modifier key state
+    bool ctrlPressed;
 
     // Timer state
     bool timerActive;
@@ -65,6 +71,7 @@ private:
 
     // Static callback wrappers for GLUT
     static void keyboardWrapper(unsigned char key, int x, int y);
+    static void specialKeysWrapper(int key, int x, int y);
     static void mouseWrapper(int button, int state, int x, int y);
     static void motionWrapper(int x, int y);
     static void timerWrapper(int value);

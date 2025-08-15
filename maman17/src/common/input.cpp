@@ -14,7 +14,7 @@ InputHandler *InputHandler::instance = nullptr;
 
 InputHandler::InputHandler(CameraController &camera)
     : cameraController(camera), rightMouseDown(false), leftMouseDown(false), lastMouseX(0), lastMouseY(0),
-      timerActive(false), timerInterval(50), startingScene(0), cowControlsEnabled(false)
+      ctrlPressed(false), timerActive(false), timerInterval(50), startingScene(0), cowControlsEnabled(false)
 {
     instance = this; // Set static instance for GLUT callbacks
 }
@@ -22,6 +22,7 @@ InputHandler::InputHandler(CameraController &camera)
 void InputHandler::setupGLUTCallbacks()
 {
     glutKeyboardFunc(keyboardWrapper);
+    glutSpecialFunc(specialKeysWrapper);
     glutMouseFunc(mouseWrapper);
     glutMotionFunc(motionWrapper);
     glutReshapeFunc(reshapeWrapper);
@@ -51,6 +52,12 @@ void InputHandler::keyboardWrapper(unsigned char key, int x, int y)
 {
     if (instance)
         instance->handleKeyboard(key, x, y);
+}
+
+void InputHandler::specialKeysWrapper(int key, int x, int y)
+{
+    if (instance)
+        instance->handleSpecialKeys(key, x, y);
 }
 
 void InputHandler::mouseWrapper(int button, int state, int x, int y)
@@ -83,6 +90,10 @@ void InputHandler::reshapeWrapper(int w, int h)
 
 void InputHandler::handleKeyboard(unsigned char key, int x, int y)
 {
+    // Track Ctrl key state
+    int modifiers = glutGetModifiers();
+    ctrlPressed = (modifiers & GLUT_ACTIVE_CTRL);
+    
     // Handle common keys first
     if (key == 27) // ESC
     {
@@ -198,6 +209,43 @@ bool InputHandler::handleCowControls(unsigned char key, int x, int y)
 #else
     return false; // Cow controls not available
 #endif
+}
+
+// ========================================
+// SPECIAL KEY HANDLING METHODS
+// ========================================
+
+void InputHandler::handleSpecialKeys(int key, int x, int y)
+{
+    // Define camera anchor movement step size
+    const float ANCHOR_MOVE_STEP = 1.0f;
+    
+    // Arrow keys now directly control camera anchor point with direction-relative movement
+    switch (key)
+    {
+    case GLUT_KEY_UP:
+        cameraController.moveAnchorForward(ANCHOR_MOVE_STEP);
+        glutPostRedisplay();
+        return;
+    case GLUT_KEY_DOWN:
+        cameraController.moveAnchorBackward(ANCHOR_MOVE_STEP);
+        glutPostRedisplay();
+        return;
+    case GLUT_KEY_LEFT:
+        cameraController.moveAnchorLeft(ANCHOR_MOVE_STEP);
+        glutPostRedisplay();
+        return;
+    case GLUT_KEY_RIGHT:
+        cameraController.moveAnchorRight(ANCHOR_MOVE_STEP);
+        glutPostRedisplay();
+        return;
+    }
+    
+    // Pass to custom special key callback if set
+    if (specialKeyCallback)
+    {
+        specialKeyCallback(key, x, y);
+    }
 }
 
 // ========================================
