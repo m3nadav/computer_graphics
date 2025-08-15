@@ -134,15 +134,11 @@ void CameraController::moveAnchorLeft(float distance)
 {
     // Calculate right direction (perpendicular to forward in XZ plane)
     float angleYRad = angleY * M_PI / 180.0f;
-    
-    // Right vector is 90 degrees clockwise from forward in XZ plane
-    float rightX = -sin(angleYRad);
-    float rightZ = cos(angleYRad);
-    
-    // Left is opposite of right
-    float leftX = -rightX;
-    float leftZ = -rightZ;
-    
+
+    // Left vector is 90 degrees clockwise from forward in XZ plane
+    float leftX = -sin(angleYRad);
+    float leftZ = cos(angleYRad);
+
     anchorX += leftX * distance;
     anchorZ += leftZ * distance;
 }
