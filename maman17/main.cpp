@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 
     // Initialize input handler
     inputHandler = new InputHandler(camera);
-    inputHandler->enableCowControls(true); // Enable cow controls for main.cpp
+    setCowInputHandler(inputHandler); // Register with cow system for auto-control enabling
     inputHandler->setKeyboardCallback(customKeyboardHandler);
     inputHandler->setDisplayCallback(customTimerCallback);
     inputHandler->handleCommandLineArgs(argc, argv); // No test scenes for main.cpp

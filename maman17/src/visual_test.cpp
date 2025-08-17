@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 
     // Initialize input handler
     inputHandler = new InputHandler(camera);
-    inputHandler->enableCowControls(true); // Enable cow controls for visual test
+    setCowInputHandler(inputHandler); // Register with cow system for auto-control enabling
     inputHandler->setKeyboardCallback(customKeyboardHandler);
     inputHandler->setDisplayCallback(customTimerCallback);
     inputHandler->handleCommandLineArgs(argc, argv, (int)tests.size());

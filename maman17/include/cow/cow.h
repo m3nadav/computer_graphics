@@ -7,7 +7,7 @@ void drawCow();
 // Cow movement functions
 void initCowMovement();
 void updateCowPosition();
-void handleCowMovement(unsigned char key, int x, int y);
+bool handleCowMovement(unsigned char key, int x, int y);
 
 // Cow state getters
 float getCowX();
@@ -24,5 +24,9 @@ bool handleCowBodyMovement(unsigned char key, int x, int y);
 // Tail movement functions
 float getTailRotationZ(); // Up/down rotation (around Z-axis)
 float getTailRotationX(); // Left/right rotation (around X-axis)
+
+// Smart cow controls - auto-enable controls when drawing
+class InputHandler;
+void setCowInputHandler(InputHandler* handler);
 
 #endif // COW_H

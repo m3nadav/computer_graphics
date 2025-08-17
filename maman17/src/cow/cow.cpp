@@ -4,6 +4,7 @@
 #include "cow/tail.h"
 #include "cow/cow_coordinates.h"
 #include "shapes/shapes.h"
+#include "common/input.h"
 #include <GLUT/glut.h>
 #include <cmath>
 #include <cstdlib>
@@ -22,6 +23,9 @@ static float headRotationY = 0.0f; // Left/right rotation around Y-axis (-45 to 
 // Global tail movement variables
 static float tailRotationZ = 0.0f; // SHIFT+I/K rotation around Z-axis (-90 to +90 degrees)
 static float tailRotationX = 0.0f; // SHIFT+J/L rotation around X-axis (-90 to +90 degrees)
+
+// Smart cow controls - global InputHandler tracking
+static InputHandler* g_cowInputHandler = nullptr;
 
 void initCowMovement()
 {
@@ -67,7 +71,7 @@ Vector2D getCowForwardDirection()
     return Vector2D(forwardX, forwardZ);
 }
 
-void handleCowMovement(unsigned char key, int x, int y)
+bool handleCowMovement(unsigned char key, int x, int y)
 {
     // Only process cow movement if no modifier keys are pressed
     int modifiers = glutGetModifiers();
@@ -78,7 +82,7 @@ void handleCowMovement(unsigned char key, int x, int y)
     // Don't process if modifiers are pressed (handled by body movement)
     if (shiftPressed || ctrlPressed || altPressed)
     {
-        return;
+        return false;
     }
 
     switch (key)
@@ -90,7 +94,8 @@ void handleCowMovement(unsigned char key, int x, int y)
         Vector2D direction = getCowForwardDirection();
         cowX += COW_MOVEMENT_SPEED * direction.x;
         cowZ += COW_MOVEMENT_SPEED * direction.z;
-        break;
+        glutPostRedisplay();
+        return true;
     }
     case 's':
     case 'S':
@@ -99,27 +104,32 @@ void handleCowMovement(unsigned char key, int x, int y)
         Vector2D direction = getCowForwardDirection();
         cowX -= COW_MOVEMENT_SPEED * direction.x;
         cowZ -= COW_MOVEMENT_SPEED * direction.z;
-        break;
+        glutPostRedisplay();
+        return true;
     }
     case 'a':
     case 'A':
         cowRotation += COW_STEERING_ANGLE;
-        break;
+        // Keep rotation between 0 and 360 degrees
+        if (cowRotation >= 360.0f)
+            cowRotation -= 360.0f;
+        if (cowRotation < 0.0f)
+            cowRotation += 360.0f;
+        glutPostRedisplay();
+        return true;
     case 'd':
     case 'D':
         cowRotation -= COW_STEERING_ANGLE;
-        break;
+        // Keep rotation between 0 and 360 degrees
+        if (cowRotation >= 360.0f)
+            cowRotation -= 360.0f;
+        if (cowRotation < 0.0f)
+            cowRotation += 360.0f;
+        glutPostRedisplay();
+        return true;
     default:
-        break;
+        return false;
     }
-
-    // Keep rotation between 0 and 360 degrees
-    if (cowRotation >= 360.0f)
-        cowRotation -= 360.0f;
-    if (cowRotation < 0.0f)
-        cowRotation += 360.0f;
-
-    glutPostRedisplay(); // Request redraw
 }
 
 float getCowX() { return cowX; }
@@ -204,8 +214,24 @@ float getHeadRotationY() { return headRotationY; }
 float getTailRotationZ() { return tailRotationZ; }
 float getTailRotationX() { return tailRotationX; }
 
+// Smart cow controls implementation
+void setCowInputHandler(InputHandler* handler)
+{
+    g_cowInputHandler = handler;
+}
+
+void ensureCowControlsEnabled()
+{
+    if (g_cowInputHandler) {
+        g_cowInputHandler->enableCowControls(true);
+    }
+}
+
 void drawCow()
 {
+    // Auto-enable cow controls if InputHandler is registered
+    ensureCowControlsEnabled();
+    
     glPushMatrix();
 
     // Apply cow's position and rotation

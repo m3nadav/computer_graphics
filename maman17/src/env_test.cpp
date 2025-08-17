@@ -7,6 +7,7 @@
 #include "environment/environment.h"
 #include "environment/lights.h"
 #include "shapes/shapes.h"
+#include "cow/cow.h"
 #include "common/camera.h"
 #include "common/input.h"
 #include "common/drawing.h"
@@ -96,6 +97,17 @@ void testMultipleObjects()
     drawProceduralMeadow(6.0f, 6.0f, 300);
 }
 
+// Test: Cow test (from visual test)
+void testCow()
+{
+    camera.setupGLCamera();
+
+    setupEnvironmentLighting();
+    drawWorldGround(20.0f);
+    DrawingUtils::drawGrid(3.0f, 0.5f);
+    drawCow();
+}
+
 // Test: Axes and grid only
 void testAxesGrid()
 {
@@ -106,12 +118,13 @@ void testAxesGrid()
 }
 
 std::vector<std::pair<std::string, std::function<void()>>> tests = {
-    {"Axes & Grid", testAxesGrid},
+    {"Cow Test", testCow},
     {"Single Tree", testTree},
     {"Single Rock", testRock},
     {"Grass Patch", testGrass},
     {"Metal Bench", testBench},
-    {"Multiple Objects", testMultipleObjects}};
+    {"Multiple Objects", testMultipleObjects},
+    {"Axes & Grid", testAxesGrid}};
 
 int currentTest = 0;
 
@@ -145,9 +158,11 @@ int main(int argc, char **argv)
 
     // Initialize camera with standard settings
     camera.setZoomLimits(1.0f, 100.0f);
+    camera.setDistance(10.0f);
 
     // Initialize input handler
     inputHandler = new InputHandler(camera);
+    setCowInputHandler(inputHandler); // Register with cow system for auto-control enabling
     inputHandler->setKeyboardCallback(customKeyboardHandler);
     inputHandler->handleCommandLineArgs(argc, argv, (int)tests.size());
 

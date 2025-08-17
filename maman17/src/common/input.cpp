@@ -200,8 +200,7 @@ bool InputHandler::handleCowControls(unsigned char key, int x, int y)
     }
 
     // If not handled by body movement, try regular cow movement
-    handleCowMovement(key, x, y);
-    return true; // Assume handled if we got here
+    return handleCowMovement(key, x, y); // Return whether the key was actually handled
 #else
     return false; // Cow controls not available
 #endif
