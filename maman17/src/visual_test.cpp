@@ -57,12 +57,6 @@ void customKeyboardHandler(unsigned char key, int x, int y)
     // Cow controls are automatically handled by InputHandler when enabled
 }
 
-void specialKeys(int key, int x, int y)
-{
-    // Handle cow movement special keys (arrow keys)
-    handleCowSpecialKeys(key, x, y);
-}
-
 // Timer callback for cow animations
 void customTimerCallback()
 {
@@ -99,7 +93,6 @@ int main(int argc, char **argv)
     // Set up GLUT callbacks
     glutDisplayFunc(display);
     inputHandler->setupGLUTCallbacks();
-    glutSpecialFunc(specialKeys); // Keep special keys for cow movement
 
     // Start timer for cow animations
     inputHandler->startTimer(50);

@@ -899,6 +899,9 @@ void drawSun()
 
 void drawLampPost(float benchX, float benchY, float benchZ, float scale, float benchRotation)
 {
+    // Setup lamp post lighting
+    setupLampLighting();
+
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glPushMatrix();
 
@@ -945,7 +948,7 @@ void drawLampPost(float benchX, float benchY, float benchZ, float scale, float b
 }
 
 // Wrapper function that handles positioning and rotation for both bench and lamp
-void drawMetalAndLamp(float x, float y, float z, float scale, float rotateY)
+void drawMetalBenchAndLamp(float x, float y, float z, float scale, float rotateY)
 {
     glPushMatrix();
 
@@ -963,7 +966,6 @@ void drawMetalAndLamp(float x, float y, float z, float scale, float rotateY)
     float lampOffsetX = seatWidth * 0.5f + 0.175f * scale; // Behind and to the side
     float lampOffsetZ = -seatDepth * 0.5f;                 // At the back of the bench
 
-    // Draw the lamp post at calculated position
     glPushMatrix();
     glTranslatef(lampOffsetX, 0.0f, lampOffsetZ);
     drawLampPost(0.0f, 0.0f, 0.0f, scale, 0.0f);

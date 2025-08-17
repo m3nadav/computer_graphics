@@ -18,7 +18,7 @@ public:
 
     // Set up GLUT callbacks
     void setupGLUTCallbacks();
-    
+
     // Special key handling (for arrow keys)
     void handleSpecialKeys(int key, int x, int y);
 
@@ -55,9 +55,6 @@ private:
     bool leftMouseDown;
     int lastMouseX;
     int lastMouseY;
-    
-    // Modifier key state
-    bool ctrlPressed;
 
     // Timer state
     bool timerActive;

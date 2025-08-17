@@ -70,7 +70,7 @@ void testBench()
     DrawingUtils::drawAxes();
 
     // Draw a single metal bench with lamp at origin for detailed inspection
-    drawMetalAndLamp(0.0f, 0.0f, 0.0f, 1.0f, 30.0f);
+    drawMetalBenchAndLamp(0.0f, 0.0f, 0.0f, 1.0f, 30.0f);
 }
 
 // Test: Multiple objects
@@ -90,7 +90,7 @@ void testMultipleObjects()
     drawRock(1.5f, 0.0f, -1.5f, 1.1f);
 
     // Add a bench with lamp to the multiple objects test too
-    drawMetalAndLamp(0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+    drawMetalBenchAndLamp(0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
     // Small grass patches
     drawProceduralMeadow(6.0f, 6.0f, 300);
