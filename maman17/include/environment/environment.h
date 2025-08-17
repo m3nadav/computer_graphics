@@ -18,7 +18,7 @@ void drawScatteredRocks(float x, float y, float z, int numRocks);
 
 // Metal bench functions
 void drawMetalBench(float x, float y, float z, float scale = 1.0f, float rotateY = 0.0f);
-void drawMetalAndLamp(float x, float y, float z, float scale = 1.0f, float rotateY = 0.0f);
+void drawMetalBenchAndLamp(float x, float y, float z, float scale = 1.0f, float rotateY = 0.0f);
 
 // Lighting visual elements (moved from lights.cpp)
 void drawSun();
