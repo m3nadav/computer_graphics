@@ -24,9 +24,8 @@ void testTree()
     camera.setupGLCamera();
 
     setupEnvironmentLighting();
-    drawWorldGround(20.0f);
-    DrawingUtils::drawGrid();
-    DrawingUtils::drawAxes();
+    drawWorldGround(6.0f);
+    DrawingUtils::drawGrid(3.0f, 0.5f);
 
     // Draw a single tree at origin
     drawTree(0.0f, 0.0f, 0.0f, 1.0f);
@@ -38,9 +37,8 @@ void testRock()
     camera.setupGLCamera();
 
     setupEnvironmentLighting();
-    drawWorldGround(20.0f);
-    DrawingUtils::drawGrid();
-    DrawingUtils::drawAxes();
+    drawWorldGround(6.0f);
+    DrawingUtils::drawGrid(3.0f, 0.5f);
 
     // Draw a single rock at origin
     drawRock(0.0f, 0.0f, 0.0f, 1.0f);
@@ -52,9 +50,8 @@ void testGrass()
     camera.setupGLCamera();
 
     setupEnvironmentLighting();
-    drawWorldGround(20.0f);
-    DrawingUtils::drawGrid();
-    DrawingUtils::drawAxes();
+    drawWorldGround(6.0f);
+    DrawingUtils::drawGrid(3.0f, 0.5f);
 
     // Draw a small grass patch
     drawProceduralMeadow(4.0f, 4.0f, 200);
@@ -66,9 +63,8 @@ void testBench()
     camera.setupGLCamera();
 
     setupEnvironmentLighting();
-    drawWorldGround(20.0f);
-    DrawingUtils::drawGrid();
-    DrawingUtils::drawAxes();
+    drawWorldGround(6.0f);
+    DrawingUtils::drawGrid(3.0f, 0.5f);
 
     // Draw a single metal bench with lamp at origin for detailed inspection
     drawMetalBenchAndLamp(0.0f, 0.0f, 0.0f, 1.0f, 30.0f);
@@ -80,9 +76,8 @@ void testMultipleObjects()
     camera.setupGLCamera();
 
     setupEnvironmentLighting();
-    drawWorldGround(20.0f);
-    DrawingUtils::drawGrid();
-    DrawingUtils::drawAxes();
+    drawWorldGround(6.0f);
+    DrawingUtils::drawGrid(3.0f, 0.5f);
 
     // Draw various objects at different positions
     drawTree(-2.0f, 0.0f, -2.0f, 0.8f);
@@ -103,7 +98,7 @@ void testCow()
     camera.setupGLCamera();
 
     setupEnvironmentLighting();
-    drawWorldGround(20.0f);
+    drawWorldGround(6.0f);
     DrawingUtils::drawGrid(3.0f, 0.5f);
     drawCow();
 }
@@ -113,7 +108,9 @@ void testAxesGrid()
 {
     camera.setupGLCamera();
 
-    DrawingUtils::drawGrid(5.0f, 0.5f);
+    setupEnvironmentLighting();
+    drawWorldGround(6.0f);
+    DrawingUtils::drawGrid(3.0f, 0.5f);
     DrawingUtils::drawAxes(3.0f);
 }
 
