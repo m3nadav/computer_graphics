@@ -3,3 +3,4 @@ node_modules/
 *.o
 CLAUDE.md
 .claude/
+*_scene
