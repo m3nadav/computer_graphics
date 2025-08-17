@@ -14,7 +14,7 @@ InputHandler *InputHandler::instance = nullptr;
 
 InputHandler::InputHandler(CameraController &camera)
     : cameraController(camera), rightMouseDown(false), leftMouseDown(false), lastMouseX(0), lastMouseY(0),
-      ctrlPressed(false), timerActive(false), timerInterval(50), startingScene(0), cowControlsEnabled(false)
+      timerActive(false), timerInterval(50), startingScene(0), cowControlsEnabled(false)
 {
     instance = this; // Set static instance for GLUT callbacks
 }
@@ -90,10 +90,6 @@ void InputHandler::reshapeWrapper(int w, int h)
 
 void InputHandler::handleKeyboard(unsigned char key, int x, int y)
 {
-    // Track Ctrl key state
-    int modifiers = glutGetModifiers();
-    ctrlPressed = (modifiers & GLUT_ACTIVE_CTRL);
-    
     // Handle common keys first
     if (key == 27) // ESC
     {
@@ -135,15 +131,15 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
     {
         // Reset camera to defaults
         cameraController.resetToDefaults();
-        
+
         // Reset all lighting to defaults
         resetLightingToDefaults();
-        
-        // Reset cow position and rotations (if available)
-        #ifdef COW_CONTROLS_AVAILABLE
+
+// Reset cow position and rotations (if available)
+#ifdef COW_CONTROLS_AVAILABLE
         initCowMovement();
-        #endif
-        
+#endif
+
         glutPostRedisplay();
     }
     else if (key == 'i' || key == 'I') // Lamp direction up (pitch)
@@ -202,7 +198,7 @@ bool InputHandler::handleCowControls(unsigned char key, int x, int y)
     {
         return true; // Key was handled by body movement
     }
-    
+
     // If not handled by body movement, try regular cow movement
     handleCowMovement(key, x, y);
     return true; // Assume handled if we got here
@@ -219,7 +215,7 @@ void InputHandler::handleSpecialKeys(int key, int x, int y)
 {
     // Define camera anchor movement step size
     const float ANCHOR_MOVE_STEP = 1.0f;
-    
+
     // Arrow keys now directly control camera anchor point with direction-relative movement
     switch (key)
     {
@@ -240,7 +236,7 @@ void InputHandler::handleSpecialKeys(int key, int x, int y)
         glutPostRedisplay();
         return;
     }
-    
+
     // Pass to custom special key callback if set
     if (specialKeyCallback)
     {
