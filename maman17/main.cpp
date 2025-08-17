@@ -60,9 +60,6 @@ void drawMainScene()
     // Setup sun lighting
     setupSunLighting();
 
-    // Setup lamp post lighting
-    setupLampLighting();
-
     // Draw the sun in the sky
     drawSun();
 
@@ -83,7 +80,7 @@ void drawMainScene()
     drawScatteredRocks(worldSize, 0.0f, worldSize, 10);
 
     // Draw metal benches
-    drawMetalAndLamp(-4, 0.0f, -6, 1.0f, 30.0f);
+    drawMetalBenchAndLamp(-4, 0.0f, -6, 1.0f, 30.0f);
 
     // Draw the cow in the center
     drawCow();

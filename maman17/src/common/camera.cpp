@@ -12,13 +12,17 @@
 
 CameraController::CameraController()
     : distance(5.0f), angleX(35.0f), angleY(55.0f), minDistance(1.0f), maxDistance(100.0f), currentMode(ORBITAL_CAMERA),
-      anchorX(0.0f), anchorY(0.0f), anchorZ(0.0f)
+      anchorX(0.0f), anchorY(0.0f), anchorZ(0.0f),
+      startingDistance(5.0f), startingAngleX(35.0f), startingAngleY(55.0f), startingMode(ORBITAL_CAMERA),
+      startingAnchorX(0.0f), startingAnchorY(0.0f), startingAnchorZ(0.0f)
 {
 }
 
 CameraController::CameraController(float distance, float angleX, float angleY)
     : distance(distance), angleX(angleX), angleY(angleY), minDistance(1.0f), maxDistance(100.0f), currentMode(ORBITAL_CAMERA),
-      anchorX(0.0f), anchorY(0.0f), anchorZ(0.0f)
+      anchorX(0.0f), anchorY(0.0f), anchorZ(0.0f),
+      startingDistance(distance), startingAngleX(angleX), startingAngleY(angleY), startingMode(ORBITAL_CAMERA),
+      startingAnchorX(0.0f), startingAnchorY(0.0f), startingAnchorZ(0.0f)
 {
     clampValues();
 }
@@ -55,7 +59,7 @@ std::tuple<float, float, float> CameraController::calculatePosition() const
     float y = distance * sin(angleX * M_PI / 180.0f);
     float z = distance * sin(angleY * M_PI / 180.0f) * cos(angleX * M_PI / 180.0f);
 
-    return {x, y, z};
+    return std::make_tuple(x, y, z);
 }
 
 void CameraController::setupGLCamera() const
@@ -106,7 +110,7 @@ void CameraController::setAnchor(float x, float y, float z)
 
 std::tuple<float, float, float> CameraController::getAnchor() const
 {
-    return {anchorX, anchorY, anchorZ};
+    return std::make_tuple(anchorX, anchorY, anchorZ);
 }
 
 void CameraController::moveAnchorForward(float distance)
@@ -151,13 +155,13 @@ void CameraController::moveAnchorRight(float distance)
 
 void CameraController::resetToDefaults()
 {
-    distance = 5.0f;
-    angleX = 35.0f;
-    angleY = 55.0f;
-    currentMode = ORBITAL_CAMERA;
-    anchorX = 0.0f;
-    anchorY = 0.0f;
-    anchorZ = 0.0f;
+    distance = startingDistance;
+    angleX = startingAngleX;
+    angleY = startingAngleY;
+    currentMode = startingMode;
+    anchorX = startingAnchorX;
+    anchorY = startingAnchorY;
+    anchorZ = startingAnchorZ;
     clampValues();
 }
 
