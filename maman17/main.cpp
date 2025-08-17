@@ -64,7 +64,7 @@ void drawMainScene()
     drawSun();
 
     // Draw world-wide ground texture
-    drawWorldGround(worldSize);
+    drawWorldGround(worldSize * 3);
 
     // Draw enhanced procedural meadow (grass only, no ground base)
     drawProceduralMeadow(worldSize, worldSize, 2000);
