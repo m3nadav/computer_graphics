@@ -16,11 +16,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+/** Renders a solid sphere with the specified radius using OpenGL primitives. */
 void drawSphere(double radius)
 {
     glutSolidSphere(radius, 32, 32);
 }
 
+/** Creates an ellipsoid by scaling a unit sphere along each axis with given radii. */
 void drawEllipsoid(double rx, double ry, double rz)
 {
     glPushMatrix();
@@ -29,6 +31,7 @@ void drawEllipsoid(double rx, double ry, double rz)
     glPopMatrix();
 }
 
+/** Draws a cylinder or cone with specified base radius, top radius, and height. */
 void drawCylinder(double baseRadius, double topRadius, double height)
 {
 #ifdef GLUT_VERSION_3_7
@@ -40,9 +43,12 @@ void drawCylinder(double baseRadius, double topRadius, double height)
 #endif
 }
 
-// PNG loading using stb_image library
-
-// Simple PNG loader using stb_image
+/**
+ * Loads image data from PNG files using the stb_image library for texture mapping.
+ * Converts various pixel formats (RGB, RGBA, grayscale) to a consistent RGB format
+ * suitable for OpenGL texture upload. Handles format conversion and provides
+ * detailed error reporting for debugging texture loading issues.
+ */
 bool loadImageFile(const char *filename, std::vector<unsigned char> &image, int &width, int &height)
 {
     int channels;
@@ -89,7 +95,12 @@ bool loadImageFile(const char *filename, std::vector<unsigned char> &image, int 
     return true;
 }
 
-// Load texture from file or generate procedural texture as fallback
+/**
+ * Creates an OpenGL texture from an image file with proper filtering and wrapping.
+ * Generates texture IDs, configures texture parameters for optimal rendering quality,
+ * and uploads image data to GPU memory. Essential for applying realistic surface
+ * materials to 3D geometry throughout the scene.
+ */
 unsigned int loadTexture(const char *filename)
 {
     unsigned int textureID;
@@ -116,7 +127,12 @@ unsigned int loadTexture(const char *filename)
     return textureID;
 }
 
-// Draw ellipsoid with texture mapping
+/**
+ * Renders a textured ellipsoid with proper UV coordinate mapping and optional mirroring.
+ * Combines geometric scaling with texture application to create realistic textured surfaces.
+ * Supports texture coordinate manipulation for specialized effects like mirrored textures
+ * on symmetric geometry such as cow body parts.
+ */
 void drawTexturedEllipsoid(double rx, double ry, double rz, unsigned int textureID, bool mirrored)
 {
     glEnable(GL_TEXTURE_2D);

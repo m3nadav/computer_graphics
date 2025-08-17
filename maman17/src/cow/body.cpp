@@ -9,6 +9,11 @@
 #include <cmath>
 #include <iostream>
 
+/**
+ * Renders the main cow body as a textured ellipsoid with cow spots.
+ * Creates the central torso component with proper scaling and applies
+ * the procedural spots texture for realistic cow appearance.
+ */
 void drawBody()
 {
     glPushMatrix();
@@ -32,6 +37,11 @@ float legPositions[4][3] = {
     {-0.4f, -0.3f, -0.25f} // Back right
 };
 
+/**
+ * Draws all four cow legs with realistic joint articulation.
+ * Renders each leg as a multi-segment structure with thigh, knee,
+ * and hoof components positioned according to predefined coordinates.
+ */
 void drawLegs()
 {
     for (int i = 0; i < 4; i++)

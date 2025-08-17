@@ -8,6 +8,11 @@
 #include <GLUT/glut.h>
 #include <cmath>
 
+/**
+ * Renders the complete cow head assembly with user-controlled positioning.
+ * Coordinates all head components including facial features, applies user
+ * rotation controls, and manages the head's position relative to the body.
+ */
 void drawFullHead()
 {
     glPushMatrix();
@@ -26,6 +31,11 @@ void drawFullHead()
 
     glPopMatrix();
 }
+/**
+ * Creates the main head geometry as a scaled ellipsoid with spots texture.
+ * Forms the base head shape that other facial features are attached to,
+ * using mirrored texture coordinates for visual variety from the body.
+ */
 void drawHead()
 {
     glPushMatrix();

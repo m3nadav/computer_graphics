@@ -9,7 +9,7 @@
 static unsigned int cowSpotsTexture = 0;
 static bool textureLoaded = false;
 
-// Generate procedural cow spots texture
+/** Creates a procedural texture with realistic cow spot patterns for body texturing. */
 unsigned int generateCowSpotsTexture()
 {
     const int texSize = 512; // High resolution for smooth spots
@@ -94,6 +94,7 @@ unsigned int generateCowSpotsTexture()
     return textureID;
 }
 
+/** Returns the cached cow spots texture, generating it if not already created. */
 unsigned int getCowSpotsTexture()
 {
     // Generate texture once if not already loaded

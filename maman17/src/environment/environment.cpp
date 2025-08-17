@@ -16,6 +16,7 @@
 static bool randomInitialized = false;
 static int programStartTime = 0;
 
+/** Initializes the random number generator with a time-based seed for consistent randomization. */
 void initializeRandom()
 {
     if (!randomInitialized)
@@ -26,7 +27,7 @@ void initializeRandom()
     }
 }
 
-// Set a specific seed for deterministic generation based on position/id
+/** Sets a deterministic random seed based on object position and type for consistent generation. */
 void setSeedForObject(float x, float y, float z, int objectType)
 {
     // Ensure random is initialized
@@ -40,7 +41,7 @@ void setSeedForObject(float x, float y, float z, int objectType)
     srand(abs(seed));
 }
 
-// Random number generation utilities
+/** Generates a random floating-point number within the specified range. */
 float randomFloat(float min, float max)
 {
     return min + (float)rand() / RAND_MAX * (max - min);
@@ -119,6 +120,7 @@ int getCurrentSunPosition()
     return currentSunPosition;
 }
 
+/** Processes keyboard input for sun position control using number keys 1-4. */
 void handleSunControls(unsigned char key, int x, int y)
 {
     switch (key)
@@ -302,6 +304,12 @@ void drawLeaves(float x, float y, float z, float size)
     glPopAttrib();
 }
 
+/**
+ * Renders a complete procedural tree with realistic branching structure and foliage.
+ * Creates a detailed tree model using recursive branch generation, trunk texturing,
+ * and distributed leaf clusters. Uses deterministic random generation based on position
+ * to ensure consistent tree appearance across renders while providing natural variation.
+ */
 void drawTree(float x, float y, float z, float scale)
 {
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
@@ -359,6 +367,7 @@ void drawTree(float x, float y, float z, float scale)
 }
 
 // Enhanced meadow implementation
+/** Renders a single realistic grass blade with natural tapering and wind bend effect. */
 void drawGrassBlade(float height, float width, float bend, float colorVariation)
 {
     // Save current material state to prevent leakage
@@ -394,6 +403,12 @@ void drawGrassBlade(float height, float width, float bend, float colorVariation)
     glPopAttrib();
 }
 
+/**
+ * Generates a realistic grass meadow using procedural blade placement and variation.
+ * Creates thousands of individual grass blades with natural randomization in height,
+ * width, bend, and color to simulate a living meadow environment. Uses deterministic
+ * seeding for consistent generation while maintaining natural organic appearance.
+ */
 void drawProceduralMeadow(float width, float depth, int grassDensity)
 {
     // Save current material state to prevent leakage
@@ -426,6 +441,7 @@ void drawProceduralMeadow(float width, float depth, int grassDensity)
 }
 
 // Rock implementation
+/** Creates a naturally irregular rock shape using vertex distortion and procedural texturing. */
 void drawIrregularRock(float scale, int complexity, float colorVariation)
 {
     // Save current material state to prevent leakage
@@ -542,6 +558,12 @@ void drawRock(float x, float y, float z, float scale, float colorVariation)
     glPopAttrib();
 }
 
+/**
+ * Places irregular rock formations throughout the scene using collision avoidance.
+ * Generates naturally-shaped rocks with procedural distortion and positioning,
+ * while avoiding placement near the cow's spawn area and other obstacles.
+ * Enhances the meadow environment with realistic geological features.
+ */
 void drawScatteredRocks(float x, float y, float z, int numRocks)
 {
     // Save current material state to prevent leakage
@@ -785,6 +807,12 @@ void drawTexturedGroundPatch(float centerX, float centerZ, float size, unsigned 
 }
 
 // World-wide ground texture
+/**
+ * Renders the base textured ground plane that forms the foundation of the entire scene.
+ * Applies repeating dirt texture across a large area to provide realistic terrain
+ * appearance, using proper texture coordinate scaling for seamless tiling and
+ * consistent visual quality regardless of world size.
+ */
 void drawWorldGround(float worldSize)
 {
     // Save current material state to prevent leakage
@@ -846,7 +874,12 @@ void drawWorldGround(float worldSize)
 // LIGHTING VISUAL ELEMENTS (moved from lights.cpp)
 // ========================================
 
-// Draw the sun as a bright sphere
+/**
+ * Renders the sun as a glowing sphere positioned according to current lighting settings.
+ * Coordinates with the lighting system to place the visual sun representation at the
+ * same location as the light source, creating visual consistency between illumination
+ * and the apparent light source. Disables lighting for the sun itself to ensure brightness.
+ */
 void drawSun()
 {
     // Use the same position logic as setupSunLighting()
@@ -897,6 +930,7 @@ void drawSun()
     glPopMatrix();
 }
 
+/** Renders an illuminated lamp post with adjustable direction and integrated lighting effects. */
 void drawLampPost(float benchX, float benchY, float benchZ, float scale, float benchRotation)
 {
     // Setup lamp post lighting
@@ -948,6 +982,12 @@ void drawLampPost(float benchX, float benchY, float benchZ, float scale, float b
 }
 
 // Wrapper function that handles positioning and rotation for both bench and lamp
+/**
+ * Creates a complete outdoor furniture scene with metal bench and illuminated lamp post.
+ * Positions and orients both elements as a cohesive unit, with the lamp strategically
+ * placed to provide scene lighting. Handles world transformation and coordinates
+ * between the furniture and lighting systems for realistic environmental props.
+ */
 void drawMetalBenchAndLamp(float x, float y, float z, float scale, float rotateY)
 {
     glPushMatrix();

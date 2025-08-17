@@ -14,7 +14,7 @@
 #define GL_SINGLE_COLOR 0x81F9
 #endif
 
-// Lighting and material setup
+/** Configures OpenGL lighting environment with ambient light and material properties. */
 void setupEnvironmentLighting()
 {
     // Enable lighting
@@ -69,6 +69,7 @@ static float currentBenchY = 0.0f;
 static float currentBenchZ = -6.0f;
 static float currentBenchRotation = 30.0f;
 
+/** Establishes directional sun lighting based on current sun position settings. */
 void setupSunLighting()
 {
     // Enable lighting
@@ -135,6 +136,7 @@ void setupSunLighting()
 // LAMP POST LIGHTING SYSTEM
 // ========================================
 
+/** Configures point lighting for the lamp post with directional controls. */
 void setupLampLighting()
 {
     if (!lampEnabled)
@@ -186,6 +188,7 @@ void setupLampLighting()
 }
 
 // Helper function to set material properties from RGB color
+/** Sets OpenGL material properties from RGB color with specified shininess and specular reflection. */
 void setMaterialFromColor(float r, float g, float b, float shininess, float specularLevel)
 {
     // Set color for GL_COLOR_MATERIAL mode (when enabled)
@@ -203,6 +206,7 @@ void setMaterialFromColor(float r, float g, float b, float shininess, float spec
 }
 
 // Environment-specific materials
+/** Applies brown bark material properties for tree rendering. */
 void setTreeMaterial()
 {
     // Disable color material temporarily to override any glColor3f effects
@@ -225,6 +229,7 @@ void setTreeMaterial()
     glEnable(GL_COLOR_MATERIAL);
 }
 
+/** Sets green grass material with color variation for natural appearance. */
 void setGrassMaterial(float colorVariation)
 {
     // Base green with slight variation
@@ -246,6 +251,7 @@ void setGrassMaterial(float colorVariation)
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess);
 }
 
+/** Applies gray stone material with color variation for realistic rock surfaces. */
 void setRockMaterial(float colorVariation)
 {
     // Base gray with slight variation
@@ -265,6 +271,7 @@ void setRockMaterial(float colorVariation)
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, matShininess);
 }
 
+/** Sets metallic material properties for bench and lamp post components. */
 void setMetalMaterial()
 {
     // Set color for GL_COLOR_MATERIAL mode (when enabled)
@@ -283,6 +290,7 @@ void setMetalMaterial()
 }
 
 // Cow-specific material functions
+/** Applies white cow hide material for main body parts. */
 void setCowWhiteMaterial()
 {
     glDisable(GL_LIGHTING);
@@ -313,6 +321,7 @@ void setCowPinkMaterial()
     glColor3f(1.0f, 0.8f, 0.6f);
 }
 
+/** Sets black material for cow features like nose and eyes. */
 void setCowBlackMaterial()
 {
     glDisable(GL_LIGHTING);
@@ -388,6 +397,7 @@ void setAmbientLevel(float level)
     }
 }
 
+/** Returns the current sun light intensity level. */
 float getLightIntensity()
 {
     return lightIntensity;
@@ -419,6 +429,7 @@ void enableCustomLightPosition(bool enable)
 }
 
 // Lamp light control functions implementation
+/** Adjusts the lamp post light intensity level. */
 void setLampIntensity(float intensity)
 {
     if (intensity >= 0.1f && intensity <= 3.0f)
@@ -427,6 +438,7 @@ void setLampIntensity(float intensity)
     }
 }
 
+/** Sets the lamp post directional angles for targeted lighting. */
 void setLampDirection(float angleX, float angleZ)
 {
     // Clamp pitch angle to prevent lamp from pointing too far up or down
@@ -453,6 +465,7 @@ void getLampDirection(float *angleX, float *angleZ)
         *angleZ = lampDirectionZ;
 }
 
+/** Returns the current lamp post intensity level. */
 float getLampIntensity()
 {
     return lampIntensity;
@@ -474,11 +487,13 @@ bool getUseCustomPosition()
     return useCustomPosition;
 }
 
+/** Returns the lamp's pitch angle in degrees. */
 float getLampDirectionX()
 {
     return lampDirectionX;
 }
 
+/** Returns the lamp's yaw angle in degrees. */
 float getLampDirectionZ()
 {
     return lampDirectionZ;

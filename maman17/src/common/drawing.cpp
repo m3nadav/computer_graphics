@@ -5,6 +5,11 @@
 
 namespace DrawingUtils
 {
+    /**
+     * Renders a wireframe grid for visual reference and debugging.
+     * Creates evenly spaced grid lines across a square area to help
+     * with spatial orientation and object positioning during development.
+     */
     void drawGrid(float size, float step)
     {
         // Save current OpenGL state
@@ -34,6 +39,11 @@ namespace DrawingUtils
         glPopAttrib();
     }
 
+    /**
+     * Draws color-coded coordinate axes for 3D orientation reference.
+     * Renders X (red), Y (green), and Z (blue) axes to provide visual
+     * indication of coordinate system orientation and scale.
+     */
     void drawAxes(float length)
     {
         glDisable(GL_LIGHTING);
@@ -62,6 +72,7 @@ namespace DrawingUtils
         glEnable(GL_LIGHTING);
     }
 
+    /** Renders text at a 3D position using bitmap fonts for UI and debugging labels. */
     void renderText(const std::string &text, float x, float y, float z)
     {
         glDisable(GL_LIGHTING);
@@ -76,11 +87,13 @@ namespace DrawingUtils
         glEnable(GL_LIGHTING);
     }
 
+    /** Sets a basic material color with default shininess and opacity values. */
     void setMaterial(float r, float g, float b)
     {
         setMaterialFromColor(r, g, b, 50.0f, 0.8f);
     }
 
+    /** Initializes essential OpenGL settings for 3D rendering including depth testing and lighting. */
     void initOpenGL()
     {
         glEnable(GL_DEPTH_TEST);
@@ -90,6 +103,7 @@ namespace DrawingUtils
         glEnable(GL_NORMALIZE);
     }
 
+    /** Configures standard OpenGL lighting with a single light source and material properties. */
     void setupLighting()
     {
         // Set up standard lighting

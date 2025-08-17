@@ -19,6 +19,7 @@ InputHandler::InputHandler(CameraController &camera)
     instance = this; // Set static instance for GLUT callbacks
 }
 
+/** Registers this InputHandler as the active GLUT callback handler for all input events. */
 void InputHandler::setupGLUTCallbacks()
 {
     glutKeyboardFunc(keyboardWrapper);
@@ -28,6 +29,7 @@ void InputHandler::setupGLUTCallbacks()
     glutReshapeFunc(reshapeWrapper);
 }
 
+/** Begins the animation timer with specified interval for periodic updates. */
 void InputHandler::startTimer(int intervalMs)
 {
     timerInterval = intervalMs;
@@ -35,6 +37,7 @@ void InputHandler::startTimer(int intervalMs)
     glutTimerFunc(intervalMs, timerWrapper, 0);
 }
 
+/** Processes command line arguments to set initial scene selection. */
 void InputHandler::handleCommandLineArgs(int argc, char **argv, int maxScenes)
 {
     if (argc > 1 && maxScenes > 0)
@@ -88,6 +91,7 @@ void InputHandler::reshapeWrapper(int w, int h)
 // KEYBOARD HANDLING METHODS
 // ========================================
 
+/** Processes standard keyboard input including cow controls and camera commands. */
 void InputHandler::handleKeyboard(unsigned char key, int x, int y)
 {
     // Handle common keys first
@@ -247,6 +251,7 @@ void InputHandler::handleSpecialKeys(int key, int x, int y)
 // MOUSE HANDLING METHODS
 // ========================================
 
+/** Handles mouse button press and release events for camera control. */
 void InputHandler::handleMouse(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON)
@@ -273,6 +278,7 @@ void InputHandler::handleMouse(int button, int state, int x, int y)
     }
 }
 
+/** Processes mouse movement for camera rotation when mouse buttons are held. */
 void InputHandler::handleMotion(int x, int y)
 {
     if (rightMouseDown)
@@ -322,6 +328,7 @@ void InputHandler::handleReshape(int w, int h)
 // UI DRAWING METHODS
 // ========================================
 
+/** Renders on-screen user interface elements and control information. */
 void InputHandler::drawUI()
 {
     menuSystem.drawUI();

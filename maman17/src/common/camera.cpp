@@ -27,18 +27,25 @@ CameraController::CameraController(float distance, float angleX, float angleY)
     clampValues();
 }
 
+/** Moves the camera closer to the target point by the specified distance. */
 void CameraController::zoomIn(float step)
 {
     distance -= step;
     clampValues();
 }
 
+/** Moves the camera farther from the target point by the specified distance. */
 void CameraController::zoomOut(float step)
 {
     distance += step;
     clampValues();
 }
 
+/**
+ * Rotates the camera based on mouse movement with configurable sensitivity.
+ * Updates horizontal and vertical viewing angles while maintaining proper
+ * angle constraints to prevent camera flipping or disorientation.
+ */
 void CameraController::rotate(float deltaX, float deltaY, float sensitivity)
 {
     angleY += deltaX * sensitivity; // Horizontal rotation
@@ -62,6 +69,12 @@ std::tuple<float, float, float> CameraController::calculatePosition() const
     return std::make_tuple(x, y, z);
 }
 
+/**
+ * Configures OpenGL camera transformation based on current camera mode.
+ * Sets up view matrix for either orbital camera around a target point or
+ * first-person cow-eye perspective, handling all necessary coordinate
+ * transformations and rotations for proper 3D viewing.
+ */
 void CameraController::setupGLCamera() const
 {
     if (currentMode == COW_EYE_CAMERA)
@@ -182,6 +195,11 @@ void CameraController::clampValues()
     // Horizontal angle can wrap around freely (no clamping needed)
 }
 
+/**
+ * Switches between orbital camera and cow first-person view modes.
+ * Provides different viewing perspectives for gameplay and debugging,
+ * with automatic position adjustment for each camera type.
+ */
 void CameraController::toggleCameraMode()
 {
     if (currentMode == ORBITAL_CAMERA)

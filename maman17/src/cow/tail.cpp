@@ -419,6 +419,11 @@ void drawConeSegment(float pos1[3], float pos2[3], float radius1, float radius2,
 }
 
 // Helper function to draw the tail cone surface
+/**
+ * Creates the main tail body using curved cone segments between control points.
+ * Generates a smooth, tapered tail shape with proper radius progression
+ * from base to tip using interpolated cone segments.
+ */
 void drawTailCone(float controlPoints[5][3])
 {
     glBegin(GL_TRIANGLES);
@@ -463,6 +468,7 @@ void drawTailCone(float controlPoints[5][3])
 }
 
 // Helper function to draw the hair tuft at the tail tip
+/** Adds a realistic hair tuft at the tail tip using scattered small spheres. */
 void drawHairTuft(float controlPoints[5][3])
 {
     glPushMatrix();
@@ -503,6 +509,11 @@ void getCurrentTailVariation(float controlPoints[5][3])
 }
 
 // Main public function to draw the animated tail
+/**
+ * Renders the animated cow tail with procedural motion and user controls.
+ * Combines automatic swishing animation with user rotation controls to create
+ * realistic tail movement. Includes both the main tail body and hair tuft.
+ */
 void drawTail()
 {
     // Setup tail position and color

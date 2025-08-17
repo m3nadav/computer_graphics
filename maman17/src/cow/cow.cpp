@@ -27,6 +27,11 @@ static float tailRotationX = 0.0f; // SHIFT+J/L rotation around X-axis (-90 to +
 // Smart cow controls - global InputHandler tracking
 static InputHandler* g_cowInputHandler = nullptr;
 
+/**
+ * Initializes the cow's position, rotation, and body part orientations to default values.
+ * Resets the cow to the center of the world with neutral head and tail positions,
+ * providing a clean starting state for the interactive cow control system.
+ */
 void initCowMovement()
 {
     cowX = 0.0f;
@@ -59,6 +64,12 @@ struct Vector2D
     Vector2D(float x = 0.0f, float z = 0.0f) : x(x), z(z) {}
 };
 
+/**
+ * Calculates the cow's current forward direction vector based on its Y-axis rotation.
+ * Returns a normalized 2D vector representing where the cow is facing, accounting for
+ * OpenGL's coordinate system where negative Z is the camera's forward direction.
+ * Essential for movement calculations and directional animations.
+ */
 Vector2D getCowForwardDirection()
 {
     // The cow's head faces along the positive X-axis relative to the cow's body
@@ -71,6 +82,12 @@ Vector2D getCowForwardDirection()
     return Vector2D(forwardX, forwardZ);
 }
 
+/**
+ * Processes basic cow locomotion controls (WASD) for moving and rotating the cow.
+ * Handles forward/backward movement along the cow's current facing direction and
+ * left/right turning to change orientation. Only responds when no modifier keys
+ * are pressed, allowing body part controls to take precedence.
+ */
 bool handleCowMovement(unsigned char key, int x, int y)
 {
     // Only process cow movement if no modifier keys are pressed
@@ -132,11 +149,19 @@ bool handleCowMovement(unsigned char key, int x, int y)
     }
 }
 
+/** Returns the cow's current X-coordinate position in world space. */
 float getCowX() { return cowX; }
+/** Returns the cow's current Z-coordinate position in world space. */
 float getCowZ() { return cowZ; }
+/** Returns the cow's current Y-axis rotation in degrees. */
 float getCowRotation() { return cowRotation; }
 
-// Unified cow body movement handler (head and tail controls)
+/**
+ * Manages fine-grained cow body part animations including head and tail movements.
+ * Processes modifier key combinations (Shift+WASD for head, Alt+WASD for tail)
+ * to enable detailed character animation. Respects rotation limits to prevent
+ * unnatural poses and maintains realistic movement constraints.
+ */
 bool handleCowBodyMovement(unsigned char key, int x, int y)
 {
     // Check modifiers
@@ -206,20 +231,23 @@ bool handleCowBodyMovement(unsigned char key, int x, int y)
     return false; // No modifier keys pressed or key not handled
 }
 
-// Head rotation getters
+/** Returns the cow's head pitch rotation around the Z-axis in degrees. */
 float getHeadRotationX() { return headRotationX; }
+/** Returns the cow's head yaw rotation around the Y-axis in degrees. */
 float getHeadRotationY() { return headRotationY; }
 
-// Tail rotation getters
+/** Returns the cow's tail rotation around the Z-axis in degrees. */
 float getTailRotationZ() { return tailRotationZ; }
+/** Returns the cow's tail rotation around the X-axis in degrees. */
 float getTailRotationX() { return tailRotationX; }
 
-// Smart cow controls implementation
+/** Registers an InputHandler instance for automatic cow control management. */
 void setCowInputHandler(InputHandler* handler)
 {
     g_cowInputHandler = handler;
 }
 
+/** Automatically enables cow controls when the cow is being rendered. */
 void ensureCowControlsEnabled()
 {
     if (g_cowInputHandler) {
@@ -227,6 +255,12 @@ void ensureCowControlsEnabled()
     }
 }
 
+/**
+ * Renders the complete cow model with all body parts positioned according to current
+ * movement and animation states. Applies world transformation, manages automatic
+ * control enabling, and coordinates the rendering of body, head, legs, and tail
+ * components to create the final cow character in the scene.
+ */
 void drawCow()
 {
     // Auto-enable cow controls if InputHandler is registered

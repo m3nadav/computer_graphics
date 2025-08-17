@@ -17,7 +17,12 @@ static InputHandler *inputHandler = nullptr;
 // - [ key: Decrease lamp intensity
 // - ] key: Increase lamp intensity
 
-// Custom keyboard handler (cow controls now handled by InputHandler)
+/**
+ * Handles custom keyboard input for lamp and sun controls that aren't covered by the
+ * main input handler. Processes lamp intensity adjustments and sun positioning while
+ * delegating cow movement to the InputHandler system for cleaner separation of concerns.
+ * This function integrates with the lighting system to provide real-time environmental control.
+ */
 void customKeyboardHandler(unsigned char key, int x, int y)
 {
     // Handle sun position controls
@@ -49,7 +54,12 @@ void customKeyboardHandler(unsigned char key, int x, int y)
 }
 
 float worldSize = 50.0f;
-// Custom main scene drawing
+/**
+ * Orchestrates the complete 3D scene rendering pipeline for the cow meadow environment.
+ * Sets up camera positioning, lighting systems, and renders all scene elements including
+ * terrain, vegetation, props, and the main cow character. This function coordinates between
+ * multiple rendering subsystems to create the final composite scene that users see.
+ */
 void drawMainScene()
 {
     glLoadIdentity();
@@ -86,6 +96,11 @@ void drawMainScene()
     drawCow();
 }
 
+/**
+ * Main OpenGL display callback that handles the complete frame rendering cycle.
+ * Clears buffers, renders the 3D scene, overlays UI elements, and swaps buffers
+ * to present the final frame. This is the core rendering entry point called by GLUT.
+ */
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -100,12 +115,22 @@ void display()
     glutSwapBuffers();
 }
 
-// Timer callback for cow animations
+/**
+ * Animation timer callback that advances the global animation frame counter.
+ * Drives time-based animations like tail swishing and other periodic movements
+ * throughout the scene, ensuring smooth temporal progression of animated elements.
+ */
 void customTimerCallback()
 {
     incrementAnimationFrame(); // Keep animation frame for cow animations (tail, etc.)
 }
 
+/**
+ * Application entry point that initializes OpenGL, sets up the 3D rendering environment,
+ * configures camera and input systems, and launches the main event loop. Establishes
+ * the complete application framework including window creation, lighting setup, input
+ * handling, and animation timing before transferring control to the GLUT main loop.
+ */
 int main(int argc, char **argv)
 {
     glutInit(&argc, argv);

@@ -7,6 +7,11 @@
 // Global animation counter
 static int animationFrame = 0;
 
+/**
+ * Creates a simple flat green ground plane as the base meadow surface.
+ * Provides the foundational terrain element that other scene components
+ * are built upon, using basic OpenGL geometry with green coloring.
+ */
 void drawMeadow()
 {
     setMaterialFromColor(0.2f, 0.8f, 0.2f, 15.0f, 0.2f); // Green meadow material
@@ -17,11 +22,13 @@ void drawMeadow()
     glPopMatrix();
 }
 
+/** Returns the current global animation frame counter for time-based animations. */
 int getAnimationFrame()
 {
     return animationFrame;
 }
 
+/** Advances the global animation frame counter to drive time-based scene animations. */
 void incrementAnimationFrame()
 {
     animationFrame++;
