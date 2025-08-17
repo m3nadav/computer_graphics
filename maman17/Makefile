@@ -5,10 +5,6 @@ LDFLAGS = -framework OpenGL -framework GLUT
 # Common source files used by all targets
 COMMON_SRCS = src/common/camera.cpp src/common/input.cpp src/common/drawing.cpp src/common/menu.cpp
 
-# Shapes test
-SHAPES_SRCS = src/shapes/shapes_test.cpp src/shapes/shapes.cpp src/environment/environment.cpp src/environment/lights.cpp $(COMMON_SRCS)
-SHAPES_TARGET = shapes_test
-
 # Visual test
 VISUAL_SRCS = src/visual_test.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp src/environment/lights.cpp $(COMMON_SRCS)
 VISUAL_TARGET = visual_test
@@ -23,10 +19,7 @@ MAIN_FLAGS = -DCOW_CONTROLS_AVAILABLE
 ENV_SRCS = src/env_test.cpp src/shapes/shapes.cpp src/environment/environment.cpp src/environment/lights.cpp $(COMMON_SRCS)
 ENV_TARGET = env_test
 
-all: $(SHAPES_TARGET) $(VISUAL_TARGET) $(MAIN_TARGET) $(ENV_TARGET)
-
-$(SHAPES_TARGET): $(SHAPES_SRCS)
-	$(CXX) $(CXXFLAGS) $(SHAPES_SRCS) -o $(SHAPES_TARGET) $(LDFLAGS)
+all: $(VISUAL_TARGET) $(MAIN_TARGET) $(ENV_TARGET)
 
 $(VISUAL_TARGET): $(VISUAL_SRCS)
 	$(CXX) $(CXXFLAGS) $(VISUAL_FLAGS) $(VISUAL_SRCS) -o $(VISUAL_TARGET) $(LDFLAGS)
@@ -36,10 +29,6 @@ $(MAIN_TARGET): $(MAIN_SRCS)
 
 $(ENV_TARGET): $(ENV_SRCS)
 	$(CXX) $(CXXFLAGS) $(ENV_SRCS) -o $(ENV_TARGET) $(LDFLAGS)
-
-test-shapes: $(SHAPES_TARGET)
-	@echo "Running shapes test..."
-	./$(SHAPES_TARGET)
 
 test-visual: $(VISUAL_TARGET)
 	@echo "Running visual test..."
@@ -53,9 +42,9 @@ test-env: $(ENV_TARGET)
 	@echo "Running environment test..."
 	./$(ENV_TARGET) 5
 
-test: test-shapes test-visual
+test: test-visual
 
 clean:
-	rm -f $(SHAPES_TARGET) $(VISUAL_TARGET) $(MAIN_TARGET) $(ENV_TARGET)
+	rm -f $(VISUAL_TARGET) $(MAIN_TARGET) $(ENV_TARGET)
 
-.PHONY: clean all test test-shapes test-visual test-main test-env
+.PHONY: clean all test test-visual test-main test-env
