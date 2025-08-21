@@ -86,4 +86,4 @@ private:
     void clampValues();
 };
 
-#endif // CAMERA_H
+#endif

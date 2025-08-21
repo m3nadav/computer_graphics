@@ -25,14 +25,14 @@ CameraController::CameraController(float distance, float angleX, float angleY)
     clampValues();
 }
 
-/** Moves the camera closer to the target point by the specified distance. */
+// Moves the camera closer to the target point by the specified distance
 void CameraController::zoomIn(float step)
 {
     distance -= step;
     clampValues();
 }
 
-/** Moves the camera farther from the target point by the specified distance. */
+// Moves the camera farther from the target point by the specified distance.
 void CameraController::zoomOut(float step)
 {
     distance += step;
@@ -58,6 +58,7 @@ void CameraController::setZoomLimits(float minDist, float maxDist)
     clampValues();
 }
 
+// Calculates the camera position in world coordinates based on current camera settings
 std::tuple<float, float, float> CameraController::calculatePosition() const
 {
     float x = distance * cos(angleY * M_PI / 180.0f) * cos(angleX * M_PI / 180.0f);
@@ -195,8 +196,8 @@ void CameraController::clampValues()
 
 /**
  * Switches between orbital camera and cow first-person view modes.
- * Provides different viewing perspectives for gameplay and debugging,
- * with automatic position adjustment for each camera type.
+ * Provides different viewing perspectives with automatic position
+ * adjustment for each camera type.
  */
 void CameraController::toggleCameraMode()
 {
@@ -217,11 +218,11 @@ void CameraController::setupCowEyeCamera() const
     float cowZ = getCowZ();
     float cowRotation = getCowRotation();
 
-    // Get head rotations (these should already be clamped by cow controls)
+    // Get head rotations
     float headRotationZ = getHeadRotationZ();
     float headRotationY = getHeadRotationY();
 
-    // Double-check the limits are respected (safety clamp)
+    // Double-check the limits
     headRotationZ = std::max(-HEAD_MAX_X_ROTATION, std::min(HEAD_MAX_X_ROTATION, headRotationZ));
     headRotationY = std::max(-HEAD_MAX_Y_ROTATION, std::min(HEAD_MAX_Y_ROTATION, headRotationY));
 
@@ -231,7 +232,7 @@ void CameraController::setupCowEyeCamera() const
     float headWorldY = COW_BASE_Y_POSITION; // Cow's base Y position from drawCow()
     float headWorldZ = cowZ;
 
-    // Add head offset (from drawFullHead translation)
+    // Add head offset
     float cowRotationRad = -cowRotation * M_PI / 180.0f; // Negate to fix camera rotation direction
     headWorldX += COW_HEAD_X * cos(cowRotationRad) - COW_HEAD_Z * sin(cowRotationRad);
     headWorldY += COW_HEAD_Y;
@@ -243,7 +244,7 @@ void CameraController::setupCowEyeCamera() const
     float eyeOffsetY = COW_EYE_OFFSET_Y;
     float eyeOffsetZ = COW_EYE_OFFSET_Z;
 
-    // Apply head rotations to eye offset
+    // Apply head rotations to eye offset to move the camera view with the head rotation
     float headRotZRad = headRotationZ * M_PI / 180.0f;
     float headRotYRad = headRotationY * M_PI / 180.0f;
 
