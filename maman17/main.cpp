@@ -7,58 +7,16 @@
 #include "common/input.h"
 #include <cmath>
 
-// Global camera and input handler
+// Global camera controller and input handler
 static CameraController camera(10.0f, 35.0f, 55.0f);
 static InputHandler *inputHandler = nullptr;
-
-// LAMP POST CONTROLS:
-// - Left Mouse Drag: Rotate lamp direction (yaw and pitch)
-// - L key: Toggle lamp on/off
-// - [ key: Decrease lamp intensity
-// - ] key: Increase lamp intensity
-
-/**
- * Handles custom keyboard input for lamp and sun controls that aren't covered by the
- * main input handler. Processes lamp intensity adjustments and sun positioning while
- * delegating cow movement to the InputHandler system for cleaner separation of concerns.
- * This function integrates with the lighting system to provide real-time environmental control.
- */
-void customKeyboardHandler(unsigned char key, int x, int y)
-{
-    // Handle sun position controls
-    handleSunControls(key, x, y);
-
-    // Handle lamp controls
-    switch (key)
-    {
-    case '[':
-        // Decrease lamp intensity
-        {
-            float intensity = getLampIntensity();
-            setLampIntensity(intensity - 0.2f);
-            glutPostRedisplay();
-        }
-        break;
-    case ']':
-        // Increase lamp intensity
-        {
-            float intensity = getLampIntensity();
-            setLampIntensity(intensity + 0.2f);
-            glutPostRedisplay();
-        }
-        break;
-    }
-
-    // Any additional custom key handling can go here
-    // Cow controls are automatically handled by InputHandler when enabled
-}
 
 float worldSize = 50.0f;
 /**
  * Orchestrates the complete 3D scene rendering pipeline for the cow meadow environment.
  * Sets up camera positioning, lighting systems, and renders all scene elements including
- * terrain, vegetation, props, and the main cow character. This function coordinates between
- * multiple rendering subsystems to create the final composite scene that users see.
+ * terrain, vegetation, props, and the cow itself. This function coordinates between
+ * multiple rendering subsystems to create the final composite scene that the user sees.
  */
 void drawMainScene()
 {
@@ -99,7 +57,7 @@ void drawMainScene()
 /**
  * Main OpenGL display callback that handles the complete frame rendering cycle.
  * Clears buffers, renders the 3D scene, overlays UI elements, and swaps buffers
- * to present the final frame. This is the core rendering entry point called by GLUT.
+ * to present the final frame. This is the core rendering entry point.
  */
 void display()
 {
@@ -117,8 +75,7 @@ void display()
 
 /**
  * Animation timer callback that advances the global animation frame counter.
- * Drives time-based animations like tail swishing and other periodic movements
- * throughout the scene, ensuring smooth temporal progression of animated elements.
+ * Drives the tail's time-based animation ensuring smooth progression of animated elements.
  */
 void customTimerCallback()
 {
@@ -146,7 +103,6 @@ int main(int argc, char **argv)
     // Initialize input handler
     inputHandler = new InputHandler(camera);
     setCowInputHandler(inputHandler); // Register with cow system for auto-control enabling
-    inputHandler->setKeyboardCallback(customKeyboardHandler);
     inputHandler->setDisplayCallback(customTimerCallback);
     inputHandler->handleCommandLineArgs(argc, argv); // No test scenes for main.cpp
 
@@ -155,7 +111,7 @@ int main(int argc, char **argv)
 
     // Set up GLUT callbacks
     glutDisplayFunc(display);
-    inputHandler->setupGLUTCallbacks(); // This now includes special key handling
+    inputHandler->setupGLUTCallbacks();
 
     // Start timer for cow animations
     inputHandler->startTimer(50);
@@ -163,5 +119,5 @@ int main(int argc, char **argv)
     glutMainLoop();
 
     delete inputHandler;
-    return 0;
+    return 0; // 0 means success in unix-like systems
 }

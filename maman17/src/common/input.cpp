@@ -1,5 +1,6 @@
 #include "common/input.h"
 #include "environment/lights.h"
+#include "environment/environment.h"
 #include <GLUT/glut.h>
 #include <cstdlib>
 #include <iostream>
@@ -172,6 +173,43 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
         float currentAngleX, currentAngleZ;
         getLampDirection(&currentAngleX, &currentAngleZ);
         setLampDirection(currentAngleX, currentAngleZ + 5.0f);
+        glutPostRedisplay();
+    }
+    else if (key == '[') // Decrease lamp intensity
+    {
+        float intensity = getLampIntensity();
+        setLampIntensity(intensity - 0.2f);
+        glutPostRedisplay();
+    }
+    else if (key == ']') // Increase lamp intensity
+    {
+        float intensity = getLampIntensity();
+        setLampIntensity(intensity + 0.2f);
+        glutPostRedisplay();
+    }
+    // Sun position controls (number keys 1-4)
+    else if (key == '1') // Sun position (-x,y,-z)
+    {
+        setSunPosition(0);
+        enableCustomLightPosition(false);
+        glutPostRedisplay();
+    }
+    else if (key == '2') // Sun position (-x,y,z)
+    {
+        setSunPosition(1);
+        enableCustomLightPosition(false);
+        glutPostRedisplay();
+    }
+    else if (key == '3') // Sun position (x,y,-z)
+    {
+        setSunPosition(2);
+        enableCustomLightPosition(false);
+        glutPostRedisplay();
+    }
+    else if (key == '4') // Sun position (x,y,z)
+    {
+        setSunPosition(3);
+        enableCustomLightPosition(false);
         glutPostRedisplay();
     }
     else

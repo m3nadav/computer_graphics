@@ -120,30 +120,6 @@ int getCurrentSunPosition()
     return currentSunPosition;
 }
 
-/** Processes keyboard input for sun position control using number keys 1-4. */
-void handleSunControls(unsigned char key, int x, int y)
-{
-    switch (key)
-    {
-    case '1':
-        setSunPosition(0);                // (-x,y,-z)
-        enableCustomLightPosition(false); // Disable custom positioning
-        break;
-    case '2':
-        setSunPosition(1);                // (-x,y,z)
-        enableCustomLightPosition(false); // Disable custom positioning
-        break;
-    case '3':
-        setSunPosition(2);                // (x,y,-z)
-        enableCustomLightPosition(false); // Disable custom positioning
-        break;
-    case '4':
-        setSunPosition(3);                // (x,y,z)
-        enableCustomLightPosition(false); // Disable custom positioning
-        break;
-    }
-}
-
 // Check if position is safe for rock placement (not too close to cow spawn or current position)
 bool isPositionSafeForRock(float rockX, float rockZ)
 {

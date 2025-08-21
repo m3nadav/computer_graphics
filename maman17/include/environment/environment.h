@@ -27,7 +27,6 @@ void drawLampPost(float benchX, float benchY, float benchZ, float scale = 1.0f, 
 // Sun position management functions
 void setSunPosition(int positionIndex);
 int getCurrentSunPosition();
-void handleSunControls(unsigned char key, int x, int y);
 
 // Random seed management for consistent generation
 void setSeedForObject(float x, float y, float z, int objectType);

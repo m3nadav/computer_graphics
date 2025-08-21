@@ -476,7 +476,7 @@ void MenuSystem::drawHelpWindow()
     int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
     float helpWidth = 510.0f;
-    float helpHeight = 450.0f;
+    float helpHeight = 480.0f;
     float helpX = (windowWidth - helpWidth) / 2.0f;   // Center horizontally
     float helpY = (windowHeight - helpHeight) / 2.0f; // Center vertically
 
@@ -593,6 +593,10 @@ void MenuSystem::drawHelpWindow()
     renderText2D("J.........................Direction left", rightMargin, currentY);
     currentY -= lineHeight;
     renderText2D("L.........................Direction right", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("[..........................Decrease intensity", rightMargin, currentY);
+    currentY -= lineHeight;
+    renderText2D("]..........................Increase intensity", rightMargin, currentY);
     currentY -= lineHeight + 5.0f;
 
     glColor3f(0.8f, 0.9f, 1.0f);
