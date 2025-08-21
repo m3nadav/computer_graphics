@@ -21,7 +21,7 @@ const float HAIR_TUFT_SCALE_X = 0.04f;
 const float HAIR_TUFT_SCALE_Y = 0.06f;
 const float HAIR_TUFT_SCALE_Z = 0.04f;
 
-// Tail variations data - 30 different positions for realistic wavy motion
+// Tail variations data - 30 different positions for realistic wavy animation
 const float TAIL_VARIATIONS[NUM_TAIL_VARIATIONS][NUM_CONTROL_POINTS][NUM_COORDS] = {
     // Variation 1: Starting position - tail pointing down
     {
@@ -71,7 +71,7 @@ const float TAIL_VARIATIONS[NUM_TAIL_VARIATIONS][NUM_CONTROL_POINTS][NUM_COORDS]
         {-0.35f, -0.1f, -0.04f},  // Middle more right
         {-0.45f, -0.15f, -0.08f}  // Tuft still left (lagging)
     },
-    // Variation 7: Middle center, tuft catching up
+    // Variation 7: Middle at the center, tuft catching up
     {
         {0.0f, 0.0f, 0.0f},      // Start point
         {-0.2f, 0.0f, 0.0f},     // Straight back
@@ -79,7 +79,7 @@ const float TAIL_VARIATIONS[NUM_TAIL_VARIATIONS][NUM_CONTROL_POINTS][NUM_COORDS]
         {-0.35f, -0.1f, 0.0f},   // Middle center
         {-0.45f, -0.15f, -0.04f} // Tuft still left but catching up
     },
-    // Variation 8: Middle right, tuft center
+    // Variation 8: Middle to the right, tuft at the center
     {
         {0.0f, 0.0f, 0.0f},      // Start point
         {-0.2f, 0.0f, 0.0f},     // Straight back
@@ -264,7 +264,7 @@ const float TAIL_VARIATIONS[NUM_TAIL_VARIATIONS][NUM_CONTROL_POINTS][NUM_COORDS]
         {-0.45f, -0.15f, 0.0f}  // End pointing down
     }};
 
-// Helper function to calculate tangent vector at the end of the tail curve
+// Helper function to calculate tangent vector at the end of the tail curve for the tuft rotation.
 float calculateTailTangent(float controlPoints[5][3], float tangent[3])
 {
     // Tangent at the end is the direction from second-to-last to last control point
@@ -315,7 +315,6 @@ void calculateHairTuftRotation(float tangent[3], float &angle, float &axisX, flo
 
         angle = acos(dotProduct) * 180.0f / M_PI; // Convert to degrees
 
-        // Better approach: Use the magnitude of the cross product to determine direction
         // If the cross product points in the negative Z direction, reverse the angle
         if (axisZ < 0)
         {
@@ -324,8 +323,7 @@ void calculateHairTuftRotation(float tangent[3], float &angle, float &axisX, flo
     }
     else
     {
-        // Special case: vectors are parallel (tangent points up or down)
-        // No rotation needed - set angle to 0 and use any axis (won't matter)
+        // In case the vectors are parallel (tangent points up or down), no rotation is needed.
         angle = 0.0f;
         axisX = 1.0f;
         axisY = 0.0f;
@@ -418,11 +416,10 @@ void drawConeSegment(float pos1[3], float pos2[3], float radius1, float radius2,
     }
 }
 
-// Helper function to draw the tail cone surface
 /**
+ * Helper function to draw the tail cone surface.
  * Creates the main tail body using curved cone segments between control points.
- * Generates a smooth, tapered tail shape with proper radius progression
- * from base to tip using interpolated cone segments.
+ * Generates a smooth, tapered tail shape with proper radius progression from base to tip using interpolated cone segments.
  */
 void drawTailCone(float controlPoints[5][3])
 {
@@ -451,9 +448,10 @@ void drawTailCone(float controlPoints[5][3])
 
         if (len > 0.001f)
         {
+            // Normalize direction
             dx /= len;
             dy /= len;
-            dz /= len; // Normalize direction
+            dz /= len;
 
             // Calculate perpendicular vectors for cone cross-section
             float right[3], forward[3];
@@ -468,7 +466,6 @@ void drawTailCone(float controlPoints[5][3])
 }
 
 // Helper function to draw the hair tuft at the tail tip
-/** Adds a realistic hair tuft at the tail tip using scattered small spheres. */
 void drawHairTuft(float controlPoints[5][3])
 {
     glPushMatrix();
@@ -477,10 +474,12 @@ void drawHairTuft(float controlPoints[5][3])
 
     // Calculate tangent vector at the end of the tail curve
     float tangent[3];
+    // mutates the tangent variable
     calculateTailTangent(controlPoints, tangent);
 
     // Calculate rotation from tangent vector to align hair tuft
     float angle, axisX, axisY, axisZ;
+    // mutates the angle, axisX, axisY, axisZ variables
     calculateHairTuftRotation(tangent, angle, axisX, axisY, axisZ);
 
     // Apply rotation based on current tail variation
@@ -494,11 +493,10 @@ void drawHairTuft(float controlPoints[5][3])
 // Helper function to get current tail variation control points
 void getCurrentTailVariation(float controlPoints[5][3])
 {
-    // Use frame-based animation that changes every timer tick (0.5 seconds)
-    // Slow down the animation by dividing by 4 to make it easier to see movement
+    // Slow down the animation by dividing by 4 to make the movement more realistic
     int currentVariation = (getAnimationFrame() / 4) % NUM_TAIL_VARIATIONS;
 
-    // Copy the current variation's control points
+    // Mutate the controlPoints variable
     for (int i = 0; i < NUM_CONTROL_POINTS; i++)
     {
         for (int j = 0; j < NUM_COORDS; j++)
@@ -508,11 +506,10 @@ void getCurrentTailVariation(float controlPoints[5][3])
     }
 }
 
-// Main public function to draw the animated tail
 /**
  * Renders the animated cow tail with procedural motion and user controls.
- * Combines automatic swishing animation with user rotation controls to create
- * realistic tail movement. Includes both the main tail body and hair tuft.
+ * Combines automatic swishing animation with user rotation controls to create realistic tail movement.
+ * Includes both the main tail body and hair tuft.
  */
 void drawTail()
 {
@@ -524,9 +521,10 @@ void drawTail()
     glRotatef(getTailRotationZ(), 0.0f, 0.0f, 1.0f); // SHIFT+I/K rotation around Z-axis
     glRotatef(getTailRotationY(), 0.0f, 1.0f, 0.0f); // SHIFT+J/L rotation around Y-axis
 
+    // Paint the tail in light gray
     setCowLightGrayMaterial();
 
-    // Get current tail variation control points
+    // Get current tail variation control points for animation
     float controlPoints[NUM_CONTROL_POINTS][NUM_COORDS];
     getCurrentTailVariation(controlPoints);
 

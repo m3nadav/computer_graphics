@@ -10,4 +10,4 @@ void calculateHairTuftRotation(float tangent[3], float &angle, float &axisX, flo
 // Function to draw the animated tail
 void drawTail();
 
-#endif // TAIL_H
+#endif
