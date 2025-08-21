@@ -34,7 +34,7 @@ public:
     void startTimer(int intervalMs = 50);
     void stopTimer() { timerActive = false; }
 
-    // Command line argument handling
+    // Command line argument handling (for testing purposes)
     void handleCommandLineArgs(int argc, char **argv, int maxScenes = 0);
     int getStartingScene() const { return startingScene; }
 
@@ -90,4 +90,4 @@ private:
     void handleReshape(int w, int h);
 };
 
-#endif // INPUT_H
+#endif

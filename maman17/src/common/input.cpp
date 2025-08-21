@@ -16,7 +16,7 @@ InputHandler::InputHandler(CameraController &camera)
     instance = this; // Set static instance for GLUT callbacks
 }
 
-/** Registers this InputHandler as the active GLUT callback handler for all input events. */
+// Registers this InputHandler as the active GLUT callback handler for all input events
 void InputHandler::setupGLUTCallbacks()
 {
     glutKeyboardFunc(keyboardWrapper);
@@ -26,7 +26,7 @@ void InputHandler::setupGLUTCallbacks()
     glutReshapeFunc(reshapeWrapper);
 }
 
-/** Begins the animation timer with specified interval for periodic updates. */
+// Begins the animation timer with specified interval for periodic updates
 void InputHandler::startTimer(int intervalMs)
 {
     timerInterval = intervalMs;
@@ -34,7 +34,7 @@ void InputHandler::startTimer(int intervalMs)
     glutTimerFunc(intervalMs, timerWrapper, 0);
 }
 
-/** Processes command line arguments to set initial scene selection. */
+// Processes command line arguments to set initial scene selection
 void InputHandler::handleCommandLineArgs(int argc, char **argv, int maxScenes)
 {
     if (argc > 1 && maxScenes > 0)
@@ -84,11 +84,7 @@ void InputHandler::reshapeWrapper(int w, int h)
         instance->handleReshape(w, h);
 }
 
-// ========================================
-// KEYBOARD HANDLING METHODS
-// ========================================
-
-/** Processes standard keyboard input including cow controls and camera commands. */
+// Processes standard keyboard input including cow controls and camera commands
 void InputHandler::handleKeyboard(unsigned char key, int x, int y)
 {
     // Handle common keys first
@@ -172,13 +168,13 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
     else if (key == '[') // Decrease lamp intensity
     {
         float intensity = getLampIntensity();
-        setLampIntensity(intensity - 0.2f);
+        setLampIntensity(intensity - 0.5f);
         glutPostRedisplay();
     }
     else if (key == ']') // Increase lamp intensity
     {
         float intensity = getLampIntensity();
-        setLampIntensity(intensity + 0.2f);
+        setLampIntensity(intensity + 0.5f);
         glutPostRedisplay();
     }
     // Sun position controls (number keys 1-4)
@@ -271,11 +267,7 @@ void InputHandler::handleSpecialKeys(int key, int x, int y)
     }
 }
 
-// ========================================
-// MOUSE HANDLING METHODS
-// ========================================
-
-/** Handles mouse button press and release events for camera control. */
+// Handles mouse button press and release events for camera control
 void InputHandler::handleMouse(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON)
@@ -302,7 +294,7 @@ void InputHandler::handleMouse(int button, int state, int x, int y)
     }
 }
 
-/** Processes mouse movement for camera rotation when mouse buttons are held. */
+// Processes mouse movement for camera rotation when mouse buttons are held
 void InputHandler::handleMotion(int x, int y)
 {
     if (rightMouseDown)
@@ -319,10 +311,6 @@ void InputHandler::handleMotion(int x, int y)
     }
     // Note: Left mouse drag lamp control removed - now using IJKL keys for lamp direction
 }
-
-// ========================================
-// OTHER HANDLERS
-// ========================================
 
 void InputHandler::handleTimer(int value)
 {
@@ -348,11 +336,7 @@ void InputHandler::handleReshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 }
 
-// ========================================
-// UI DRAWING METHODS
-// ========================================
-
-/** Renders on-screen user interface elements and control information. */
+// Renders on-screen user interface elements and control information
 void InputHandler::drawUI()
 {
     menuSystem.drawUI();
