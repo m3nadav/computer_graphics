@@ -889,9 +889,6 @@ void drawSun()
 // Renders an illuminated lamp post with adjustable direction and integrated lighting effects
 void drawLampPost(float benchX, float benchY, float benchZ, float scale, float benchRotation)
 {
-    // Setup lamp post lighting
-    setupLampLighting();
-
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
     glPushMatrix();
 
@@ -946,6 +943,9 @@ void drawLampPost(float benchX, float benchY, float benchZ, float scale, float b
  */
 void drawMetalBenchAndLamp(float x, float y, float z, float scale, float rotateY)
 {
+    // Update lighting system with current bench parameters
+    updateCurrentBenchParameters(x, y, z, rotateY);
+
     glPushMatrix();
 
     // Apply world transformation (translation and rotation)

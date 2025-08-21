@@ -144,14 +144,23 @@ void setupLampLighting()
     // Enable the second light source for the lamp
     glEnable(GL_LIGHT1);
 
-    // Calculate lamp position (above the bench backrest, accounting for bench rotation)
-    // Transform the backrest offset position by the bench rotation
+    // Calculate lamp position to match the visual lamp post position
+    // This should match the positioning logic in drawMetalBenchAndLamp
     float cosRot = cos(currentBenchRotation * M_PI / 180.0f);
     float sinRot = sin(currentBenchRotation * M_PI / 180.0f);
 
-    float lampX = currentBenchX + BACKREST_OFFSET * (-sinRot); // Transform backrest offset
+    // Match the lamp positioning from drawMetalBenchAndLamp:
+    // lampOffsetX = seatWidth * 0.5f + 0.175f * scale (behind and to the side)
+    // lampOffsetZ = -seatDepth * 0.5f (at the back of the bench)
+    float seatWidth = 2.0f; // Default scale = 1.0f
+    float seatDepth = 0.5f;
+    float lampOffsetX = seatWidth * 0.5f + 0.175f; // 1.175f
+    float lampOffsetZ = -seatDepth * 0.5f;         // -0.25f
+
+    // Transform the lamp offset by the bench rotation
+    float lampX = currentBenchX + (lampOffsetX * cosRot - lampOffsetZ * sinRot);
     float lampY = currentBenchY + LAMP_HEIGHT;
-    float lampZ = currentBenchZ + BACKREST_OFFSET * cosRot;
+    float lampZ = currentBenchZ + (lampOffsetX * sinRot + lampOffsetZ * cosRot);
 
     // Calculate lamp direction based on rotation angles
     float dirX = sin(lampDirectionX * M_PI / 180.0f);
@@ -427,7 +436,7 @@ void enableCustomLightPosition(bool enable)
 // Adjusts the lamp post light intensity level
 void setLampIntensity(float intensity)
 {
-    if (intensity >= 0.1f && intensity <= 3.0f)
+    if (intensity >= 0.1f && intensity <= 10.0f)
     {
         lampIntensity = intensity;
     }

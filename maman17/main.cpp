@@ -28,6 +28,9 @@ void drawMainScene()
     // Setup sun lighting default position and intensity
     setupSunLighting();
 
+    // Setup lamp lighting
+    setupLampLighting();
+
     // Draw the sun in the sky
     drawSun();
 
