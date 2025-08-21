@@ -1,14 +1,10 @@
+#include "cow/cow.h"
 #include "common/input.h"
 #include "environment/lights.h"
 #include "environment/environment.h"
 #include <GLUT/glut.h>
 #include <cstdlib>
 #include <iostream>
-
-// Include cow controls if available
-#ifdef COW_CONTROLS_AVAILABLE
-#include "cow/cow.h"
-#endif
 
 // Static instance for GLUT callbacks
 InputHandler *InputHandler::instance = nullptr;
@@ -140,10 +136,8 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
         // Reset all lighting to defaults
         resetLightingToDefaults();
 
-// Reset cow position and rotations (if available)
-#ifdef COW_CONTROLS_AVAILABLE
+        // Reset cow position and rotations
         initCowMovement();
-#endif
 
         glutPostRedisplay();
     }
@@ -233,25 +227,17 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
 
 bool InputHandler::handleCowControls(unsigned char key, int x, int y)
 {
-// Forward to cow control functions if they exist
-#ifdef COW_CONTROLS_AVAILABLE
-    // First try body movement (head/tail with modifiers) - returns true if handled
+    // Try body movement (head/tail with modifiers)
     if (handleCowHeadAndTailMovement(key, x, y))
     {
-        return true; // Key was handled by body movement
+        return true; // Key was handled by head or tail movement
     }
 
-    // If not handled by body movement, try regular cow movement
+    // If not handled by head or tail movement, try regular cow movement
     return handleCowMovement(key, x, y); // Return whether the key was actually handled
-#else
-    return false; // Cow controls not available
-#endif
 }
 
-// ========================================
-// SPECIAL KEY HANDLING METHODS
-// ========================================
-
+// Special key handling methods
 void InputHandler::handleSpecialKeys(int key, int x, int y)
 {
     // Define camera anchor movement step size

@@ -4,11 +4,9 @@
 #include <algorithm>
 
 // Only include cow headers if cow controls are available
-#ifdef COW_CONTROLS_AVAILABLE
 #include "cow/cow.h"
 #include "cow/cow_coordinates.h"
 #include "cow/cow_camera_constants.h"
-#endif
 
 CameraController::CameraController()
     : distance(5.0f), angleX(35.0f), angleY(55.0f), minDistance(1.0f), maxDistance(100.0f), currentMode(ORBITAL_CAMERA),
@@ -214,7 +212,6 @@ void CameraController::toggleCameraMode()
 
 void CameraController::setupCowEyeCamera() const
 {
-#ifdef COW_CONTROLS_AVAILABLE
     // Get cow's world position and rotation
     float cowX = getCowX();
     float cowZ = getCowZ();
@@ -295,14 +292,4 @@ void CameraController::setupCowEyeCamera() const
     gluLookAt(cameraX, cameraY, cameraZ, // Eye position (cow's eye)
               targetX, targetY, targetZ, // Look at target
               0.0f, 1.0f, 0.0f);         // Up vector (world up)
-#else
-    // Fallback to orbital camera if cow controls are not available
-    std::tuple<float, float, float> pos = calculatePosition();
-    float x = std::get<0>(pos);
-    float y = std::get<1>(pos);
-    float z = std::get<2>(pos);
-    gluLookAt(x, y, z,        // Eye position (orbital camera)
-              0.0, 0.0, 0.0,  // Look at center
-              0.0, 1.0, 0.0); // Up vector
-#endif
 }

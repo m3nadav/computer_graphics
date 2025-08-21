@@ -1,10 +1,8 @@
 #include "environment/environment.h"
 #include "environment/lights.h"
 #include "shapes/shapes.h"
-#ifdef COW_CONTROLS_AVAILABLE
 #include "cow/cow.h"
 #include "cow/cow_coordinates.h"
-#endif
 #include <GLUT/glut.h>
 #include <cmath>
 #include <cstdlib>
@@ -56,7 +54,6 @@ bool isPositionTooCloseToPoint(float x, float z, float targetX, float targetZ, f
     return distanceSquared < (minDistance * minDistance);
 }
 
-#ifdef COW_CONTROLS_AVAILABLE
 // Calculate cow's collision radius based on actual cow dimensions
 float getCowCollisionRadius()
 {
@@ -86,23 +83,6 @@ float getCowClearanceRadius()
 {
     return getCowCollisionRadius() + 0.5f; // Some clearance but not as much as spawn
 }
-#else
-// Fallback functions when cow module is not available - use default values
-float getCowCollisionRadius()
-{
-    return 1.5f; // Default conservative cow collision radius
-}
-
-float getCowSpawnRadius()
-{
-    return 3.0f; // Default spawn protection radius
-}
-
-float getCowClearanceRadius()
-{
-    return 2.5f; // Default clearance radius
-}
-#endif
 
 // Sun position management
 static int currentSunPosition = 0; // 0: (-x,y,-z), 1: (-x,y,z), 2: (x,y,-z), 3: (x,y,z)
