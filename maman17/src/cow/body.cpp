@@ -2,7 +2,7 @@
 #include "cow/spots.h"
 #include "cow/tail.h"
 #include "shapes/shapes.h"
-#include "scene/scene.h"
+#include "common/animation.h"
 #include "environment/environment.h"
 #include "environment/lights.h"
 #include <GLUT/glut.h>

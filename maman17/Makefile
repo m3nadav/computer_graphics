@@ -6,12 +6,12 @@ LDFLAGS = -framework OpenGL -framework GLUT
 COMMON_SRCS = src/common/camera.cpp src/common/input.cpp src/common/drawing.cpp src/common/menu.cpp
 
 # Main application (with environment models)
-MAIN_SRCS = main.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp src/environment/lights.cpp $(COMMON_SRCS)
+MAIN_SRCS = main.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/common/animation.cpp src/environment/environment.cpp src/environment/lights.cpp $(COMMON_SRCS)
 MAIN_TARGET = main_scene
 MAIN_FLAGS = -DCOW_CONTROLS_AVAILABLE
 
 # Manual tests
-TEST_SRCS = test.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/scene/scene.cpp src/environment/environment.cpp src/environment/lights.cpp $(COMMON_SRCS)
+TEST_SRCS = test.cpp src/cow/cow.cpp src/cow/body.cpp src/cow/tail.cpp src/cow/head.cpp src/cow/spots.cpp src/shapes/shapes.cpp src/common/animation.cpp src/environment/environment.cpp src/environment/lights.cpp $(COMMON_SRCS)
 TEST_TARGET = test_scene
 TEST_FLAGS = -DCOW_CONTROLS_AVAILABLE
 
