@@ -5,4 +5,4 @@ void drawMeadow();
 int getAnimationFrame();
 void incrementAnimationFrame();
 
-#endif // SCENE_H
+#endif

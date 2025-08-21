@@ -25,32 +25,32 @@ void drawMainScene()
     // Use camera controller for positioning
     camera.setupGLCamera();
 
-    // Setup sun lighting
+    // Setup sun lighting default position and intensity
     setupSunLighting();
 
     // Draw the sun in the sky
     drawSun();
 
-    // Draw world-wide ground texture
+    // Draw world-wide ground texture large enough to cover the entire scene
     drawWorldGround(worldSize * 3);
 
-    // Draw enhanced procedural meadow (grass only, no ground base)
+    // Draw a procedural meadow containing grass
     drawProceduralMeadow(worldSize, worldSize, 2000);
 
-    // Draw multiple trees at different positions
+    // Draw multiple trees at different fixed positions
     drawTree(-8.0f, 0.0f, -5.0f, 1.2f);
     drawTree(12.0f, 0.0f, -8.0f, 0.9f);
     drawTree(-15.0f, 0.0f, 10.0f, 1.1f);
     drawTree(8.0f, 0.0f, 12.0f, 1.0f);
     drawTree(-3.0f, 0.0f, -15.0f, 0.8f);
 
-    // Draw rocks scattered around
+    // Draw rocks scattered around the scene at random positions
     drawScatteredRocks(worldSize, 0.0f, worldSize, 10);
 
-    // Draw metal benches
+    // Draw a metal bench and a lamp post
     drawMetalBenchAndLamp(-4, 0.0f, -6, 1.0f, 30.0f);
 
-    // Draw the cow in the center
+    // Draw the cow in the center of the scene
     drawCow();
 }
 
