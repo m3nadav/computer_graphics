@@ -14,7 +14,10 @@
 static bool randomInitialized = false;
 static int programStartTime = 0;
 
-/** Initializes the random number generator with a time-based seed for consistent randomization. */
+/**
+ * Initializes the random number generator with a time-based seed
+ * for consistent randomization during the program execution
+ */
 void initializeRandom()
 {
     if (!randomInitialized)
@@ -25,7 +28,7 @@ void initializeRandom()
     }
 }
 
-/** Sets a deterministic random seed based on object position and type for consistent generation. */
+// Sets a deterministic random seed based on object position and type for consistent generation.
 void setSeedForObject(float x, float y, float z, int objectType)
 {
     // Ensure random is initialized
@@ -39,13 +42,13 @@ void setSeedForObject(float x, float y, float z, int objectType)
     srand(abs(seed));
 }
 
-/** Generates a random floating-point number within the specified range. */
+// Generates a random floating-point number within the specified range.
 float randomFloat(float min, float max)
 {
     return min + (float)rand() / RAND_MAX * (max - min);
 }
 
-// Simple collision detection function to check if a point is too close to another point
+// Simple collision detection function to check if a point is too close to another point.
 bool isPositionTooCloseToPoint(float x, float z, float targetX, float targetZ, float minDistance)
 {
     float dx = x - targetX;
@@ -58,13 +61,13 @@ bool isPositionTooCloseToPoint(float x, float z, float targetX, float targetZ, f
 float getCowCollisionRadius()
 {
     // Calculate cow's extent in X direction (length)
-    // From tail position to head position, plus some margin for actual geometry
-    float lengthX = (COW_HEAD_X - COW_TAIL_X) + 0.5f; // Add 0.5 units margin for head/tail geometry
+    // From tail position to head position, plus some margin
+    float lengthX = (COW_HEAD_X - COW_TAIL_X) + 0.5f;
 
     // Calculate cow's extent in Z direction (width)
     // Body is scaled to 0.6f on a unit ellipsoid (radius 1.0), so body width is 1.2
     // Legs extend to ±0.25, but body is wider
-    float widthZ = std::max(1.2f, 2.0f * std::abs(COW_LEG_FRONT_LEFT_Z)) + 0.2f; // Add 0.2 units margin
+    float widthZ = std::max(1.2f, 2.0f * std::abs(COW_LEG_FRONT_LEFT_Z)) + 0.2f;
 
     // Use the larger dimension as collision radius for conservative collision detection
     float radius = std::max(lengthX, widthZ) / 2.0f;
@@ -75,13 +78,27 @@ float getCowCollisionRadius()
 // Calculate spawn protection radius (larger than collision radius for initial placement)
 float getCowSpawnRadius()
 {
-    return getCowCollisionRadius() + 1.5f; // Extra clearance for spawn area
+    return getCowCollisionRadius() + 1.5f;
 }
 
 // Calculate clearance radius for dynamic rock placement (smaller than spawn radius)
 float getCowClearanceRadius()
 {
-    return getCowCollisionRadius() + 0.5f; // Some clearance but not as much as spawn
+    return getCowCollisionRadius() + 0.5f;
+}
+
+// Check if position is safe for rock placement (not too close to cow spawn or current position)
+bool isPositionSafeForRock(float rockX, float rockZ)
+{
+    // Cow spawn protection - avoid placing rocks near origin (0, 0)
+    // Use calculated spawn radius based on cow's actual dimensions
+    float spawnRadius = getCowSpawnRadius();
+    if (isPositionTooCloseToPoint(rockX, rockZ, 0.0f, 0.0f, spawnRadius))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 // Sun position management
@@ -98,20 +115,6 @@ void setSunPosition(int positionIndex)
 int getCurrentSunPosition()
 {
     return currentSunPosition;
-}
-
-// Check if position is safe for rock placement (not too close to cow spawn or current position)
-bool isPositionSafeForRock(float rockX, float rockZ)
-{
-    // Cow spawn protection - avoid placing rocks near origin (0, 0)
-    // Use calculated spawn radius based on cow's actual dimensions
-    float spawnRadius = getCowSpawnRadius();
-    if (isPositionTooCloseToPoint(rockX, rockZ, 0.0f, 0.0f, spawnRadius))
-    {
-        return false;
-    }
-
-    return true;
 }
 
 // Tree implementation
@@ -224,6 +227,7 @@ void drawBranch(float length, float radius, int depth, float angleX, float angle
     glPopAttrib();
 }
 
+// Draw leaves as a sphere with a random position and size.
 void drawLeaves(float x, float y, float z, float size)
 {
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
@@ -261,7 +265,7 @@ void drawLeaves(float x, float y, float z, float size)
 }
 
 /**
- * Renders a complete procedural tree with realistic branching structure and foliage.
+ * Renders a complete procedural tree with semi-realistic branching structure and foliage.
  * Creates a detailed tree model using recursive branch generation, trunk texturing,
  * and distributed leaf clusters. Uses deterministic random generation based on position
  * to ensure consistent tree appearance across renders while providing natural variation.
@@ -322,8 +326,7 @@ void drawTree(float x, float y, float z, float scale)
     glPopAttrib();
 }
 
-// Enhanced meadow implementation
-/** Renders a single realistic grass blade with natural tapering and wind bend effect. */
+// Renders a single realistic grass blade with natural tapering
 void drawGrassBlade(float height, float width, float bend, float colorVariation)
 {
     // Save current material state to prevent leakage
@@ -342,7 +345,7 @@ void drawGrassBlade(float height, float width, float bend, float colorVariation)
         float currentWidth = width * (1.0f - t * 0.7f); // Taper towards top
 
         // Apply bend (wind effect)
-        float bendOffset = bend * t * t; // Quadratic bend
+        float bendOffset = bend * t * t;
 
         // Left side of blade
         glNormal3f(-0.1f, 0.9f, 0.1f);
@@ -361,9 +364,10 @@ void drawGrassBlade(float height, float width, float bend, float colorVariation)
 
 /**
  * Generates a realistic grass meadow using procedural blade placement and variation.
- * Creates thousands of individual grass blades with natural randomization in height,
- * width, bend, and color to simulate a living meadow environment. Uses deterministic
- * seeding for consistent generation while maintaining natural organic appearance.
+ * Creates {{grassDensity}} amount of individual grass blades with natural randomization
+ * in height, width, bend, and color to simulate a living meadow environment. Uses
+ * deterministic seeding for consistent generation while maintaining natural organic
+ * appearance.
  */
 void drawProceduralMeadow(float width, float depth, int grassDensity)
 {
@@ -373,7 +377,7 @@ void drawProceduralMeadow(float width, float depth, int grassDensity)
     // Set deterministic seed for consistent grass generation
     setSeedForObject(width, depth, grassDensity, 3); // objectType = 3 for grass
 
-    // Draw individual grass blades (no ground base)
+    // Draw individual grass blades
     for (int i = 0; i < grassDensity; i++)
     {
         float grassX = randomFloat(-width / 2, width / 2);
@@ -397,7 +401,7 @@ void drawProceduralMeadow(float width, float depth, int grassDensity)
 }
 
 // Rock implementation
-/** Creates a naturally irregular rock shape using vertex distortion and procedural texturing. */
+// Creates a naturally irregular rock shape using vertex distortion and procedural texturing.
 void drawIrregularRock(float scale, int complexity, float colorVariation)
 {
     // Save current material state to prevent leakage
@@ -487,6 +491,7 @@ void drawIrregularRock(float scale, int complexity, float colorVariation)
     glPopAttrib();
 }
 
+// Draws a rock at the given position with the given scale and color variation.
 void drawRock(float x, float y, float z, float scale, float colorVariation)
 {
     // Save current material state to prevent leakage
@@ -515,10 +520,9 @@ void drawRock(float x, float y, float z, float scale, float colorVariation)
 }
 
 /**
- * Places irregular rock formations throughout the scene using collision avoidance.
- * Generates naturally-shaped rocks with procedural distortion and positioning,
- * while avoiding placement near the cow's spawn area and other obstacles.
- * Enhances the meadow environment with realistic geological features.
+ * Places {{numRocks}} amount of rock formations throughout the scene using collision
+ * avoidance. Generates rocks with procedural distortion and positioning, while
+ * avoiding placement near the cow's spawn area and other obstacles.
  */
 void drawScatteredRocks(float x, float y, float z, int numRocks)
 {
@@ -611,13 +615,13 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
     const float slatZFront = -benchHalfDepth + (0.15f * seatDepth) + 1.0f * (seatDepth - 0.30f * seatDepth); // 0.175
     const float slatZBack = -benchHalfDepth + (0.15f * seatDepth) + 0.0f * (seatDepth - 0.30f * seatDepth);  // -0.175
 
-    // Position legs at the actual seat slat edges
+    // Position legs at the seat slat edges
     const float legXLeft = slatXLeft;
     const float legXRight = slatXRight;
     const float legZFront = slatZFront;
     const float legZBack = slatZBack;
 
-    // 1) Legs: four tubular posts (vertical)
+    // Legs: four tubular posts (vertical)
     auto drawVerticalPost = [&](float px, float pz, float height, float radius)
     {
         glPushMatrix();
@@ -625,7 +629,7 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
         // Align cylinder axis (Z) to +Y by rotating -90° about X
         glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
         // Cylinder draws from origin in +Z, which after rotation is +Y
-        // So the cylinder base is at y=0, which is what we want for legs
+        // So the cylinder base is at y=0, which is what we want
         drawCylinder(radius, radius, height);
         glPopMatrix();
     };
@@ -636,7 +640,7 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
     drawVerticalPost(legXLeft, legZBack, seatYPos, legRadius);
     drawVerticalPost(legXRight, legZBack, seatYPos, legRadius);
 
-    // 2) Seat rails: two horizontal tubes connecting left-right at front and back
+    // Seat rails: two horizontal tubes connecting left-right at front and back
     auto drawHorizontalRailX = [&](float py, float pz, float length, float radius)
     {
         glPushMatrix();
@@ -650,7 +654,7 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
     drawHorizontalRailX(seatYPos - slatRadius * 1.2f, legZFront, seatWidth, railRadius);
     drawHorizontalRailX(seatYPos - slatRadius * 1.2f, legZBack, seatWidth, railRadius);
 
-    // 2b) Seat side rails along depth (Z) to connect front and back legs
+    // Seat side rails along depth (Z) to connect front and back legs
     auto drawHorizontalRailZ = [&](float px, float py, float length, float radius)
     {
         glPushMatrix();
@@ -666,7 +670,7 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
     drawHorizontalRailZ(legXLeft, seatYPos - slatRadius * 1.3f, actualSeatDepth, railRadius);
     drawHorizontalRailZ(legXRight, seatYPos - slatRadius * 1.3f, actualSeatDepth, railRadius);
 
-    // 3) Seat slats: several rounded tubes spanning left-right, distributed along depth
+    // Seat slats: several rounded tubes spanning left-right, distributed along depth
     for (int i = 0; i < seatSlatCount; ++i)
     {
         float t = (seatSlatCount == 1) ? 0.5f : (float)i / (seatSlatCount - 1);
@@ -679,11 +683,11 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
         glPopMatrix();
     }
 
-    // 4) Backrest frame: two vertical posts from back legs up to backrest height
+    // Backrest frame: two vertical posts from back legs up to backrest height
     drawVerticalPost(legXLeft, legZBack, seatYPos + backrestHeight + 0.05f, legRadius * 0.9f);
     drawVerticalPost(legXRight, legZBack, seatYPos + backrestHeight + 0.05f, legRadius * 0.9f);
 
-    // 5) Backrest slats: horizontal tubes across width, tilted back slightly
+    // Backrest slats: horizontal tubes across width, tilted back slightly
     for (int i = 0; i < backSlatCount; ++i)
     {
         float t = (backSlatCount == 1) ? 0.5f : (float)i / (backSlatCount - 1);
@@ -698,7 +702,7 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
         glPopMatrix();
     }
 
-    // 6) Top backrest rail across width (tilted to match backrest)
+    // Top backrest rail across width (tilted to match backrest)
     glPushMatrix();
     glTranslatef(-benchHalfWidth, seatYPos + backrestHeight, legZBack);
     glRotatef(-backTiltDegrees, 1.0f, 0.0f, 0.0f);
@@ -706,7 +710,7 @@ void drawMetalBench(float x, float y, float z, float scale, float rotateY)
     drawCylinder(railRadius, railRadius, seatWidth);
     glPopMatrix();
 
-    // 7) Lower braces near ground for stability
+    // Lower braces near ground for stability
     // Front X brace
     drawHorizontalRailX(legRadius * 1.2f, legZFront, seatWidth, railRadius * 0.8f);
     // Back X brace
@@ -826,21 +830,17 @@ void drawWorldGround(float worldSize)
     glPopAttrib();
 }
 
-// ========================================
-// LIGHTING VISUAL ELEMENTS (moved from lights.cpp)
-// ========================================
-
 /**
  * Renders the sun as a glowing sphere positioned according to current lighting settings.
  * Coordinates with the lighting system to place the visual sun representation at the
  * same location as the light source, creating visual consistency between illumination
- * and the apparent light source. Disables lighting for the sun itself to ensure brightness.
+ * and the apparent light source.
  */
 void drawSun()
 {
-    // Use the same position logic as setupSunLighting()
     float sunX, sunY, sunZ;
 
+    // Whether to use the custom position or the predefined positions
     if (getUseCustomPosition())
     {
         // Use custom adjustable position
@@ -886,7 +886,7 @@ void drawSun()
     glPopMatrix();
 }
 
-/** Renders an illuminated lamp post with adjustable direction and integrated lighting effects. */
+// Renders an illuminated lamp post with adjustable direction and integrated lighting effects
 void drawLampPost(float benchX, float benchY, float benchZ, float scale, float benchRotation)
 {
     // Setup lamp post lighting
