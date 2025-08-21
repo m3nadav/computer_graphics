@@ -22,7 +22,7 @@ static float headRotationY = 0.0f; // Left/right rotation around Y-axis (-45 to 
 
 // Global tail movement variables
 static float tailRotationZ = 0.0f; // SHIFT+I/K rotation around Z-axis (-90 to +90 degrees)
-static float tailRotationX = 0.0f; // SHIFT+J/L rotation around X-axis (-90 to +90 degrees)
+static float tailRotationY = 0.0f; // SHIFT+J/L rotation around Y-axis (-90 to +90 degrees)
 
 // Smart cow controls - global InputHandler tracking
 static InputHandler *g_cowInputHandler = nullptr;
@@ -40,7 +40,7 @@ void initCowMovement()
     headRotationZ = 0.0f;
     headRotationY = 0.0f;
     tailRotationZ = 0.0f;
-    tailRotationX = 0.0f;
+    tailRotationY = 0.0f;
 }
 
 // Movement constants - easily tweakable
@@ -215,12 +215,12 @@ bool handleCowHeadAndTailMovement(unsigned char key, int x, int y)
             return true;
         case 'a': // Tail rotation (X-axis positive)
         case 'A':
-            tailRotationX = std::min(tailRotationX + TAIL_ROTATION_SPEED, TAIL_MAX_ROTATION);
+            tailRotationY = std::max(tailRotationY - TAIL_ROTATION_SPEED, -TAIL_MAX_ROTATION);
             glutPostRedisplay();
             return true;
         case 'd': // Tail rotation (X-axis negative)
         case 'D':
-            tailRotationX = std::max(tailRotationX - TAIL_ROTATION_SPEED, -TAIL_MAX_ROTATION);
+            tailRotationY = std::min(tailRotationY + TAIL_ROTATION_SPEED, TAIL_MAX_ROTATION);
             glutPostRedisplay();
             return true;
         default:
@@ -238,8 +238,8 @@ float getHeadRotationY() { return headRotationY; }
 
 /** Returns the cow's tail rotation around the Z-axis in degrees. */
 float getTailRotationZ() { return tailRotationZ; }
-/** Returns the cow's tail rotation around the X-axis in degrees. */
-float getTailRotationX() { return tailRotationX; }
+/** Returns the cow's tail rotation around the Y-axis in degrees. */
+float getTailRotationY() { return tailRotationY; }
 
 /** Registers an InputHandler instance for automatic cow control management. */
 void setCowInputHandler(InputHandler *handler)

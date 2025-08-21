@@ -25,7 +25,7 @@ bool handleCowHeadAndTailMovement(unsigned char key, int x, int y);
 
 // Tail movement functions
 float getTailRotationZ(); // Up/down rotation (around Z-axis)
-float getTailRotationX(); // Left/right rotation (around X-axis)
+float getTailRotationY(); // Left/right rotation (around X-axis)
 
 // Smart cow controls - auto-enable controls when drawing
 class InputHandler;
