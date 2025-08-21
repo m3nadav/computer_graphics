@@ -29,7 +29,6 @@ void enableLampLight(bool enable);
 // Reset functions
 void resetLightingToDefaults();
 
-
 // Accessor functions for variables needed by moved functions
 float *getSunPositions();
 bool getUseCustomPosition();
@@ -66,4 +65,4 @@ void setGreenAxisMaterial();
 void setBlueAxisMaterial();
 void setBlackTextMaterial();
 
-#endif // LIGHTS_H
+#endif
