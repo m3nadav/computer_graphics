@@ -236,7 +236,7 @@ bool InputHandler::handleCowControls(unsigned char key, int x, int y)
 // Forward to cow control functions if they exist
 #ifdef COW_CONTROLS_AVAILABLE
     // First try body movement (head/tail with modifiers) - returns true if handled
-    if (handleCowBodyMovement(key, x, y))
+    if (handleCowHeadAndTailMovement(key, x, y))
     {
         return true; // Key was handled by body movement
     }

@@ -17,7 +17,7 @@ static float cowZ = 0.0f;
 static float cowRotation = 0.0f; // Rotation in degrees around Y-axis
 
 // Global head movement variables
-static float headRotationX = 0.0f; // Up/down rotation around Z-axis (-30 to +30 degrees)
+static float headRotationZ = 0.0f; // Up/down rotation around Z-axis (-30 to +30 degrees)
 static float headRotationY = 0.0f; // Left/right rotation around Y-axis (-45 to +45 degrees)
 
 // Global tail movement variables
@@ -25,7 +25,7 @@ static float tailRotationZ = 0.0f; // SHIFT+I/K rotation around Z-axis (-90 to +
 static float tailRotationX = 0.0f; // SHIFT+J/L rotation around X-axis (-90 to +90 degrees)
 
 // Smart cow controls - global InputHandler tracking
-static InputHandler* g_cowInputHandler = nullptr;
+static InputHandler *g_cowInputHandler = nullptr;
 
 /**
  * Initializes the cow's position, rotation, and body part orientations to default values.
@@ -37,7 +37,7 @@ void initCowMovement()
     cowX = 0.0f;
     cowZ = 0.0f;
     cowRotation = 0.0f;
-    headRotationX = 0.0f;
+    headRotationZ = 0.0f;
     headRotationY = 0.0f;
     tailRotationZ = 0.0f;
     tailRotationX = 0.0f;
@@ -162,7 +162,7 @@ float getCowRotation() { return cowRotation; }
  * to enable detailed character animation. Respects rotation limits to prevent
  * unnatural poses and maintains realistic movement constraints.
  */
-bool handleCowBodyMovement(unsigned char key, int x, int y)
+bool handleCowHeadAndTailMovement(unsigned char key, int x, int y)
 {
     // Check modifiers
     int modifiers = glutGetModifiers();
@@ -176,12 +176,12 @@ bool handleCowBodyMovement(unsigned char key, int x, int y)
         {
         case 'w': // Head up (rotate to look up)
         case 'W':
-            headRotationX = std::min(headRotationX + HEAD_ROTATION_SPEED, HEAD_MAX_X_ROTATION);
+            headRotationZ = std::min(headRotationZ + HEAD_ROTATION_SPEED, HEAD_MAX_X_ROTATION);
             glutPostRedisplay();
             return true; // Handled, don't process as regular movement
         case 's':        // Head down (rotate to look down)
         case 'S':
-            headRotationX = std::max(headRotationX - HEAD_ROTATION_SPEED, -HEAD_MAX_X_ROTATION);
+            headRotationZ = std::max(headRotationZ - HEAD_ROTATION_SPEED, -HEAD_MAX_X_ROTATION);
             glutPostRedisplay();
             return true;
         case 'a': // Head left
@@ -232,7 +232,7 @@ bool handleCowBodyMovement(unsigned char key, int x, int y)
 }
 
 /** Returns the cow's head pitch rotation around the Z-axis in degrees. */
-float getHeadRotationX() { return headRotationX; }
+float getHeadRotationZ() { return headRotationZ; }
 /** Returns the cow's head yaw rotation around the Y-axis in degrees. */
 float getHeadRotationY() { return headRotationY; }
 
@@ -242,7 +242,7 @@ float getTailRotationZ() { return tailRotationZ; }
 float getTailRotationX() { return tailRotationX; }
 
 /** Registers an InputHandler instance for automatic cow control management. */
-void setCowInputHandler(InputHandler* handler)
+void setCowInputHandler(InputHandler *handler)
 {
     g_cowInputHandler = handler;
 }
@@ -250,7 +250,8 @@ void setCowInputHandler(InputHandler* handler)
 /** Automatically enables cow controls when the cow is being rendered. */
 void ensureCowControlsEnabled()
 {
-    if (g_cowInputHandler) {
+    if (g_cowInputHandler)
+    {
         g_cowInputHandler->enableCowControls(true);
     }
 }
@@ -265,7 +266,7 @@ void drawCow()
 {
     // Auto-enable cow controls if InputHandler is registered
     ensureCowControlsEnabled();
-    
+
     glPushMatrix();
 
     // Apply cow's position and rotation

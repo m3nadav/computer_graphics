@@ -221,11 +221,11 @@ void CameraController::setupCowEyeCamera() const
     float cowRotation = getCowRotation();
 
     // Get head rotations (these should already be clamped by cow controls)
-    float headRotationX = getHeadRotationX();
+    float headRotationZ = getHeadRotationZ();
     float headRotationY = getHeadRotationY();
 
     // Double-check the limits are respected (safety clamp)
-    headRotationX = std::max(-HEAD_MAX_X_ROTATION, std::min(HEAD_MAX_X_ROTATION, headRotationX));
+    headRotationZ = std::max(-HEAD_MAX_X_ROTATION, std::min(HEAD_MAX_X_ROTATION, headRotationZ));
     headRotationY = std::max(-HEAD_MAX_Y_ROTATION, std::min(HEAD_MAX_Y_ROTATION, headRotationY));
 
     // Calculate head position in world space
@@ -247,7 +247,7 @@ void CameraController::setupCowEyeCamera() const
     float eyeOffsetZ = COW_EYE_OFFSET_Z;
 
     // Apply head rotations to eye offset
-    float headRotXRad = headRotationX * M_PI / 180.0f;
+    float headRotZRad = headRotationZ * M_PI / 180.0f;
     float headRotYRad = headRotationY * M_PI / 180.0f;
 
     // For eye position, use simpler rotation matching the head visual rotation
@@ -274,7 +274,7 @@ void CameraController::setupCowEyeCamera() const
     // Create proper first-person camera using spherical coordinates
     // Convert head rotations to proper yaw/pitch for camera
     float yaw = -headRotationY * M_PI / 180.0f;  // Left/right (inverted)
-    float pitch = headRotationX * M_PI / 180.0f; // Up/down
+    float pitch = headRotationZ * M_PI / 180.0f; // Up/down
 
     // Calculate look direction using spherical coordinates
     // This avoids gimbal lock by using proper first-person math
