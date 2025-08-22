@@ -13,6 +13,7 @@
 #include <fstream>
 #include <vector>
 #include <cstring>
+// Include stb_image.h for image loading
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
