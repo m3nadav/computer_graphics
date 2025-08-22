@@ -2,7 +2,6 @@
 .DS_Store
 *.zip
 main
-*.mp4
 .python-version
 pipeline_demo
 node_modules/
