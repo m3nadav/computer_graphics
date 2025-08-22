@@ -4,7 +4,7 @@
 #include <GLUT/glut.h>
 #include <cmath>
 
-// Function to get the shared cow spots texture
+// Returns the shared cow spots texture
 unsigned int getCowSpotsTexture();
 
-#endif // SPOTS_H
+#endif

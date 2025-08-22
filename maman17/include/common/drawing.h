@@ -24,4 +24,4 @@ namespace DrawingUtils
     void setupLighting();
 }
 
-#endif // DRAWING_H
+#endif

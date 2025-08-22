@@ -264,7 +264,7 @@ const float TAIL_VARIATIONS[NUM_TAIL_VARIATIONS][NUM_CONTROL_POINTS][NUM_COORDS]
         {-0.45f, -0.15f, 0.0f}  // End pointing down
     }};
 
-// Helper function to calculate tangent vector at the end of the tail curve for the tuft rotation.
+// Helper function to calculate tangent vector at the end of the tail curve for the tuft rotation
 float calculateTailTangent(float controlPoints[5][3], float tangent[3])
 {
     // Tangent at the end is the direction from second-to-last to last control point

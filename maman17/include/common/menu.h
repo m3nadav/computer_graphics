@@ -3,6 +3,7 @@
 
 #include <tuple>
 
+// Generic UI button component
 class UIButton
 {
 public:
@@ -31,7 +32,7 @@ public:
     void updateWindowDimensions(float width, float height);
 };
 
-// Menu system for OpenGL applications
+// Menu system for the main scene
 class MenuSystem
 {
 public:
@@ -49,17 +50,17 @@ public:
     // Drawing functions
     void drawUI();
 
-    // Input handling - returns true if click was handled by menu system
+    // Handles menu clicks
     void handleMenuClick(int mouseX, int mouseY);
 
-    // Expose menu functions
+    // Applies menu clicks
     void applyMenuClick();
     void applyQuitClick();
     void applyHelpClick();
     void applyLightClick();
 
 private:
-    // UI drawing methods
+    // UI drawing methods for the menu
     void drawMenuButton();
     void drawMenuBox();
     void drawLightControls();
@@ -76,4 +77,4 @@ private:
 void drawButton(UIButton button);
 void renderText2D(const char *text, float x, float y);
 
-#endif // MENU_H
+#endif

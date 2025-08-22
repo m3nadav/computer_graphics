@@ -7,9 +7,9 @@
 
 // Global texture ID for cow spots
 static unsigned int cowSpotsTexture = 0;
-static bool textureLoaded = false;
+static bool textureGenerated = false;
 
-/** Creates a procedural texture with realistic cow spot patterns for body texturing. */
+// Creates a procedural texture with realistic cow spot patterns for body texturing
 unsigned int generateCowSpotsTexture()
 {
     const int texSize = 512; // High resolution for smooth spots
@@ -22,15 +22,14 @@ unsigned int generateCowSpotsTexture()
     };
 
     SpotDef spots[] = {
-        {0.2f, 0.3f, 0.09075f},  // Large spot (0.0825 * 1.1)
-        {0.7f, 0.6f, 0.0726f},   // Medium spot (0.066 * 1.1)
-        {0.4f, 0.8f, 0.05445f},  // Small spot (0.0495 * 1.1)
-        {0.8f, 0.2f, 0.045375f}, // Tiny spot (0.04125 * 1.1)
-        {0.5f, 0.1f, 0.063525f}, // Medium-small spot (0.05775 * 1.1)
-        {0.1f, 0.7f, 0.081675f}, // Large spot (0.07425 * 1.1)
-        {0.6f, 0.45f, 0.05445f}, // Small spot (0.0495 * 1.1)
-        {0.15f, 0.9f, 0.045375f} // Tiny spot (0.04125 * 1.1)
-    };
+        {0.2f, 0.3f, 0.09075f},
+        {0.7f, 0.6f, 0.0726f},
+        {0.4f, 0.8f, 0.05445f},
+        {0.8f, 0.2f, 0.045375f},
+        {0.5f, 0.1f, 0.063525f},
+        {0.1f, 0.7f, 0.081675f},
+        {0.6f, 0.45f, 0.05445f},
+        {0.15f, 0.9f, 0.045375f}};
 
     // Generate texture
     for (int y = 0; y < texSize; y++)
@@ -94,14 +93,14 @@ unsigned int generateCowSpotsTexture()
     return textureID;
 }
 
-/** Returns the cached cow spots texture, generating it if not already created. */
+// Returns the cached cow spots texture, generating it if not already created
 unsigned int getCowSpotsTexture()
 {
-    // Generate texture once if not already loaded
-    if (!textureLoaded)
+    // Generate texture only once
+    if (!textureGenerated)
     {
         cowSpotsTexture = generateCowSpotsTexture();
-        textureLoaded = true;
+        textureGenerated = true;
         std::cout << "Generated procedural cow spots texture" << std::endl;
     }
     return cowSpotsTexture;

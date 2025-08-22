@@ -33,4 +33,4 @@ const float COW_LEG_BACK_RIGHT_X = -0.4f;
 const float COW_LEG_BACK_RIGHT_Y = -0.3f;
 const float COW_LEG_BACK_RIGHT_Z = -0.25f;
 
-#endif // COW_COORDINATES_H
+#endif
