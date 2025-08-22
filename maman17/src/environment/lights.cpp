@@ -546,6 +546,7 @@ float getLampHeight()
     return LAMP_HEIGHT;
 }
 
+// Updates the bench parameters used for setting the lamp post position and rotation
 void updateCurrentBenchParameters(float x, float y, float z, float rotation)
 {
     currentBenchX = x;

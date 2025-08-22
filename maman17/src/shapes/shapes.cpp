@@ -16,13 +16,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-/** Renders a solid sphere with the specified radius using OpenGL primitives. */
+// Renders a solid sphere with the specified radius using OpenGL primitives
 void drawSphere(double radius)
 {
     glutSolidSphere(radius, 32, 32);
 }
 
-/** Creates an ellipsoid by scaling a unit sphere along each axis with given radii. */
+// Creates an ellipsoid by scaling a unit sphere along each axis with given radii
 void drawEllipsoid(double rx, double ry, double rz)
 {
     glPushMatrix();
@@ -31,7 +31,7 @@ void drawEllipsoid(double rx, double ry, double rz)
     glPopMatrix();
 }
 
-/** Draws a cylinder or cone with specified base radius, top radius, and height. */
+// Draws a cylinder or cone with specified base radius, top radius, and height
 void drawCylinder(double baseRadius, double topRadius, double height)
 {
 #ifdef GLUT_VERSION_3_7
