@@ -23,7 +23,6 @@ void testTree()
 {
     camera.setupGLCamera();
 
-    setupEnvironmentLighting();
     drawWorldGround(6.0f);
     DrawingUtils::drawGrid(3.0f, 0.5f);
 
@@ -36,7 +35,6 @@ void testRock()
 {
     camera.setupGLCamera();
 
-    setupEnvironmentLighting();
     drawWorldGround(6.0f);
     DrawingUtils::drawGrid(3.0f, 0.5f);
 
@@ -49,7 +47,6 @@ void testGrass()
 {
     camera.setupGLCamera();
 
-    setupEnvironmentLighting();
     drawWorldGround(6.0f);
     DrawingUtils::drawGrid(3.0f, 0.5f);
 
@@ -62,7 +59,7 @@ void testBench()
 {
     camera.setupGLCamera();
 
-    setupEnvironmentLighting();
+    setupSunLighting();
     drawWorldGround(6.0f);
     DrawingUtils::drawGrid(3.0f, 0.5f);
 
@@ -75,7 +72,6 @@ void testMultipleObjects()
 {
     camera.setupGLCamera();
 
-    setupEnvironmentLighting();
     drawWorldGround(6.0f);
     DrawingUtils::drawGrid(3.0f, 0.5f);
 
@@ -97,7 +93,6 @@ void testCow()
 {
     camera.setupGLCamera();
 
-    setupEnvironmentLighting();
     drawWorldGround(6.0f);
     DrawingUtils::drawGrid(3.0f, 0.5f);
     drawCow();
@@ -108,7 +103,6 @@ void testAxesGrid()
 {
     camera.setupGLCamera();
 
-    setupEnvironmentLighting();
     drawWorldGround(6.0f);
     DrawingUtils::drawGrid(3.0f, 0.5f);
     DrawingUtils::drawAxes(3.0f);
@@ -153,12 +147,13 @@ int main(int argc, char **argv)
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.5f, 0.8f, 1.0f, 1.0f); // Sky blue background like main.cpp
 
+    setupSunLighting();
     // Initialize camera with standard settings
     camera.setZoomLimits(1.0f, 100.0f);
     camera.setDistance(10.0f);
 
     // Initialize input handler
-    inputHandler = new InputHandler(camera);
+    inputHandler = new InputHandler(camera, true);
     setCowInputHandler(inputHandler); // Register with cow system for auto-control enabling
     inputHandler->setKeyboardCallback(customKeyboardHandler);
     inputHandler->handleCommandLineArgs(argc, argv, (int)tests.size());

@@ -9,9 +9,9 @@
 // Static instance for GLUT callbacks
 InputHandler *InputHandler::instance = nullptr;
 
-InputHandler::InputHandler(CameraController &camera)
+InputHandler::InputHandler(CameraController &camera, bool disableSunKeyboard)
     : cameraController(camera), rightMouseDown(false), leftMouseDown(false), lastMouseX(0), lastMouseY(0),
-      timerActive(false), timerInterval(50), startingScene(0), cowControlsEnabled(false)
+      timerActive(false), timerInterval(50), startingScene(0), cowControlsEnabled(false), disableSunKeyboard(disableSunKeyboard)
 {
     instance = this; // Set static instance for GLUT callbacks
 }
@@ -178,25 +178,25 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
         glutPostRedisplay();
     }
     // Sun position controls (number keys 1-4)
-    else if (key == '1') // Sun position (-x,y,-z)
+    else if (key == '1' && !disableSunKeyboard) // Sun position (-x,y,-z)
     {
         setSunPosition(0);
         enableCustomLightPosition(false);
         glutPostRedisplay();
     }
-    else if (key == '2') // Sun position (-x,y,z)
+    else if (key == '2' && !disableSunKeyboard) // Sun position (-x,y,z)
     {
         setSunPosition(1);
         enableCustomLightPosition(false);
         glutPostRedisplay();
     }
-    else if (key == '3') // Sun position (x,y,-z)
+    else if (key == '3' && !disableSunKeyboard) // Sun position (x,y,-z)
     {
         setSunPosition(2);
         enableCustomLightPosition(false);
         glutPostRedisplay();
     }
-    else if (key == '4') // Sun position (x,y,z)
+    else if (key == '4' && !disableSunKeyboard) // Sun position (x,y,z)
     {
         setSunPosition(3);
         enableCustomLightPosition(false);

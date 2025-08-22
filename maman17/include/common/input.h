@@ -14,7 +14,7 @@ public:
     using SpecialKeyCallback = std::function<void(int, int, int)>;
     using DisplayCallback = std::function<void()>;
 
-    InputHandler(CameraController &camera);
+    InputHandler(CameraController &camera, bool disableSunKeyboard = false);
 
     // Set up GLUT callbacks
     void setupGLUTCallbacks();
@@ -46,6 +46,7 @@ private:
     KeyboardCallback keyboardCallback;
     SpecialKeyCallback specialKeyCallback;
     DisplayCallback displayCallback;
+    bool disableSunKeyboard;
 
     // Cow controls
     bool cowControlsEnabled;

@@ -21,12 +21,7 @@ void setupEnvironmentLighting()
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
-    // Set up directional light (sun)
-    GLfloat lightAmbient[] = {0.3f, 0.3f, 0.3f, 1.0f};
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-
-    // Setup for rotating objects like the cow
+    // Setup for rotating objects
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_NORMALIZE);                          // Auto-normalize normals after transformations
@@ -43,20 +38,20 @@ void setupEnvironmentLighting()
 static float sunPositions[4][3] = {
     {-15.0f, 25.0f, -15.0f}, // Position 0: (-x,y,-z)
     {-15.0f, 25.0f, 15.0f},  // Position 1: (-x,y,z)
-    {15.0f, 25.0f, -15.0f},  // Position 2: (x,y,-z)
-    {15.0f, 25.0f, 15.0f}    // Position 3: (x,y,z)
+    {15.0f, 25.0f, 15.0f},   // Position 2: (x,y,z)
+    {15.0f, 25.0f, -15.0f}   // Position 3: (x,y,-z)
 };
 
 // Light control variables
-static float lightIntensity = 1.0f;    // Multiplier for diffuse/specular (0.1 to 2.0)
-static float lightPositionX = -15.0f;  // Custom X position
-static float lightPositionY = 25.0f;   // Custom Y position
-static float lightPositionZ = -15.0f;  // Custom Z position
-static float ambientLevel = 0.3f;      // Ambient light level (0.0 to 1.0)
+static float lightIntensity = 1.0f; // Multiplier for diffuse/specular
+static float lightPositionX = 0.0f; // Custom X position
+static float lightPositionY = 0.0f; // Custom Y position
+static float lightPositionZ = 0.0f; // Custom Z position
+static float ambientLevel = 0.3f;
 static bool useCustomPosition = false; // Whether to use custom position or sunPositions array
 
 // Lamp light control variables
-static float lampIntensity = 1.5f;            // Lamp light intensity (0.1 to 3.0)
+static float lampIntensity = 1.5f;            // Lamp light intensity
 static float lampDirectionX = 0.0f;           // Lamp direction angle around X axis (pitch)
 static float lampDirectionZ = 0.0f;           // Lamp direction angle around Z axis (yaw)
 static bool lampEnabled = true;               // Whether lamp light is enabled
@@ -109,8 +104,22 @@ void setupSunLighting()
         lightPositionZ = sunZ;
     }
 
-    // Set up point light source (sun) with adjustable properties
-    GLfloat lightPos[] = {sunX, sunY, sunZ, 1.0f}; // Point light (w=1.0)
+    // Set up directional light source (sun) for uniform scene illumination
+    // Calculate normalized direction from sun position to world center (0,0,0)
+    GLfloat dirX = 0.0f - sunX; // Direction to (0,0,0)
+    GLfloat dirY = 0.0f - sunY;
+    GLfloat dirZ = 0.0f - sunZ;
+    // Normalize direction vector
+    float magnitude = sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
+    if (magnitude > 0.0f)
+    {
+        dirX /= magnitude;
+        dirY /= magnitude;
+        dirZ /= magnitude;
+    }
+
+    // Set up as directional light pointing toward world center
+    GLfloat lightPos[] = {-dirX, -dirY, -dirZ, 0.0f};
     GLfloat lightAmbient[] = {ambientLevel, ambientLevel, ambientLevel, 1.0f};
     GLfloat lightDiffuse[] = {0.9f * lightIntensity, 0.85f * lightIntensity, 0.75f * lightIntensity, 1.0f};
     GLfloat lightSpecular[] = {0.8f * lightIntensity, 0.75f * lightIntensity, 0.7f * lightIntensity, 1.0f};
@@ -144,6 +153,9 @@ void setupLampLighting()
     // Enable the second light source for the lamp
     glEnable(GL_LIGHT1);
 
+    // Ensure sun light remains enabled and properly configured
+    glEnable(GL_LIGHT0);
+
     // Calculate lamp position to match the visual lamp post position
     // This should match the positioning logic in drawMetalBenchAndLamp
     float cosRot = cos(currentBenchRotation * M_PI / 180.0f);
@@ -159,37 +171,63 @@ void setupLampLighting()
 
     // Transform the lamp offset by the bench rotation
     float lampX = currentBenchX + (lampOffsetX * cosRot - lampOffsetZ * sinRot);
-    float lampY = currentBenchY + LAMP_HEIGHT;
+    float lampY = currentBenchY + LAMP_HEIGHT - 0.2f; // Match lamp head/bulb center position
     float lampZ = currentBenchZ + (lampOffsetX * sinRot + lampOffsetZ * cosRot);
 
-    // Calculate lamp direction based on rotation angles
-    float dirX = sin(lampDirectionX * M_PI / 180.0f);
-    float dirY = -cos(lampDirectionX * M_PI / 180.0f) * cos(lampDirectionZ * M_PI / 180.0f);
-    float dirZ = cos(lampDirectionX * M_PI / 180.0f) * sin(lampDirectionZ * M_PI / 180.0f);
+    // Calculate lamp direction to exactly match visual lamp rotation
+    // Use initial direction pointing slightly forward and down (like a real lamp)
+    float pitchRad = lampDirectionX * M_PI / 180.0f;
+    float yawRad = -lampDirectionZ * M_PI / 180.0f; // Flip yaw sign to match visual rotation direction
 
-    // Set up spotlight parameters
+    // Calculate light direction based on lamp's current rotation state
+    // L/J always rotate around Y-axis, I/K always rotate around X-axis
+    // Light should point based on these combined rotations from default downward direction
+
+    // Start with default downward direction (0, -1, 0)
+    // Apply the lamp's current rotations to determine where it should point
+
+    // Method: Calculate direction vector from spherical coordinates
+    // yaw (lampDirectionZ) rotates around Y-axis
+    // pitch (lampDirectionX) rotates around X-axis from the downward position
+
+    // Convert lamp angles to light direction
+    // When pitch = 0, light points down: (0, -1, 0)
+    // When pitch > 0, light tilts forward: (0, -cos(pitch), -sin(pitch))
+    // When yaw != 0, light direction rotates around Y-axis
+
+    float dirX = sin(yawRad) * sin(pitchRad);  // X component from yaw rotation
+    float dirY = -cos(pitchRad);               // Y component - always downward when pitch=0
+    float dirZ = -cos(yawRad) * sin(pitchRad); // Z component from yaw rotation
+
+    // Set up directional spotlight for additive illumination
+    // Note: OpenGL fixed-function lighting does not cast shadows - light is purely additive
     GLfloat lampPos[] = {lampX, lampY, lampZ, 1.0f}; // Point light position
     GLfloat lampDir[] = {dirX, dirY, dirZ};          // Spotlight direction
 
-    // Warm white light color with high intensity
-    GLfloat lampDiffuse[] = {1.0f * lampIntensity, 0.95f * lampIntensity, 0.8f * lampIntensity, 1.0f};
-    GLfloat lampSpecular[] = {1.0f * lampIntensity, 0.95f * lampIntensity, 0.8f * lampIntensity, 1.0f};
-    GLfloat lampAmbient[] = {0.1f, 0.1f, 0.1f, 1.0f}; // Minimal ambient contribution
+    // Configure directional spotlight with visible cone effect
+    GLfloat lampAmbient[] = {0.0f, 0.0f, 0.0f, 1.0f};                                                  // No ambient (avoid washing out scene)
+    GLfloat lampDiffuse[] = {lampIntensity * 0.4f, lampIntensity * 0.35f, lampIntensity * 0.2f, 1.0f}; // Warm diffuse light for visible spotlight
+    GLfloat lampSpecular[] = {lampIntensity * 0.3f, lampIntensity * 0.3f, lampIntensity * 0.2f, 1.0f}; // Visible specular highlights
 
     glLightfv(GL_LIGHT1, GL_POSITION, lampPos);
     glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, lampDir);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, lampDiffuse);
-    glLightfv(GL_LIGHT1, GL_SPECULAR, lampSpecular);
-    glLightfv(GL_LIGHT1, GL_AMBIENT, lampAmbient);
+    glLightfv(GL_LIGHT1, GL_AMBIENT, lampAmbient);   // No ambient contribution
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, lampDiffuse);   // Warm diffuse illumination
+    glLightfv(GL_LIGHT1, GL_SPECULAR, lampSpecular); // Subtle specular highlights
 
-    // Configure spotlight cone
-    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 45.0f);  // 45-degree cone
-    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.0f); // Moderate falloff
+    // Configure lamp as directional spotlight pointing in the calculated direction
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 45.0f);  // 45-degree cone for focused lamp effect
+    glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 5.0f); // Moderate falloff for visible spotlight cone
 
-    // Set attenuation for realistic distance falloff
+    // Set moderate attenuation for realistic but not too rapid falloff
     glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.0f);
-    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.1f);
-    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.02f);
+    glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.1f);     // Reduced linear attenuation
+    glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.05f); // Reduced quadratic attenuation
+
+    // Ensure proper lighting state is maintained
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT1); // Ensure lamp light is enabled
+    glEnable(GL_LIGHT0); // Ensure sun light stays enabled
 }
 
 // Helper function to set material properties from RGB color
