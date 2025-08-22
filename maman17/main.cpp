@@ -105,9 +105,8 @@ int main(int argc, char **argv)
 
     // Initialize input handler
     inputHandler = new InputHandler(camera);
-    setCowInputHandler(inputHandler); // Register with cow system for auto-control enabling
-    inputHandler->setDisplayCallback(customTimerCallback);
-    inputHandler->handleCommandLineArgs(argc, argv); // No test scenes for main.cpp
+    setCowInputHandler(inputHandler);                      // Register with cow system for auto-control enabling
+    inputHandler->setDisplayCallback(customTimerCallback); // Starts the timer for the cow animations
 
     // Initialize cow movement
     initCowMovement();

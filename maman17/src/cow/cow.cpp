@@ -149,11 +149,11 @@ bool handleCowMovement(unsigned char key, int x, int y)
     }
 }
 
-/** Returns the cow's current X-coordinate position in world space. */
+// Returns the cow's current X-coordinate position in world space
 float getCowX() { return cowX; }
-/** Returns the cow's current Z-coordinate position in world space. */
+// Returns the cow's current Z-coordinate position in world space
 float getCowZ() { return cowZ; }
-/** Returns the cow's current Y-axis rotation in degrees. */
+// Returns the cow's current Y-axis rotation in degrees
 float getCowRotation() { return cowRotation; }
 
 /**
@@ -231,23 +231,23 @@ bool handleCowHeadAndTailMovement(unsigned char key, int x, int y)
     return false; // No modifier keys pressed or key not handled
 }
 
-/** Returns the cow's head pitch rotation around the Z-axis in degrees. */
+// Returns the cow's head pitch rotation around the Z-axis in degrees
 float getHeadRotationZ() { return headRotationZ; }
-/** Returns the cow's head yaw rotation around the Y-axis in degrees. */
+// Returns the cow's head yaw rotation around the Y-axis in degrees
 float getHeadRotationY() { return headRotationY; }
 
-/** Returns the cow's tail rotation around the Z-axis in degrees. */
+// Returns the cow's tail rotation around the Z-axis in degrees
 float getTailRotationZ() { return tailRotationZ; }
-/** Returns the cow's tail rotation around the Y-axis in degrees. */
+// Returns the cow's tail rotation around the Y-axis in degrees
 float getTailRotationY() { return tailRotationY; }
 
-/** Registers an InputHandler instance for automatic cow control management. */
+// Registers an InputHandler instance for automatic cow control management
 void setCowInputHandler(InputHandler *handler)
 {
     g_cowInputHandler = handler;
 }
 
-/** Automatically enables cow controls when the cow is being rendered. */
+// Automatically enables cow controls when the cow is being rendered
 void ensureCowControlsEnabled()
 {
     if (g_cowInputHandler)

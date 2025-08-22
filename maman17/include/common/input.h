@@ -22,7 +22,7 @@ public:
     // Special key handling (for arrow keys)
     void handleSpecialKeys(int key, int x, int y);
 
-    // Callback configuration
+    // Callback configuration. Used for custom tests.
     void setKeyboardCallback(KeyboardCallback callback) { keyboardCallback = callback; }
     void setSpecialKeyCallback(SpecialKeyCallback callback) { specialKeyCallback = callback; }
     void setDisplayCallback(DisplayCallback callback) { displayCallback = callback; }

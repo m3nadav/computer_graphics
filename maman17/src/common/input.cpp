@@ -177,7 +177,7 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
         setLampIntensity(intensity + 0.5f);
         glutPostRedisplay();
     }
-    // Sun position controls (number keys 1-4)
+    // Sun position controls (number keys 1-4) if not explicitly disabled
     else if (key == '1' && !disableSunKeyboard) // Sun position (-x,y,-z)
     {
         setSunPosition(0);
@@ -190,13 +190,13 @@ void InputHandler::handleKeyboard(unsigned char key, int x, int y)
         enableCustomLightPosition(false);
         glutPostRedisplay();
     }
-    else if (key == '3' && !disableSunKeyboard) // Sun position (x,y,-z)
+    else if (key == '3' && !disableSunKeyboard) // Sun position (x,y,z)
     {
         setSunPosition(2);
         enableCustomLightPosition(false);
         glutPostRedisplay();
     }
-    else if (key == '4' && !disableSunKeyboard) // Sun position (x,y,z)
+    else if (key == '4' && !disableSunKeyboard) // Sun position (x,y,-z)
     {
         setSunPosition(3);
         enableCustomLightPosition(false);
